@@ -1,3 +1,4 @@
+from __future__ import annotations  # noqa
 """Build web/dist: self-contained pages (fonts, styles, jsQR, and a recorded real Flower run for REPLAY mode).
 
     python3 web/build.py            # uses web/recordings/*.jsonl if present

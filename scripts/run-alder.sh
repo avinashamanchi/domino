@@ -19,7 +19,7 @@ default = "domino-local"
 address = "127.0.0.1:8000"
 insecure = true
 TOML
-python3 "$ROOT/web/build.py" >/dev/null
+"$BIN/python" "$ROOT/web/build.py" >/dev/null
 echo "Starting Flower SuperLink (Fleet API :9092 for the hospitals, Control API 127.0.0.1:8000)…"
 "$BIN/flower-superlink" --insecure --disable-runtime-dependency-installation --database "$FLWR_HOME/state.db" > "$ROOT/logs/superlink.log" 2>&1 &
 SUPERLINK=$!
@@ -32,4 +32,4 @@ trap 'kill $SUPERLINK $ALDERNODE 2>/dev/null' EXIT
 IP=$(ipconfig getifaddr en0 2>/dev/null || hostname -I 2>/dev/null | awk '{print $1}' || echo 127.0.0.1)
 echo "Hospitals connect with:  scripts/run-hospital.sh harbor $IP   /   scripts/run-hospital.sh riverbend $IP"
 echo "Projector: http://127.0.0.1:8765/projector.html"
-FLWR_HOME="$FLWR_HOME" python3 "$ROOT/bridge/bridge.py" coordinator --port 8765 --federation domino-local --pace "${DOMINO_PACE:-2.0}"
+FLWR_HOME="$FLWR_HOME" "$BIN/python" "$ROOT/bridge/bridge.py" coordinator --port 8765 --federation domino-local --pace "${DOMINO_PACE:-2.0}"
