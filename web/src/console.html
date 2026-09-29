@@ -38,6 +38,12 @@ table.t th { text-align: left; font-weight: 500; color: #6b778c; padding: 4px; b
 table.t td { padding: 5px 4px; border-bottom: 1px solid #f1f3f6; }
 table.t tr.pass td { background: #e6f4ef; }
 .ok { color: #0E7C61; font-weight: 700; } .bad { color: #B3261E; font-weight: 700; }
+.round { margin-top: 14px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #5b6b82; border-top: 2px solid var(--divider); padding-top: 12px; }
+.decide { border: 2px solid #0A3C6E; background: #fff; border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.decide .dh { display: flex; justify-content: space-between; font-weight: 800; color: #0A3C6E; font-size: 15px; text-transform: uppercase; letter-spacing: .04em; }
+.decide .dh .cd { font-weight: 500; text-transform: none; letter-spacing: 0; color: #5b6b82; }
+.decide .btn.secondary { align-self: flex-start; }
+.decide.done { border-color: #A7D8C9; }
 footer.foot { background: var(--navy); color: #fff; padding: 16px 0; }
 footer.foot .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 footer.foot .private { font-weight: 700; letter-spacing: .06em; font-size: 13px; }
@@ -68,9 +74,11 @@ footer.foot .fine { font-size: 12px; color: var(--tint); }
 
 <script>/*@SOURCE@*/</script>
 <script>/*@THINKJS@*/</script>
+<script>/*@FEEDJS@*/</script>
 <script>
 const RECORDINGS = /*@RECORDINGS@*/;
 const HOSP = {
+  alder: { name: 'Alder Medical Center', short: 'Alder', city: 'San Jose', rulebook: 'AMC-KTP-04' },
   harbor: { name: 'Harbor Point Hospital', short: 'Harbor Point', city: 'Oakland', rulebook: 'HPH-LD-12' },
   riverbend: { name: 'Riverbend General', short: 'Riverbend', city: 'Sacramento', rulebook: 'SW-TX-07' },
 };
@@ -80,107 +88,33 @@ const chip = b => `<span class="chip ${b}">${b}</span>`;
 const mmdd = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 let me = new URLSearchParams(location.search).get('h') || window.DEFAULT_HOSPITAL || 'harbor';
 
-let log = new Think.Log(), run = null, reads = new Set(), files = [], ledger = [], runId = null;
+let feed = null, reads = new Set(), files = [], ledger = [], runId = null;
 const scroll = () => { const last = $('seq').lastElementChild; last?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
-
 function idle() {
-  $('seq').innerHTML = `<div class="idle"><b><span class="dot on"></span>Waiting for Alder's form</b>Starts on its own when Alder clicks <i>Find an exchange</i>.</div>`;
+  $('seq').innerHTML = `<div class="idle"><b><span class="dot on"></span>Waiting for Alder</b>Starts on its own when a Flower message arrives.</div>`;
 }
 function renderPod() {
   const h = HOSP[me];
   $('podTitle').innerHTML = `${Think.LOCK} ${esc(h.short)} pod`;
   if (!files.length) return;
   $('files').innerHTML = files.map(f => `<li class="${reads.has(f) ? 'read' : ''}"><span>${esc(f)}</span></li>`).join('');
-  $('walls').innerHTML = `Only this pod is mounted. ${Object.keys(HOSP).filter(k => k !== me).map(k => `<s>${HOSP[k].short}</s>`).join(' · ')} · <s>Alder</s>: not reachable`;
+  $('walls').innerHTML = `Only this pod is mounted. ${Object.keys(HOSP).filter(k => k !== me).map(k => `<s>${HOSP[k].short}</s>`).join(' · ')}: not reachable`;
 }
 function renderLedger() {
-  $('ledger').innerHTML = ledger.length ? ledger.map(l => `<li><span>${l.t} · 5 fields</span><span>${l.bytes} B</span></li>`).join('') : '<li class="muted">nothing yet</li>';
+  $('ledger').innerHTML = ledger.length ? ledger.map(l => `<li><span>${l.t} · ${esc(l.kind)}</span><span>${l.bytes} B</span></li>`).join('') : '<li class="muted">nothing yet</li>';
 }
-
-function onEvent(e, fast = false) {
+function onEvent(e) {
   if (!e || (e.who && e.who !== me)) return;
-  if (e.type === 'flower.message' && e.direction === 'in') start(e, fast);
-  if (e.type === 'pod.open') { files = e.files; reads = new Set(); renderPod(); }
-  if (e.type === 'pod.read') { reads.add(e.file); renderPod(); }
-  if (e.type === 'reply.ready') { ledger.unshift({ t: new Date((e.t || Date.now() / 1000) * 1000).toTimeString().slice(0, 5), bytes: e.bytes }); renderLedger(); }
-  log.push(e);
-}
-
-function start(first, fast) {
-  run?.cancel();
-  log = new Think.Log();
-  run = new Think.Run(fast);
-  runId = first.run_id;
-  pill();
-  $('seq').innerHTML = '';
-  play(run).catch(err => { if (err !== Think.CANCEL) console.error(err); });
-}
-
-async function play(R) {
-  const host = $('seq'), h = HOSP[me];
-  const is = t => e => e.type === t;
-  const opt = { scroll };
-
-  const con = Think.connect({ name: 'Flower', working: 'Connecting…', done: 'Connected to the exchange network',
-    chips: [{ name: 'SuperNode', color: '#0E7C61' }, { name: `${h.short} pod`, color: '#0C7AC9' }, { name: 'Other pods', color: '#8A97B5' }] });
-  host.appendChild(con.el);
-  await R.wait(350); con.set(0, 'ok', 'connected');
-  await R.wait(350); con.set(1, 'ok', 'mounted');
-  await R.wait(350); con.set(2, 'off', 'unreachable'); con.finish();
-  await R.wait(500);
-
-  const form = await Think.step(R, host, { working: "Receiving Alder's form…", done: "Received Alder's form" }, log.waitFor(is('form.received'), R),
-    e => ({ html: true, result: `Donor ${chip(e.request.donor.blood)} · patient ${chip(e.request.patient.blood)} · ${mmdd(e.request.window.from)}–${mmdd(e.request.window.to)} · no names` }), opt);
-
-  await Think.step(R, host, { working: 'Opening our pod…', done: 'Opened our pod' }, log.waitFor(is('pod.open'), R),
-    e => {
-      const notes = e.files.filter(f => f.startsWith('availability/')).length;
-      return { result: `${pairsCount()} pairs · ${notes} notes · 1 rulebook`, lock: true };
-    }, opt);
-
-  await Think.step(R, host, { working: 'Searching our records…', done: 'Searched our records' }, log.waitFor(is('retrieve'), R),
-    e => ({ result: `Closest: ${e.hits.map(x => x.id).join(' · ')}` }), opt);
-
-  const sc = await Think.step(R, host, { working: 'Screening every pair…', done: 'Screened every pair' }, log.waitFor(is('screen'), R),
-    e => {
-      const both = e.rows.find(r => r.reciprocal), one = e.rows.find(r => r.receive.ok);
-      return { result: both ? `${both.patient_name} + ${both.donor_name} fit both ways` : one ? `None both ways · ${one.donor_name} fits one way` : 'None fit',
-        details: screenTable(e) };
-    }, opt);
-
-  const both = sc.rows.find(r => r.reciprocal);
-  let reply;
-  if (both) {
-    const rd = await Think.step(R, host, { working: 'Checking readiness…', done: 'Ready in the window' }, log.waitFor(is('readiness'), R),
-      e => ({ ok: e.status === 'ready', title: e.status === 'ready' ? 'Ready in the window' : 'Not ready', result: `${both.donor_name} free ${mmdd(e.header.available_from)}–${mmdd(e.header.available_to)} · work-up done · ${e.rules.slice(0, 2).join(' ')}` }), opt);
-    await Think.reason(R, host, [`Alder's donor fits ${both.patient_name}.`, `${both.donor_name} fits Alder's patient.`, `Ready ${mmdd(form.request.window.from)}–${mmdd(form.request.window.to)}.`, '→ Candidate found.'], opt);
-    reply = await log.waitFor(is('reply.ready'), R);
-    host.appendChild(Think.conclusion({ label: 'Conclusion', text: 'Candidate found', tone: 'ok',
-      extra: `<div class="muted">Alder gets a token, not a name: <b style="color:#0A3C6E">${esc(reply.response.candidate_token)}</b></div>` }));
-    void rd;
-  } else {
-    const one = sc.rows.find(r => r.receive.ok);
-    await Think.step(R, host, { working: 'Checking our rulebook…', done: `Rulebook ${h.rulebook}` }, log.waitFor(is('outreach'), R),
-      e => ({ result: `${e.rule}: no local match → widen the search` }), opt);
-    const out = log.find(is('outreach'));
-    await Think.step(R, host, { working: 'Reaching partner regions…', done: 'Asked partner regions' }, Promise.resolve(out),
-      e => ({ html: true, result: `<span class="regions2">${e.regions.map(r => `<span>${esc(r.split(' (')[1]?.replace(')', '') || r)}</span>`).join('')}<span style="border-style:solid">illustrative</span></span>` }), opt);
-    await Think.reason(R, host, [`Alder's donor is type ${form.request.donor.blood}.`, 'None of our patients can take it.', one ? `${one.donor_name} could help Alder's patient, one way only.` : 'Nothing fits either way.', '→ No candidate. Widen the search.'], opt);
-    reply = await log.waitFor(is('reply.ready'), R);
-    host.appendChild(Think.conclusion({ label: 'Conclusion', text: 'No candidate found', tone: 'warn' }));
+  if (e.run_id) { runId = e.run_id; pill(); }
+  // a new search starts the story over on this screen
+  if (!feed || (e.type === 'flower.message' && e.direction === 'in' && e.kind === 'profiles')) {
+    $('seq').innerHTML = ''; feed = AgentFeed($('seq'), me, { post: Source.post, scroll });
   }
-  scroll();
-  await R.wait(700);
-  const r = reply.response;
-  await Think.step(R, host, { accent: 'blue', working: 'Replying over Flower…', done: 'Sent to Alder' }, Promise.resolve(reply),
-    () => ({ html: true, result: `<span class="fields5">${Object.entries(r).map(([k, v]) => `<span>${k}</span><span>${esc(v === '' ? '—' : String(v))}</span>`).join('')}</span><div class="muted" style="margin-top:6px">${reply.bytes} bytes · exactly 5 fields · nothing else left ${esc(h.short)}</div>` }), opt);
+  if (e.type === 'pod.open') { files = e.files; renderPod(); }
+  if (e.type === 'pod.read') { reads.add(e.file); renderPod(); }
+  if (e.type === 'flower.message' && e.direction === 'out') { ledger.unshift({ t: new Date((e.t || Date.now() / 1000) * 1000).toTimeString().slice(0, 5), kind: e.kind, bytes: e.bytes }); renderLedger(); }
+  feed.push(e);
 }
-function pairsCount() { const s = log.find(e => e.type === 'pod.read' && e.file === 'pairs.json'); return s ? parseInt(s.detail, 10) : 4; }
-function screenTable(e) {
-  const c = x => `${x.abo ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>'}${x.crossmatch ? '<span class="ok">✓</span>' : `<span class="bad">✗</span> <span style="font-family:var(--font-mono)">${x.conflicts.join(' ')}</span>`}`;
-  return `<table class="t"><tr><th>Pair</th><th>Patient</th><th>Donor</th><th>Alder donor → ours</th><th>Ours → Alder patient</th></tr>${e.rows.map(r => `<tr class="${r.reciprocal ? 'pass' : ''}"><td>${r.pair_id}</td><td>${esc(r.patient_name)} ${chip(r.patient_blood)}</td><td>${esc(r.donor_name)} ${chip(r.donor_blood)}</td><td>${c(r.give)}</td><td>${c(r.receive)}</td></tr>`).join('')}</table>`;
-}
-
 function pill() {
   $('dot').className = 'dot ' + (Source.live ? 'on' : 'warn');
   $('pillText').textContent = Source.live ? `LIVE · Flower SuperNode${runId ? ' · run ' + runId : ''}` : `REPLAY · Flower run ${RECORDINGS[me]?.run_id ?? ''}`;
@@ -194,15 +128,11 @@ function init() {
   if (!Source.live && RECORDINGS[me]) { $('replayBtn').hidden = false; $('replayBtn').onclick = () => Source.replay(RECORDINGS[me].events.map(e => ({ ...e }))); }
 }
 Source.on((e, meta) => {
-  if (meta.catchUp) {  // show the latest run this machine took part in, instantly
-    const evs = meta.events.filter(x => x.who === me);
-    const i = evs.map(x => x.type === 'flower.message' && x.direction === 'in').lastIndexOf(true);
-    if (i >= 0) evs.slice(i).forEach(x => onEvent(x, true));
-    return;
-  }
+  if (meta.catchUp) return;
   onEvent(e);
 });
 fetch('/config').then(r => r.json()).then(c => { if (c.hospital && HOSP[c.hospital] && c.hospital !== me) { me = c.hospital; init(); } }).catch(() => {});
+if (me === 'alder') me = 'harbor';
 init();
 </script>
 </body>

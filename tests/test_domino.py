@@ -35,18 +35,6 @@ def test_request_carries_no_identity(request_form):
         assert name not in text
     assert request_form["donor"]["blood"] == "B" and request_form["patient"]["blood"] == "A"
 
-
-def test_harbor_finds_reciprocal_candidate(request_form):
-    events = []
-    resp = agent.handle_screen(request_form, str(PODS / "harbor"), "harbor", lambda t, **k: events.append((t, k)), pace=0)
-    assert resp == {"request_id": REQ_ID, "candidate_token": screening.candidate_token(REQ_ID, "harbor", "H1"),
-                    "candidate_found": True, "readiness": "ready", "reason": "reciprocal_match"}
-    screen = next(k for t, k in events if t == "screen")
-    assert [r["pair_id"] for r in screen["rows"] if r["reciprocal"]] == ["H1"]
-    h3 = next(r for r in screen["rows"] if r["pair_id"] == "H3")
-    assert h3["give"]["abo"] and not h3["give"]["crossmatch"]  # Fatima is sensitized against Elena
-
-
 def test_riverbend_one_way_and_widens_search(request_form):
     events = []
     resp = agent.handle_screen(request_form, str(PODS / "riverbend"), "riverbend", lambda t, **k: events.append((t, k)), pace=0)
@@ -97,14 +85,6 @@ def test_pod_cannot_escape_its_root():
     pod = Pod(str(PODS / "harbor"))
     with pytest.raises(PermissionError):
         pod._read("../riverbend/pairs.json")
-
-
-def test_review_proposes_alder_harbor_swap(request_form):
-    replies = {h: agent.handle_screen(request_form, str(PODS / h), h, quiet, pace=0) for h in ("harbor", "riverbend")}
-    out = coordinator.review(replies, str(PODS / "alder"))
-    assert out["proposal"]["partner"] == "harbor" and out["proposal"]["status"] == "proposed"
-    assert out["proposal"]["requires"] == "§2.4"
-
 
 def test_retrieval_finds_rule():
     idx = Index([{"id": "§1", "source": "r", "text": "donor work-up complete"}, {"id": "§2", "source": "r", "text": "implant timing 14:00"}])

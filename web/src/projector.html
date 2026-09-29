@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Domino · Alder coordinator</title>
+<title>Domino · Alder</title>
 <style>
 /*@FONTS@*/
 /*@SHARED@*/
@@ -13,131 +13,91 @@ body { background: var(--navy); overflow: hidden; color: #fff; }
 #stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; overflow: hidden;
   background: radial-gradient(ellipse at 30% 40%, transparent 55%, rgba(8, 20, 36, .55) 100%), linear-gradient(135deg, #0E2740 0%, #13345C 55%, #1B4F8A 100%); }
 .topbar { position: relative; z-index: 6; }
-.topnav span { font-size: 15px; opacity: .7; cursor: pointer; }
-.topnav span.on { opacity: 1; }
-.topnav span:hover { color: var(--gold); opacity: 1; }
-.hero-area { position: absolute; left: 0; right: 0; top: 70px; height: 890px; }
+.topnav span { font-size: 15px; opacity: .7; cursor: pointer; } .topnav span.on { opacity: 1; color: var(--gold); }
+.area { position: absolute; left: 0; right: 0; top: 70px; height: 890px; }
 .beat { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .5s ease; }
 .beat.on { opacity: 1; pointer-events: auto; }
-.reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
-.reveal.in { opacity: 1; transform: none; }
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; } .reveal.in { opacity: 1; transform: none; }
 .eyebrow { font-size: 20px; }
-h1.display { font-size: 60px; margin: 6px 0 0; }
-
-/* Bigger thinking components for the projector */
-#stage .work .tt { font-size: 20px; } #stage .work .rs { font-size: 19px; }
-#stage .work { padding: 12px 16px; }
-#stage .think .th { font-size: 20px; } #stage .think .l { font-size: 20px; }
-#stage .concl .ct { font-size: 26px; } #stage .concl .cl { font-size: 14px; }
-#stage .connect .nm { font-size: 20px; } #stage .connect .sb { font-size: 16px; }
-#stage .chip2 { font-size: 15px; }
-#stage .hero .ht { font-size: 24px; } #stage .hero .hs { font-size: 16px; }
-#stage .fields5 { font-size: 16px; }
-
-/* Footer: Flower strip + bar */
+#stage .work .tt { font-size: 18px; } #stage .work .rs { font-size: 17px; } #stage .work { padding: 10px 14px; }
+#stage .think .th { font-size: 18px; } #stage .think .l { font-size: 18px; }
+#stage .concl .ct { font-size: 24px; } #stage .hero .ht { font-size: 21px; } #stage .hero .hs { font-size: 15px; }
 .wirebar { position: absolute; left: 0; right: 0; top: 960px; height: 50px; background: rgba(8, 20, 36, .6); border-top: 1px solid rgba(196, 228, 247, .12); display: flex; align-items: center; gap: 12px; padding: 0 28px; overflow: hidden; }
-.wirebar .lbl { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; letter-spacing: .12em; color: var(--tint); flex: none; }
-.wirebar .lbl svg { width: 22px; height: 22px; }
+.wirebar .lbl { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; letter-spacing: .12em; color: var(--tint); flex: none; } .wirebar .lbl svg { width: 22px; height: 22px; }
 .pkt { flex: none; background: #fff; color: var(--navy); font-family: var(--font-mono); font-size: 15px; padding: 4px 12px; border-radius: 13px; white-space: nowrap; animation: rise .4s ease; }
 .pkt b { color: var(--blue); font-weight: 400; } .pkt.in b { color: #0E7C61; }
 .foot { position: absolute; left: 0; right: 0; bottom: 0; height: 70px; background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; }
 .foot .fine { font-size: 14px; color: var(--tint); }
-.badge { font-weight: 700; font-size: 13px; letter-spacing: .06em; padding: 7px 12px; border-radius: 3px; border: 1px solid var(--gold); color: var(--gold); }
-.badge.live { border-color: var(--teal); color: var(--teal); }
+.badge { font-weight: 700; font-size: 13px; letter-spacing: .06em; padding: 7px 12px; border-radius: 3px; border: 1px solid var(--gold); color: var(--gold); } .badge.live { border-color: var(--teal); color: var(--teal); }
 .navbtns { display: flex; gap: 10px; } .navbtns .btn { font-size: 16px; padding: 9px 16px; }
 
-/* Beat 0 · situation */
-.b0 { position: absolute; left: 90px; right: 90px; top: 60px; }
-.b0 h1 { font-size: 72px; }
-.fams { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 50px; }
-.fam { background: #fff; color: var(--body); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); }
-.fam header { background: var(--navy-2); color: #fff; padding: 12px 22px; font-size: 20px; font-weight: 500; border-bottom: 4px solid var(--teal); display: flex; justify-content: space-between; }
-.fam header i { color: var(--tint); font-weight: 400; }
-.fam .row { display: flex; align-items: center; justify-content: space-between; padding: 26px 30px; }
-.who { display: flex; align-items: center; gap: 14px; }
-.av { width: 76px; height: 76px; border-radius: 50%; background: var(--heading); color: #fff; font-weight: 700; font-size: 26px; display: flex; align-items: center; justify-content: center; }
-.who .n { font-size: 26px; font-weight: 700; color: var(--heading); }
-.who .r { font-size: 18px; color: #6b778c; }
-.who .chip { margin-top: 6px; font-size: 16px; height: 28px; }
-.nope { display: flex; flex-direction: column; align-items: center; color: #B3261E; font-weight: 700; font-size: 18px; }
-.nope svg { width: 90px; }
-.stat { margin-top: 56px; display: flex; align-items: baseline; gap: 26px; }
-.stat .num { font-family: var(--font-cond); font-size: 150px; line-height: .9; color: var(--gold); }
-.stat .txt { font-size: 34px; font-weight: 500; }
-.stat .src { font-size: 14px; color: var(--offline); margin-top: 8px; }
+/* 0 · situation */
+.b0 { position: absolute; left: 70px; right: 70px; top: 50px; }
+.b0 h1 { font-size: 66px; }
+.fams { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 40px; }
+.fam { background: #fff; color: var(--body); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+.fam header { background: var(--navy-2); color: #fff; padding: 12px 20px; font-size: 20px; font-weight: 500; border-bottom: 4px solid var(--teal); display: flex; justify-content: space-between; }
+.fam header i { color: var(--tint); font-weight: 400; font-size: 17px; }
+.fam .who { display: flex; align-items: center; gap: 14px; padding: 16px 20px 0; }
+.av { width: 64px; height: 64px; border-radius: 50%; background: var(--heading); color: #fff; font-weight: 700; font-size: 22px; display: flex; align-items: center; justify-content: center; flex: none; }
+.who .n { font-size: 23px; font-weight: 700; color: var(--heading); } .who .r { font-size: 16px; color: #6b778c; }
+.who .chip { margin-left: auto; font-size: 16px; height: 28px; }
+.fam .why { margin: 16px 20px 18px; padding: 10px 14px; background: #FDECEA; border-left: 4px solid #B3261E; font-size: 17px; color: #7a1c16; font-weight: 500; }
+.fam .role { padding: 0 20px 16px; font-size: 16px; color: #5b6b82; font-style: italic; }
 
-/* Beat 1 · question */
-.b1 { position: absolute; left: 0; right: 0; top: 110px; text-align: center; }
-.b1 h1 { font-size: 84px; max-width: 1500px; margin: 0 auto; }
-.b1 svg { margin-top: 50px; }
+/* 1 · question */
+.b1 { position: absolute; left: 0; right: 0; top: 200px; text-align: center; }
+.b1 h1 { font-size: 88px; max-width: 1500px; margin: 0 auto; }
 
-/* Map */
+/* map */
 #map { position: absolute; left: 0; top: 0; width: 1920px; height: 890px; opacity: 0; transition: opacity .5s; }
 #map.on { opacity: 1; }
 #map .land { fill: var(--county); stroke: var(--county-stroke); stroke-width: 1.5; fill-rule: evenodd; }
 #map .river { fill: none; stroke: #1F4A7A; stroke-width: 3; }
 #map .hwy { fill: none; stroke: rgba(196, 228, 247, .14); stroke-width: 2; stroke-dasharray: 2 5; }
-#map .city { fill: var(--offline); font-size: 17px; font-style: italic; font-family: var(--font); }
 #map .lbl-box { fill: rgba(14, 39, 64, .9); stroke: rgba(196, 228, 247, .25); }
 #map .lbl-name { fill: #fff; font-size: 22px; font-weight: 500; font-family: var(--font); }
 #map .lbl-sub { fill: var(--tint); font-size: 16px; font-family: var(--font); }
-#map .lbl-state { font-size: 15px; font-weight: 700; letter-spacing: .06em; font-family: var(--font); }
-#map .arc { fill: none; stroke-width: 7; stroke-linecap: round; }
-#map .arc.proposed { stroke: var(--gold); stroke-dasharray: 14 12; animation: flow 1.6s linear infinite; }
-#map .arc.reviewed { stroke: var(--teal); }
-@keyframes flow { to { stroke-dashoffset: -52; } }
-#map .out { fill: none; stroke: rgba(242, 182, 50, .7); stroke-width: 2.5; stroke-dasharray: 5 7; }
-#map .outlbl { fill: var(--gold); font-size: 16px; font-family: var(--font); }
-.rpanel { position: absolute; left: 1140px; top: 36px; width: 720px; }
-.rpanel h1.display { font-size: 52px; }
-.netlist { list-style: none; padding: 0; margin: 30px 0 0; }
+#map .arc { fill: none; stroke-width: 6; stroke-linecap: round; }
+.rpanel { position: absolute; left: 1140px; top: 40px; width: 720px; }
+.rpanel h1.display { font-size: 54px; }
+.netlist { list-style: none; padding: 0; margin: 28px 0 0; }
 .netlist li { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid rgba(196, 228, 247, .14); font-size: 22px; }
 .netlist li small { margin-left: auto; color: var(--tint); font-size: 16px; }
-.netlist svg { width: 22px; height: 26px; }
-.findbtn { margin-top: 30px; font-size: 28px; padding: 22px 38px; }
-.findnote { margin-top: 12px; color: var(--tint); font-size: 16px; min-height: 22px; }
+.startbtn { margin-top: 30px; font-size: 28px; padding: 22px 38px; }
+.note { margin-top: 12px; color: var(--tint); font-size: 16px; min-height: 22px; }
 
-/* Beat 3 · three columns */
-.head { position: absolute; left: 50px; top: 18px; }
-.head h1.display { font-size: 42px; }
-#net { position: absolute; left: 0; top: 96px; width: 1920px; height: 96px; }
-.col { position: absolute; top: 196px; width: 560px; height: 684px; overflow: hidden; }
-.col .seq { gap: 10px; }
-.colhead { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+/* 3 · live */
+.livehead { position: absolute; left: 50px; right: 50px; top: 14px; display: flex; align-items: flex-end; justify-content: space-between; }
+.livehead h1 { font-size: 44px; margin: 4px 0 0; }
+.counter { text-align: right; } .counter .num { font-family: var(--font-cond); font-size: 110px; line-height: .85; color: var(--gold); font-variant-numeric: tabular-nums; }
+.counter .lab { font-size: 16px; color: var(--tint); letter-spacing: .08em; text-transform: uppercase; }
+#net { position: absolute; left: 0; top: 118px; width: 1920px; height: 86px; }
+.col { position: absolute; top: 206px; width: 580px; height: 560px; overflow: hidden; }
+.col .inner { display: flex; flex-direction: column; gap: 8px; position: absolute; left: 0; right: 0; bottom: 0; }
+.colhead { position: absolute; top: -2px; left: 0; right: 0; display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; z-index: 2; background: linear-gradient(#123055 70%, transparent); padding-bottom: 8px; }
 .colhead small { font-weight: 400; color: var(--tint); font-size: 16px; }
 .colhead .lk { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--gold); border: 1px solid rgba(242, 182, 50, .6); padding: 3px 10px; border-radius: 999px; }
 .colhead .lk svg { width: 13px; height: 13px; }
+.round { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--tint); border-top: 1px solid rgba(196, 228, 247, .2); padding-top: 8px; margin-top: 4px; }
+.decide { border: 2px solid var(--gold); background: rgba(8, 20, 36, .5); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.decide .dh { display: flex; justify-content: space-between; font-weight: 800; color: var(--gold); font-size: 14px; text-transform: uppercase; letter-spacing: .04em; }
+.decide .dh .cd { font-weight: 500; text-transform: none; color: var(--tint); }
+.decide .btn.secondary { align-self: flex-start; font-size: 14px; padding: 8px 12px; }
+.decide.done { border-color: var(--teal); }
+.planbar { position: absolute; left: 50px; right: 50px; top: 782px; height: 104px; display: flex; gap: 20px; align-items: stretch; }
+.planbar .concl { flex: 1; }
+.planbar .hero { width: 520px; }
+#stage .planbar .concl .ct { font-size: 26px; }
 
-/* Beat 4 · review table */
-.rtable { background: #fff; color: var(--body); border-radius: 8px; border: 2px solid var(--divider); overflow: hidden; }
-.rtable table { width: 100%; border-collapse: collapse; font-size: 17px; }
-.rtable th { text-align: left; font-weight: 700; color: #5b6b82; font-size: 14px; padding: 8px 14px; background: var(--pale); }
-.rtable td { padding: 6px 14px; border-top: 1px solid #f0f2f5; font-family: var(--font-mono); color: var(--heading); opacity: 0; transition: opacity .3s; }
-.rtable tr.in td { opacity: 1; }
-.rtable td.k { font-family: var(--font); color: #6b778c; }
-td.t { color: #0E7C61 !important; font-weight: 700; } td.f { color: #B45309 !important; font-weight: 700; }
-
-/* Beat 5 · doctor review */
-.drop { position: absolute; left: 50px; top: 110px; width: 930px; height: 770px; border: 2px dashed rgba(196, 228, 247, .45); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(8, 20, 36, .25); cursor: pointer; text-align: center; transition: border-color .2s, background .2s; }
-.drop.over { border-color: var(--gold); background: rgba(242, 182, 50, .08); }
-.drop .t { font-size: 28px; font-weight: 500; margin-top: 12px; }
-.drop .s { font-size: 17px; color: var(--tint); margin-top: 6px; }
-.drop canvas { max-width: 910px; max-height: 750px; display: none; border-radius: 4px; }
-.drop.has canvas { display: block; } .drop.has .hint { display: none; }
-.evid { position: absolute; left: 1030px; top: 110px; width: 830px; }
-
-/* Beat 6 */
-.done-big { display: flex; align-items: center; gap: 18px; margin-top: 20px; }
-.done-big .ck { width: 70px; height: 70px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; }
-.done-big b { font-size: 58px; font-weight: 700; letter-spacing: .02em; }
-.legs { margin-top: 26px; font-size: 22px; line-height: 1.8; }
-.legs .mono { color: var(--gold); }
-.closing { margin-top: 40px; font-size: 32px; font-weight: 500; color: var(--gold); line-height: 1.3; }
-
+/* 4 · final */
+.final .counter { text-align: left; margin-top: 10px; } .final .counter .num { font-size: 170px; }
+.legs { margin-top: 16px; font-size: 21px; line-height: 1.75; }
+.legs b { color: var(--gold); font-weight: 500; }
+.closing { margin-top: 28px; font-size: 34px; font-weight: 500; color: var(--gold); line-height: 1.25; }
 .overlay { position: absolute; inset: 0; background: rgba(8, 20, 36, .85); display: none; align-items: center; justify-content: center; z-index: 20; }
 .overlay.on { display: flex; }
 .panel { background: #fff; color: var(--body); border-radius: 6px; padding: 24px 30px; width: 1300px; max-height: 860px; overflow: auto; }
-.panel h2 { margin: 0 0 10px; color: var(--heading); font-weight: 500; }
 .log { font-family: var(--font-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; color: #333; }
 </style>
 </head>
@@ -145,87 +105,41 @@ td.t { color: #0E7C61 !important; font-weight: 700; } td.f { color: #B45309 !imp
 <div id="stage">
   <header class="topbar">
     <div class="brand"><span class="wordmark">DOMINO</span></div>
-    <nav class="topnav" id="nav">
-      <span data-b="0,1">Situation</span><span data-b="2">Network</span><span data-b="3">1 · Ask</span><span data-b="4">2 · Review</span><span data-b="5,6">3 · Doctor</span>
-    </nav>
+    <nav class="topnav" id="nav"><span data-b="0,1">Situation</span><span data-b="2">Network</span><span data-b="3">Live</span><span data-b="4">Result</span></nav>
   </header>
   <div class="stripe"></div>
-
-  <div class="hero-area">
+  <div class="area">
     <svg id="map" viewBox="0 0 1920 890"></svg>
 
     <section class="beat" id="b0"><div class="b0">
-      <h1 class="display">A willing donor.<br>The wrong blood type.</h1>
-      <div class="fams">
-        <div class="fam reveal" id="fam1"><header>Alder Medical Center<i>San Jose</i></header>
-          <div class="row">
-            <div class="who"><div class="av">MA</div><div><div class="n">Maria</div><div class="r">needs a kidney</div><span class="chip A">A</span></div></div>
-            <div class="nope"><svg viewBox="0 0 90 30"><path d="M86 15H10m0 0l10-9M10 15l10 9" stroke="#8A97B5" stroke-width="3" fill="none"/><path d="M40 4l12 22M52 4L40 26" stroke="#B3261E" stroke-width="4"/></svg>no match</div>
-            <div class="who"><div class="av">EA</div><div><div class="n">Elena</div><div class="r">her sister</div><span class="chip B">B</span></div></div>
-          </div></div>
-        <div class="fam reveal" id="fam2"><header>Harbor Point Hospital<i>Oakland</i></header>
-          <div class="row">
-            <div class="who"><div class="av">JO</div><div><div class="n">James</div><div class="r">needs a kidney</div><span class="chip B">B</span></div></div>
-            <div class="nope"><svg viewBox="0 0 90 30"><path d="M86 15H10m0 0l10-9M10 15l10 9" stroke="#8A97B5" stroke-width="3" fill="none"/><path d="M40 4l12 22M52 4L40 26" stroke="#B3261E" stroke-width="4"/></svg>no match</div>
-            <div class="who"><div class="av">PO</div><div><div class="n">Priya</div><div class="r">his wife</div><span class="chip A">A</span></div></div>
-          </div></div>
-      </div>
-      <div class="stat reveal" id="stat"><div class="num">95,492</div><div><div class="txt">people in the U.S. are waiting for a kidney.</div><div class="src">organdonor.gov (HRSA) · as of July 30, 2026</div></div></div>
+      <h1 class="display">Three families. Three donors.<br>None of them match.</h1>
+      <div class="fams" id="fams"></div>
     </div></section>
 
     <section class="beat" id="b1"><div class="b1">
-      <h1 class="display">What if the person who could help your patient is at another hospital?</h1>
-      <svg width="1000" height="300" viewBox="0 0 1000 300" aria-hidden="true">
-        <g font-family="Ubuntu, Helvetica" font-size="18" fill="#C4E4F7"><text x="140" y="24" text-anchor="middle">Alder</text><text x="860" y="24" text-anchor="middle">Harbor Point</text></g>
-        <g font-family="Ubuntu, Helvetica" font-weight="700" font-size="22" text-anchor="middle">
-          <circle cx="140" cy="90" r="40" fill="#0A3C6E"/><text x="140" y="98" fill="#fff">MA</text>
-          <circle cx="140" cy="230" r="40" fill="#0A3C6E"/><text x="140" y="238" fill="#fff">EA</text>
-          <circle cx="860" cy="90" r="40" fill="#0A3C6E"/><text x="860" y="98" fill="#fff">JO</text>
-          <circle cx="860" cy="230" r="40" fill="#0A3C6E"/><text x="860" y="238" fill="#fff">PO</text>
-        </g>
-        <path d="M190 225 C 420 225, 580 95, 808 95" stroke="#F2B632" stroke-width="3" stroke-dasharray="10 9" fill="none"/>
-        <path d="M810 225 C 580 225, 420 95, 192 95" stroke="#F2B632" stroke-width="3" stroke-dasharray="10 9" fill="none"/>
-        <circle cx="500" cy="160" r="30" fill="#0E2740" stroke="#F2B632" stroke-width="3"/>
-        <text x="500" y="172" fill="#F2B632" font-size="34" font-weight="700" text-anchor="middle" font-family="Ubuntu, Helvetica">?</text>
-      </svg>
+      <h1 class="display">What if each family's match is at another hospital?</h1>
     </div></section>
 
     <section class="beat" id="b2"><div class="rpanel">
       <h1 class="display">Three hospitals.<br>Three private pods.</h1>
       <ul class="netlist" id="netlist"></ul>
-      <button class="btn findbtn" id="findBtn">Find an exchange</button>
-      <div class="findnote" id="findNote"></div>
+      <button class="btn startbtn" id="findBtn">Find matches</button>
+      <div class="note" id="note"></div>
     </div></section>
 
     <section class="beat" id="b3">
-      <div class="head"><div class="eyebrow">Step 1 · Ask</div><h1 class="display">One form. Three private pods.</h1></div>
-      <svg id="net" viewBox="0 0 1920 96"></svg>
-      <div class="col" id="col-alder" style="left:50px"></div>
-      <div class="col" id="col-harbor" style="left:680px"></div>
-      <div class="col" id="col-riverbend" style="left:1310px"></div>
+      <div class="livehead"><div><div class="eyebrow" id="phaseEyebrow">Step 1</div><h1 class="display" id="phaseTitle">Find matches</h1></div>
+        <div class="counter"><div class="num" id="count">0</div><div class="lab">transplants</div></div></div>
+      <svg id="net" viewBox="0 0 1920 86"></svg>
+      <div class="col" id="col-alder" style="left:50px"><div class="colhead">Alder<small>San Jose · this Mac</small><span class="lk" style="color:#4FA3A5;border-color:#4FA3A5">own pod · visible here</span></div><div class="inner"></div></div>
+      <div class="col" id="col-harbor" style="left:670px"></div>
+      <div class="col" id="col-riverbend" style="left:1290px"></div>
+      <div class="planbar" id="planbar"></div>
     </section>
 
-    <section class="beat" id="b4"><div class="rpanel">
-      <div class="eyebrow">Step 2 · Review</div>
-      <h1 class="display">The answers come back.</h1>
-      <div class="seq" id="seqReview" style="margin-top:18px"></div>
-    </div></section>
-
-    <section class="beat" id="b5">
-      <div class="head"><div class="eyebrow">Step 3 · Doctor review</div><h1 class="display">A surgeon signs. A person confirms.</h1></div>
-      <div class="drop" id="drop">
-        <div class="hint">
-          <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><rect x="14" y="8" width="44" height="56" rx="3" fill="none" stroke="#C4E4F7" stroke-width="2.5"/><path d="M22 22h28M22 30h28M22 38h16" stroke="#C4E4F7" stroke-width="2"/><path d="M22 52c5-7 8-8 10-4s4 4 7-1 5-5 7 0" fill="none" stroke="#F2B632" stroke-width="3" stroke-linecap="round"/></svg>
-          <div class="t">Drop the signed approval form</div><div class="s">or click to choose · or paste</div>
-        </div>
-        <canvas id="formCanvas"></canvas>
-        <input type="file" id="file" accept="image/*" hidden>
-      </div>
-      <div class="evid seq" id="seqEvid"></div>
-    </section>
-
-    <section class="beat" id="b6"><div class="rpanel">
-      <div class="done-big"><div class="ck">✓</div><b>REVIEWED</b></div>
+    <section class="beat final" id="b4"><div class="rpanel">
+      <div class="eyebrow">Result</div>
+      <div class="counter"><div class="num" id="finalCount">7</div><div class="lab">transplants</div></div>
       <div class="legs" id="legs"></div>
       <div class="closing">No shared database.<br>A person at every step.</div>
     </div></section>
@@ -243,14 +157,9 @@ td.t { color: #0E7C61 !important; font-weight: 700; } td.f { color: #B45309 !imp
 <script>/*@JSQR@*/</script>
 <script>/*@SOURCE@*/</script>
 <script>/*@THINKJS@*/</script>
+<script>/*@FEEDJS@*/</script>
 <script>
 const RECORDING = /*@RECORDING@*/;
-const HOSP = {
-  alder: { name: 'Alder Medical Center', short: 'Alder', city: 'San Jose', lat: 37.335, lon: -121.89 },
-  harbor: { name: 'Harbor Point Hospital', short: 'Harbor Point', city: 'Oakland', lat: 37.805, lon: -122.27 },
-  riverbend: { name: 'Riverbend General', short: 'Riverbend', city: 'Sacramento', lat: 38.58, lon: -121.49 },
-};
-const LANES = ['harbor', 'riverbend'];
 const $ = id => document.getElementById(id);
 const { esc } = Think;
 const chip = b => `<span class="chip ${b}">${b}</span>`;
@@ -260,354 +169,203 @@ function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); $('s
 addEventListener('resize', fit); fit();
 $('flowerLbl').insertAdjacentHTML('afterbegin', Think.FLOWER);
 
-// ---------------- State ----------------
-const S = { beat: 0, step: 0, runId: null, nodes: {}, replies: {}, review: null, proposed: false, reviewed: null,
-  started: false, log: new Think.Log(), runs: {} };
-const POD = c => `<svg width="22" height="26" viewBox="0 0 22 26"><ellipse cx="11" cy="5" rx="9" ry="3.5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 5v15c0 2 4 3.5 9 3.5s9-1.5 9-3.5V5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 12.5c0 2 4 3.5 9 3.5s9-1.5 9-3.5" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
+const HOSP = {
+  alder: { name: 'Alder Medical Center', short: 'Alder', city: 'San Jose', lat: 37.335, lon: -121.89 },
+  harbor: { name: 'Harbor Point Hospital', short: 'Harbor Point', city: 'Oakland', lat: 37.805, lon: -122.27 },
+  riverbend: { name: 'Riverbend General', short: 'Riverbend', city: 'Sacramento', lat: 38.58, lon: -121.49 },
+};
+// For the audience only: the agents exchange pair ids; these names come from the story, not from the wire.
+const STORY = { A1: ['Maria', 'Elena'], A2: ['Hannah', 'Mark'], H1: ['James', 'Priya'], H2: ['Kenji', 'Aiko'], H3: ['Fatima', 'Samir'], H4: ['Rosa', 'Luis'],
+  R1: ['Grace', 'Sam'], R2: ['David', 'Ruth'], R3: ['Aisha', 'Malik'], R4: ['Tom', 'Nora'], ALT: ['', 'the stranger'] };
+const FAMS = [
+  ['alder', 'MA', 'Maria', 'A', 'EA', 'Elena, her sister', 'B', 'Blood type: B can\'t go to A', 'Says yes when asked to wait'],
+  ['harbor', 'JO', 'James', 'B', 'PO', 'Priya, his wife', 'A', 'Blood type: A can\'t go to B', 'Says no when asked to wait'],
+  ['riverbend', 'GL', 'Grace', 'A', 'SL', 'Sam, her brother', 'O', 'Her body would reject his kidney', 'Asks everyone to wait'],
+];
+$('fams').innerHTML = FAMS.map(([h, pi, pn, pb, di, dn, db, why, role], i) => `<div class="fam reveal" id="fam${i}"><header>${HOSP[h].short}<i>${HOSP[h].city}</i></header>
+  <div class="who"><div class="av">${pi}</div><div><div class="n">${pn}</div><div class="r">needs a kidney</div></div>${chip(pb)}</div>
+  <div class="who"><div class="av" style="background:#4b5d78">${di}</div><div><div class="n">${dn.split(',')[0]}</div><div class="r">${dn.split(', ')[1]} · wants to give</div></div>${chip(db)}</div>
+  <div class="why">✗ ${why}</div><div class="role">${role}</div></div>`).join('');
 
+// ---------------- state ----------------
+const S = { beat: 0, step: 0, phase: null, runId: null, plan: {}, counter: 0, busy: false };
 function badge() {
   const b = $('badge');
   if (Source.live) { b.className = 'badge live'; b.textContent = `LIVE · Flower${S.runId ? ' run ' + S.runId : ''}`; }
-  else { b.className = 'badge'; b.textContent = `REPLAY · Flower run ${RECORDING?.run_id ?? '—'}`; }
+  else { b.className = 'badge'; b.textContent = 'REPLAY · recorded Flower run'; }
 }
-
-// ---------------- Navigation ----------------
 function show(beat, step = 0) {
-  S.beat = Math.max(0, Math.min(6, beat)); S.step = step;
+  S.beat = Math.max(0, Math.min(4, beat)); S.step = step;
   document.querySelectorAll('.beat').forEach(el => el.classList.toggle('on', el.id === 'b' + S.beat));
   document.querySelectorAll('#nav span').forEach(el => el.classList.toggle('on', el.dataset.b.split(',').includes(String(S.beat))));
-  $('map').classList.toggle('on', [2, 4, 6].includes(S.beat));
-  if (S.beat === 0) ['fam1', 'fam2', 'stat'].forEach((id, i) => $(id).classList.toggle('in', i <= S.step));
-  if ([2, 4, 6].includes(S.beat)) drawMap();
-  if (S.beat === 4 && !S.runs.review) startPlayer('review', playReview);
-  if (S.beat === 6) renderDone();
-  const nb = $('nextBtn');
-  nb.textContent = S.beat === 2 && !S.started ? 'Find an exchange →' : S.beat === 6 ? 'End' : 'Next →';
-  nb.disabled = (S.beat === 5 && !S.reviewed) || S.beat === 6;
-  nb.classList.toggle('locked', nb.disabled);
+  $('map').classList.toggle('on', [2, 4].includes(S.beat));
+  if (S.beat === 0) [0, 1, 2].forEach(i => $('fam' + i).classList.toggle('in', i <= S.step));
+  if ([2, 4].includes(S.beat)) drawMap();
+  if (S.beat === 4) renderFinal();
+  $('nextBtn').textContent = S.beat === 2 && !S.phase ? 'Find matches →' : 'Next →';
 }
-function next() {
-  if (S.beat === 0 && S.step < 2) return show(0, S.step + 1);
-  if (S.beat === 2 && !S.started) return find();
-  if (S.beat === 5 && !S.reviewed) return;
-  show(S.beat + 1);
-}
+function next() { if (S.beat === 0 && S.step < 2) return show(0, S.step + 1); if (S.beat === 2 && !S.phase) return startPhase('search'); show(S.beat + 1); }
 function back() { if (S.beat === 0 && S.step > 0) return show(0, S.step - 1); show(S.beat - 1, S.beat - 1 === 0 ? 2 : 0); }
-function startPlayer(name, fn, ...args) {
-  S.runs[name]?.cancel();
-  const R = new Think.Run();
-  S.runs[name] = R;
-  fn(R, ...args).catch(e => { if (e !== Think.CANCEL) console.error(e); });
-  return R;
-}
 
-// ---------------- Map ----------------
+// ---------------- map ----------------
 const LAT_MAX = 38.66, LAT_MIN = 37.22, K = 890 / (LAT_MAX - LAT_MIN), LON_MIN = -123.2, COS = 0.79;
 const P = (lat, lon) => [(lon - LON_MIN) * COS * K, (LAT_MAX - lat) * K];
 const path = (pts, close) => pts.map((p, i) => (i ? 'L' : 'M') + P(p[0], p[1]).map(n => n.toFixed(1)).join(' ')).join('') + (close ? 'Z' : '');
 const COAST = [[39.5, -123.78], [39.0, -123.72], [38.75, -123.5], [38.6, -123.34], [38.45, -123.12], [38.31, -123.06], [38.24, -122.97], [38.1, -122.96], [38.0, -123.02], [37.99, -122.83], [37.94, -122.74], [37.9, -122.68], [37.83, -122.53], [37.826, -122.48], [37.79, -122.505], [37.73, -122.51], [37.63, -122.495], [37.5, -122.5], [37.4, -122.42], [37.25, -122.41], [37.11, -122.33], [37.0, -122.18], [36.96, -122.03], [36.97, -121.95], [36.95, -121.88], [36.85, -121.8], [36.6, -121.9], [36.5, -121.95], [36.5, -119.5], [39.5, -119.5]];
 const BAY = [[37.826, -122.475], [37.855, -122.475], [37.89, -122.5], [37.93, -122.49], [37.96, -122.49], [38.02, -122.5], [38.06, -122.48], [38.1, -122.4], [38.12, -122.3], [38.09, -122.24], [38.06, -122.22], [38.045, -122.12], [38.07, -122.05], [38.08, -121.95], [38.05, -121.88], [38.03, -121.88], [38.02, -121.95], [38.02, -122.1], [38.03, -122.2], [38.0, -122.3], [37.96, -122.39], [37.92, -122.385], [37.9, -122.32], [37.86, -122.305], [37.82, -122.3], [37.79, -122.285], [37.77, -122.26], [37.75, -122.23], [37.72, -122.21], [37.69, -122.17], [37.63, -122.15], [37.57, -122.11], [37.52, -122.05], [37.47, -122.0], [37.44, -121.96], [37.45, -122.02], [37.46, -122.1], [37.49, -122.17], [37.52, -122.21], [37.56, -122.26], [37.59, -122.3], [37.62, -122.36], [37.66, -122.38], [37.71, -122.38], [37.74, -122.37], [37.78, -122.385], [37.805, -122.405], [37.808, -122.43], [37.81, -122.465]];
 const RIVER = [[38.04, -121.88], [38.06, -121.75], [38.1, -121.62], [38.16, -121.66], [38.24, -121.58], [38.33, -121.56], [38.45, -121.51], [38.58, -121.51], [38.72, -121.6]];
-const HWYS = [
-  [[37.83, -122.29], [37.93, -122.32], [38.02, -122.26], [38.1, -122.21], [38.25, -122.04], [38.36, -121.97], [38.55, -121.74], [38.58, -121.5]],
-  [[37.805, -122.27], [37.725, -122.175], [37.6, -122.05], [37.48, -121.93], [37.335, -121.89]],
-  [[37.77, -122.41], [37.6, -122.39], [37.45, -122.16], [37.37, -121.95], [37.335, -121.89]],
-];
-function marker(id, state) {
+const HWYS = [[[37.83, -122.29], [37.93, -122.32], [38.02, -122.26], [38.1, -122.21], [38.25, -122.04], [38.36, -121.97], [38.55, -121.74], [38.58, -121.5]], [[37.805, -122.27], [37.725, -122.175], [37.6, -122.05], [37.48, -121.93], [37.335, -121.89]]];
+const POD = c => `<svg width="22" height="26" viewBox="0 0 22 26"><ellipse cx="11" cy="5" rx="9" ry="3.5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 5v15c0 2 4 3.5 9 3.5s9-1.5 9-3.5V5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 12.5c0 2 4 3.5 9 3.5s9-1.5 9-3.5" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
+function marker(id) {
   const h = HOSP[id]; const [x, y] = P(h.lat, h.lon);
-  const ring = { yes: '#4FA3A5', no: '#F2B632', home: '#4FA3A5' }[state] || '#C4E4F7';
-  const tag = { yes: 'CANDIDATE FOUND', no: 'NO CANDIDATE' }[state] || '';
-  const w = 270, ly = y < 150 ? y + 24 : y - 100, lx = id === 'riverbend' ? x - 24 - w : x + 24;
-  return `<g><circle cx="${x}" cy="${y}" r="28" fill="${ring}" opacity=".16"/><circle cx="${x}" cy="${y}" r="11" fill="#0E2740" stroke="${ring}" stroke-width="5"/>
-    <rect class="lbl-box" x="${lx}" y="${ly}" width="${w}" height="${tag ? 90 : 66}" rx="4"/>
-    <text class="lbl-name" x="${lx + 14}" y="${ly + 29}">${h.name}</text>
-    <g transform="translate(${lx + 14} ${ly + 38}) scale(.7)">${POD('#C4E4F7')}</g><text class="lbl-sub" x="${lx + 36}" y="${ly + 54}">${h.city} · own pod</text>
-    ${tag ? `<text class="lbl-state" x="${lx + 14}" y="${ly + 80}" fill="${ring}">${tag}</text>` : ''}</g>`;
+  const w = 270, ly = y < 150 ? y + 24 : y - 90, lx = id === 'riverbend' ? x - 24 - w : x + 24;
+  return `<circle cx="${x}" cy="${y}" r="26" fill="#4FA3A5" opacity=".16"/><circle cx="${x}" cy="${y}" r="11" fill="#0E2740" stroke="#4FA3A5" stroke-width="5"/>
+    <rect class="lbl-box" x="${lx}" y="${ly}" width="${w}" height="66" rx="4"/><text class="lbl-name" x="${lx + 14}" y="${ly + 29}">${h.name}</text><text class="lbl-sub" x="${lx + 14}" y="${ly + 53}">${h.city} · own pod</text>`;
 }
-function arc(a, b, bend) {
+function arcD(a, b, bend) {
   const [x1, y1] = P(HOSP[a].lat, HOSP[a].lon), [x2, y2] = P(HOSP[b].lat, HOSP[b].lon);
   const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
-  return { d: `M${x1} ${y1}Q${mx - dy / len * bend} ${my + dx / len * bend} ${x2} ${y2}`, cx: mx - dy / len * bend, cy: my + dx / len * bend };
+  return `M${x1} ${y1}Q${mx - dy / len * bend} ${my + dx / len * bend} ${x2} ${y2}`;
 }
 function drawMap() {
-  const rh = S.replies.harbor, rr = S.replies.riverbend, showAns = S.beat >= 4;
-  const ex = S.proposed && S.review?.proposal, rv = !!S.reviewed && S.beat >= 6;
-  const arcs = ex ? [arc('alder', 'harbor', 70), arc('harbor', 'alder', 70)] : [];
-  const [sx, sy] = P(HOSP.riverbend.lat, HOSP.riverbend.lon);
-  const out = showAns && rr?.readiness === 'searching_other_regions' ? `
-    <path class="out" d="M${sx} ${sy}L1040 120"/><text class="outlbl" x="1034" y="146" text-anchor="end">Reno</text>
-    <path class="out" d="M${sx} ${sy}L1010 290"/><text class="outlbl" x="1004" y="316" text-anchor="end">Fresno</text>
-    <path class="out" d="M${sx} ${sy}L720 8"/><text class="outlbl" x="712" y="26" text-anchor="end">Portland</text>` : '';
-  const [fx, fy] = P(37.775, -122.42), [tx, ty] = P(37.4275, -122.17);
-  const tag = ex ? `<g transform="translate(${arcs[0].cx + 70} ${arcs[0].cy - 10})"><rect x="-6" y="-26" width="140" height="38" rx="4" fill="${rv ? '#4FA3A5' : '#F2B632'}"/><text x="8" y="0" fill="#0E2740" font-weight="700" font-size="20" letter-spacing="2" font-family="Ubuntu, Helvetica">${rv ? 'REVIEWED' : 'PROPOSED'}</text></g>` : '';
-  $('map').innerHTML = `
+  let arcs = '';
+  if (S.beat === 4) {
+    const legs = [...(S.plan.swap?.legs || []), ...(S.plan.chain?.legs || [])];
+    const seen = {};
+    arcs = legs.map((l, i) => {
+      const key = l.donor_hospital + l.patient_hospital; seen[key] = (seen[key] || 0) + 1;
+      if (l.donor_hospital === l.patient_hospital) return '';
+      const chain = i >= (S.plan.swap?.legs.length || 0);
+      return `<path class="arc" d="${arcD(l.donor_hospital, l.patient_hospital, 40 + seen[key] * 45)}" stroke="${chain ? '#F2B632' : '#4FA3A5'}" style="animation: rise .6s ${i * 0.35}s both"/>`;
+    }).join('');
+  }
+  $('map').innerHTML = `<rect width="1920" height="890" fill="#081424" opacity=".45"/><path class="land" d="${path(COAST, true)}${path(BAY, true)}"/><path class="river" d="${path(RIVER)}"/>
+    ${HWYS.map(h => `<path class="hwy" d="${path(h)}"/>`).join('')}${arcs}${marker('alder')}${marker('harbor')}${marker('riverbend')}
     <defs><linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="#0E2740" stop-opacity="0"/><stop offset="1" stop-color="#0E2740" stop-opacity=".95"/></linearGradient></defs>
-    <rect width="1920" height="890" fill="#081424" opacity=".45"/>
-    <path class="land" d="${path(COAST, true)}${path(BAY, true)}"/><path class="river" d="${path(RIVER)}"/>
-    ${HWYS.map(h => `<path class="hwy" d="${path(h)}"/>`).join('')}
-    <text class="city" x="${fx - 120}" y="${fy + 6}">San Francisco</text>
-    <circle cx="${tx}" cy="${ty}" r="5" fill="#F2B632"/><text class="city" x="${tx - 12}" y="${ty + 26}" text-anchor="end" style="fill:#F2B632">Stanford · you are here</text>
-    ${arcs.map(a => `<path class="arc ${rv ? 'reviewed' : 'proposed'}" d="${a.d}"/>`).join('')}${out}
-    ${marker('alder', 'home')}${marker('harbor', showAns && rh ? (rh.candidate_found ? 'yes' : 'no') : '')}${marker('riverbend', showAns && rr ? (rr.candidate_found ? 'yes' : 'no') : '')}${tag}
     <rect x="1000" y="0" width="120" height="890" fill="url(#fade)"/><rect x="1120" y="0" width="800" height="890" fill="#0E2740" opacity=".95"/>`;
 }
-function renderNet() {
-  $('netlist').innerHTML = [['alder', 'coordinator'], ['harbor', 'agent'], ['riverbend', 'agent']]
-    .map(([id, role]) => `<li>${POD('#4FA3A5')}<span>${HOSP[id].name}</span><small>${role}</small></li>`).join('');
-}
+$('netlist').innerHTML = [['alder', 'this Mac · coordinator + agent'], ['harbor', 'Mac 2 · agent'], ['riverbend', 'Mac 3 · agent']]
+  .map(([id, role]) => `<li>${POD('#4FA3A5')}<span>${HOSP[id].name}</span><small>${role}</small></li>`).join('');
 
-// ---------------- Flower network bar (beat 3) ----------------
-const NODE_X = { alder: 330, harbor: 960, riverbend: 1590 };
+// ---------------- network bar + packets ----------------
+const NX = { alder: 340, harbor: 960, riverbend: 1580 };
 function drawNet() {
-  const node = (id, sub) => `<g><circle cx="${NODE_X[id]}" cy="40" r="15" fill="#0E2740" stroke="${id === 'alder' ? '#4FA3A5' : '#EC8017'}" stroke-width="5"/>
-    <text x="${NODE_X[id]}" y="86" text-anchor="middle" fill="#C4E4F7" font-size="16" font-family="Ubuntu, Helvetica">${sub}</text></g>`;
-  $('net').innerHTML = `<path id="p-harbor" d="M${NODE_X.alder} 40 L${NODE_X.harbor} 40" stroke="#1F4A7A" stroke-width="3" stroke-dasharray="8 8" fill="none"/>
-    <path id="p-riverbend" d="M${NODE_X.alder} 40 Q${NODE_X.harbor} -10 ${NODE_X.riverbend} 40" stroke="#1F4A7A" stroke-width="3" stroke-dasharray="8 8" fill="none"/>
-    ${node('alder', 'Alder · Flower SuperLink')}${node('harbor', 'Harbor Point · SuperNode')}${node('riverbend', 'Riverbend · SuperNode')}<g id="pkts"></g>`;
+  const node = (id, s) => `<circle cx="${NX[id]}" cy="30" r="14" fill="#0E2740" stroke="${id === 'alder' ? '#4FA3A5' : '#EC8017'}" stroke-width="5"/><text x="${NX[id]}" y="74" text-anchor="middle" fill="#C4E4F7" font-size="16" font-family="Ubuntu, Helvetica">${s}</text>`;
+  $('net').innerHTML = `<path id="p-harbor" d="M${NX.alder} 30 L${NX.harbor} 30" stroke="#1F4A7A" stroke-width="3" stroke-dasharray="8 8" fill="none"/>
+    <path id="p-riverbend" d="M${NX.alder} 30 Q${NX.harbor} -18 ${NX.riverbend} 30" stroke="#1F4A7A" stroke-width="3" stroke-dasharray="8 8" fill="none"/>
+    ${node('alder', 'Alder · Flower SuperLink + SuperNode')}${node('harbor', 'Harbor Point · SuperNode')}${node('riverbend', 'Riverbend · SuperNode')}<g id="pkts"></g>`;
 }
-function flyPacket(h, dir, label, color = '#fff') {
-  const p = $('p-' + h), g = $('pkts');
-  if (!p || !g) return;
+function fly(h, dir, label, color = '#fff') {
+  const p = $('p-' + h), g = $('pkts'); if (!p || !g) return;
   p.setAttribute('stroke', dir === 'out' ? '#C4E4F7' : '#4FA3A5');
-  const L = p.getTotalLength();
-  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  el.innerHTML = `<rect x="-62" y="-15" width="124" height="30" rx="15" fill="${color}"/><text x="0" y="5" text-anchor="middle" fill="#0E2740" font-size="15" font-family="Ubuntu Mono, monospace">${esc(label)}</text>`;
+  const L = p.getTotalLength(), el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.innerHTML = `<rect x="-66" y="-14" width="132" height="28" rx="14" fill="${color}"/><text y="5" text-anchor="middle" fill="#0E2740" font-size="14" font-family="Ubuntu Mono, monospace">${esc(label)}</text>`;
   g.appendChild(el);
-  const dur = REDUCED ? 10 : 1300, t0 = performance.now();
-  (function frame(now) {
-    const t = Math.min(1, (now - t0) / dur), e = t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
-    const pt = p.getPointAtLength(L * (dir === 'out' ? e : 1 - e));
-    el.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
-    if (t < 1) requestAnimationFrame(frame); else setTimeout(() => el.remove(), 300);
-  })(t0);
+  const dur = REDUCED ? 10 : 1200, t0 = performance.now();
+  (function f(now) { const t = Math.min(1, (now - t0) / dur), e = t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+    const pt = p.getPointAtLength(L * (dir === 'out' ? e : 1 - e)); el.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
+    if (t < 1) requestAnimationFrame(f); else setTimeout(() => el.remove(), 300); })(t0);
 }
 
-// ---------------- Step 1 players ----------------
-const is = t => e => e.type === t;
-async function playAlder(R) {
-  const col = $('col-alder');
-  col.innerHTML = `<div class="colhead">Alder<small>San Jose · coordinator</small></div><div class="seq"></div>`;
-  const host = col.querySelector('.seq');
-  const con = Think.connect({ name: 'Flower SuperLink', working: 'Waiting for hospitals…', done: 'Hospitals connected',
-    chips: [{ name: 'Harbor Point', color: '#0E7C61' }, { name: 'Riverbend', color: '#0E7C61' }] });
-  host.appendChild(con.el);
-  const hs = await S.log.waitFor(is('hospitals'), R);
-  const nodeOf = h => Object.keys(hs.nodes).find(n => hs.nodes[n] === h);
-  await R.wait(400); con.set(0, 'ok', 'node ' + short(nodeOf('harbor')));
-  await R.wait(400); con.set(1, 'ok', 'node ' + short(nodeOf('riverbend'))); con.finish();
-  await R.wait(600);
-  await Think.step(R, host, { working: "Reading Alder's pod…", done: "Read Alder's pod" }, S.log.waitFor(e => e.type === 'pod.read' && e.who === 'coordinator', R),
-    () => ({ html: true, result: `Maria ${chip('A')} · Elena ${chip('B')}` }));
-  await Think.step(R, host, { working: 'Building the form…', done: 'Built the form' }, S.log.waitFor(is('form'), R),
-    () => ({ result: 'Blood types · HLA · tokens · no names' }));
-  await Think.step(R, host, { working: 'Sending over Flower…', done: 'Sent to 2 hospitals' }, waitCount(R, 'ask.sent', 2),
-    e => ({ result: `${e.bytes} B each · query.screen` }));
-  await Think.step(R, host, { accent: 'blue', working: 'Waiting for replies…', done: '2 replies' }, waitCount(R, 'reply.received', 2),
-    () => ({ result: '5 fields each · nothing else' }), { minMs: 800 });
-  await S.log.waitFor(is('review'), R);
-  host.appendChild(Think.hero({ title: 'Review the answers', sub: 'Step 2', onClick: () => show(4) }));
+// ---------------- columns ----------------
+const colInner = h => $('col-' + h).querySelector('.inner');
+const keepBottom = () => {};
+let alderFeed = AgentFeed(colInner('alder'), 'alder', { post: Source.post });
+function remoteHead(h) {
+  $('col-' + h).innerHTML = `<div class="colhead">${HOSP[h].short}<small>${HOSP[h].city} · ${h === 'harbor' ? 'Mac 2' : 'Mac 3'}</small><span class="lk">${Think.LOCK} own pod · private</span></div><div class="inner"></div>`;
 }
-function waitCount(R, type, n) {
-  return new Promise((res, rej) => {
-    const tick = () => {
-      if (!R.alive) return rej(Think.CANCEL);
-      const evs = S.log.events.filter(is(type));
-      if (evs.length >= n) return res(evs[n - 1]);
-      setTimeout(tick, 150);
-    };
-    tick();
-  });
+const pending = {};
+const LABEL = {
+  profiles: ['Sharing donor profiles…', 'Shared donor profiles', r => `${r.pairs.length} donors · blood + HLA · no names`],
+  compat: ['Checking donors against its patients…', 'Checked, privately', r => `${r.edges.length} possible match${r.edges.length === 1 ? '' : 'es'} · pair ids only`],
+  approve: ['Checking readiness…', null, null],
+  hold: ['Checking its donors…', null, null],
+};
+function remoteAsk(e) {
+  const [w] = LABEL[e.kind] || ['Working…'];
+  const b = Think.work({ working: w, done: '' });
+  colInner(e.to).appendChild(b.el);
+  pending[e.to + e.kind] = { b, t0: performance.now() };
 }
-async function playLane(R, h) {
-  const col = $('col-' + h);
-  col.innerHTML = `<div class="colhead">${HOSP[h].short}<small>${HOSP[h].city} · agent</small><span class="lk">${Think.LOCK} own pod</span></div><div class="seq"></div>`;
-  const host = col.querySelector('.seq');
-  const ask = await S.log.waitFor(e => e.type === 'ask.sent' && e.to === h, R);
-  flyPacket(h, 'out', `form · ${ask.bytes} B`);
-  await R.wait(1100);
-  const replyP = S.log.waitFor(e => e.type === 'reply.received' && e.from === h, R);
-  const priv = { result: `Stays inside ${HOSP[h].short}`, lock: true };
-  await Think.step(R, host, { working: 'Receiving the form…', done: 'Received the form' }, Promise.resolve(ask), e => ({ result: `Flower message ${short(e.message_id)}` }), { minMs: 1000, gapMs: 800 });
-  await Think.step(R, host, { working: 'Opening its own pod…', done: 'Opened its own pod' }, Think.sleep(0), () => priv, { minMs: 1500, gapMs: 900 });
-  await Think.step(R, host, { working: 'Screening its pairs…', done: 'Screened its pairs' }, Think.sleep(0), () => priv, { minMs: 1700, gapMs: 900 });
-  await Think.step(R, host, { working: 'Checking its rules…', done: 'Checked its rules' }, Think.sleep(0), () => priv, { minMs: 1600, gapMs: 900 });
-  const rep = await Think.step(R, host, { accent: 'blue', working: 'Replying…', done: 'Replied over Flower' }, replyP, e => ({ result: `5 fields · ${e.bytes} B` }), { minMs: 900, gapMs: 300 });
-  flyPacket(h, 'in', `5 fields · ${rep.bytes} B`, rep.response.candidate_found ? '#A7D8C9' : '#F3C98B');
-  await R.wait(1200);
-  const r = rep.response;
-  host.appendChild(r.candidate_found
-    ? Think.conclusion({ label: HOSP[h].short, text: 'Candidate found', tone: 'ok', extra: `<span class="fields5"><span>token</span><span>${esc(r.candidate_token)}</span><span>readiness</span><span>${esc(r.readiness)}</span></span>` })
-    : Think.conclusion({ label: HOSP[h].short, text: 'No candidate found', tone: 'warn', extra: r.readiness === 'searching_other_regions' ? '<span class="regions2"><span>Reno</span><span>Fresno</span><span>Portland</span><span style="border-style:solid">searching · illustrative</span></span>' : '' }));
-}
-
-// ---------------- Step 2 player ----------------
-async function playReview(R) {
-  const host = $('seqReview');
-  host.innerHTML = '';
-  const rv = await S.log.waitFor(is('review'), R);
-  const cols = LANES.filter(h => S.replies[h]);
-  const fields = ['request_id', 'candidate_token', 'candidate_found', 'readiness', 'reason'];
-  const tbl = document.createElement('div');
-  tbl.className = 'rtable rise';
-  tbl.innerHTML = `<table><tr><th></th>${cols.map(h => `<th>${HOSP[h].short}</th>`).join('')}</tr>${fields.map(k => `<tr><td class="k">${k}</td>${cols.map(h => {
-    const v = S.replies[h][k]; return `<td class="${k === 'candidate_found' ? (v ? 't' : 'f') : ''}">${esc(v === '' ? '—' : String(v))}</td>`;
-  }).join('')}</tr>`).join('')}</table>`;
-  host.appendChild(tbl);
-  for (const tr of tbl.querySelectorAll('tr')) { await R.wait(220); tr.classList.add('in'); }
-  await R.wait(500);
-  const p = rv.proposal;
-  const lines = rv.checks.map(c => c.usable ? `${HOSP[c.hospital].short} fits both ways, and is ready.` : `${HOSP[c.hospital].short}: ${c.reason.replaceAll('_', ' ')}. Still searching.`);
-  lines.push(p ? `→ Propose Alder ↔ ${HOSP[p.partner].short}.` : '→ Nothing to propose yet.');
-  await Think.reason(R, host, lines);
-  await R.wait(300);
-  if (!p) return;
-  host.appendChild(Think.conclusion({ label: 'Proposed exchange', text: `Elena → ${p.candidate_token}  ·  ${p.candidate_token}'s donor → Maria`, tone: 'warn' }));
-  S.proposed = true; drawMap();
-  await R.wait(900);
-  host.appendChild(Think.hero({ title: 'Send to the surgeon', sub: `Signed approval required · AMC-KTP-04 ${p.requires}`, onClick: () => show(5) }));
-}
-
-// ---------------- Step 3: evidence ----------------
-function loadImage(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; }); }
-function inkRatio(data, w, h, poly, inset) {
-  const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
-  let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
-  const ix = (x1 - x0) * inset, iy = (y1 - y0) * inset;
-  x0 = Math.max(0, Math.round(x0 + ix)); x1 = Math.min(w - 1, Math.round(x1 - ix)); y0 = Math.max(0, Math.round(y0 + iy)); y1 = Math.min(h - 1, Math.round(y1 - iy));
-  let ink = 0, n = 0;
-  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-    const i = (y * w + x) * 4, g = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-    if (g < 110) ink++; n++;
+function remoteReply(e) {
+  const p = pending[e.from + e.kind]; if (!p) return;
+  const r = e.response;
+  let res;
+  if (e.kind === 'approve') {
+    const a = r.answers[0];
+    res = a.decision === 'hold' ? { ok: false, title: 'Not this week', result: `${a.reason} · asks everyone to wait until ${a.hold_until}` } : { title: 'Approved', result: `Surgeon approved · ${a.readiness}` };
+  } else if (e.kind === 'hold') {
+    res = r.decision === 'accept' ? { title: 'Can wait', result: 'Accepts the new date' } : { ok: false, title: "Can't wait", result: `${r.reason.replace('_', ' ')} · only ${HOSP[e.from].short} knows why`, lock: true };
+  } else {
+    res = { title: LABEL[e.kind][1], result: LABEL[e.kind][2](r) };
   }
-  return n ? ink / n : 0;
+  setTimeout(() => p.b.resolve(res), Math.max(0, 900 - (performance.now() - p.t0)));
 }
-async function analyzeForm(src) {
-  const img = await loadImage(src);
-  const sc = Math.min(1, 1800 / img.naturalWidth);
-  const w = Math.round(img.naturalWidth * sc), h = Math.round(img.naturalHeight * sc);
-  const cv = $('formCanvas'); cv.width = w; cv.height = h;
-  const ctx = cv.getContext('2d', { willReadFrequently: true });
-  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
-  const data = ctx.getImageData(0, 0, w, h).data;
-  $('drop').classList.add('has');
-  const qr = typeof jsQR === 'function' ? jsQR(data, w, h) : null;
-  let f = null;
-  try { f = qr ? JSON.parse(qr.data) : null; } catch { f = null; }
-  if (!f) return { f: null };
-  const L = f.layout, loc = qr.location, [qx, qy, qs] = L.qr;
-  const map = (fx, fy) => { const u = (fx - qx) / qs, v = (fy - qy) / qs;
-    return [loc.topLeftCorner.x + u * (loc.topRightCorner.x - loc.topLeftCorner.x) + v * (loc.bottomLeftCorner.x - loc.topLeftCorner.x),
-      loc.topLeftCorner.y + u * (loc.topRightCorner.y - loc.topLeftCorner.y) + v * (loc.bottomLeftCorner.y - loc.topLeftCorner.y)]; };
-  const poly = b => [map(b[0], b[1]), map(b[2], b[1]), map(b[2], b[3]), map(b[0], b[3])];
-  const draw = (pts, color) => { ctx.strokeStyle = color; ctx.lineWidth = Math.max(5, w / 260); ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); ctx.stroke(); };
-  const res = { f, sig: inkRatio(data, w, h, poly(L.sig), 0.06), apr: inkRatio(data, w, h, poly(L.approve), 0.2), dec: inkRatio(data, w, h, poly(L.decline), 0.2),
-    overlay: () => {
-      draw([loc.topLeftCorner, loc.topRightCorner, loc.bottomRightCorner, loc.bottomLeftCorner].map(p => [p.x, p.y]), '#4FA3A5');
-      draw(poly(L.approve), '#EC8017'); draw(poly(L.decline), '#8A97B5'); draw(poly(L.sig), '#EC8017');
-    } };
-  return res;
+function planBar(e) {
+  const names = l => l.donor_pair === 'ALT' ? `Stranger → ${STORY[l.patient_pair][0]}` : `${STORY[l.donor_pair][1]} → ${STORY[l.patient_pair][0]}`;
+  const legs = e.legs.map(names).join(' · ');
+  const label = { loop: 'Loop found · 3 hospitals', swap: 'No consensus → swap', chain: `Chain · ${STORY[e.bridge_donor]?.[1] || ''} starts the next one` }[e.kind];
+  const nextBtn = { loop: ['Ask for approval', 'Each surgeon decides', () => startPhase('approve')], swap: ['A stranger gives a kidney', 'Surgery at Alder · blood O', () => startPhase('chain')], chain: ['See the result', 'All transplants on the map', () => show(4)] }[e.kind];
+  $('planbar').innerHTML = '';
+  $('planbar').appendChild(Think.conclusion({ label, text: legs, tone: e.kind === 'swap' ? 'warn' : 'ok' }));
+  $('planbar').appendChild(Think.hero({ title: nextBtn[0], sub: nextBtn[1], onClick: nextBtn[2] }));
 }
-async function playEvidence(R, src) {
-  const host = $('seqEvid');
-  host.innerHTML = '';
-  S.reviewed = null; show(5);
-  let a;
-  try { a = await analyzeForm(src); } catch { a = { f: null }; }
-  const token = S.review?.proposal?.candidate_token, reqId = S.log.find(is('form'))?.request?.request_id;
-  const opt = { minMs: 1100, gapMs: 700 };
-  const read = await Think.step(R, host, { working: 'Reading the form…', done: 'Read the form' }, Promise.resolve(a),
-    x => x.f ? { result: `${x.f.form} · ${x.f.surgeon}` } : { ok: false, title: 'Could not read the form', result: 'No form QR code found' }, opt);
-  if (!read.f) return finishEvidence(R, host, false, ['No readable form.', '→ Approval stays locked.']);
-  a.overlay();
-  const runOk = !!reqId && a.f.request_id === reqId, tokOk = !!token && a.f.candidate_token === token;
-  await Think.step(R, host, { working: 'Matching this run…', done: 'Matches this run' }, Promise.resolve(a),
-    x => (runOk && tokOk) ? { result: `${x.f.request_id} · ${x.f.candidate_token}` }
-      : { ok: false, title: 'Does not match this run', result: !tokOk ? `Token ${x.f.candidate_token} ≠ ${token || '—'}` : `Request ${x.f.request_id} ≠ ${reqId || '—'}` }, opt);
-  const boxOk = a.apr > 0.04 && a.dec < 0.02;
-  await Think.step(R, host, { working: 'Checking the boxes…', done: '"Approve" is marked' }, Promise.resolve(a),
-    x => boxOk ? { result: `Approve ${(x.apr * 100).toFixed(0)}% ink · decline empty` } : { ok: false, title: 'Decision unclear', result: `Approve ${(x.apr * 100).toFixed(0)}% · decline ${(x.dec * 100).toFixed(0)}%` }, opt);
-  const sigOk = a.sig > 0.008;
-  await Think.step(R, host, { working: 'Looking for a signature…', done: 'Signed' }, Promise.resolve(a),
-    x => sigOk ? { result: `Ink in the signature box · ${(x.sig * 100).toFixed(1)}%` } : { ok: false, title: 'No signature', result: 'The signature box is empty' }, opt);
-  const pass = runOk && tokOk && boxOk && sigOk;
-  const lines = [runOk && tokOk ? 'Right request, right candidate.' : 'Wrong request or candidate.', boxOk ? 'Approved on paper.' : 'Decision not clear.', sigOk ? 'Signed by the surgeon.' : 'Not signed.',
-    pass ? '→ Ready for the surgeon to confirm.' : '→ Approval stays locked.'];
-  await finishEvidence(R, host, pass, lines, a.f);
+function setCount(n) {
+  const el = $('count'), from = S.counter; S.counter = n;
+  const t0 = performance.now();
+  (function f(now) { const t = Math.min(1, (now - t0) / 700); el.textContent = Math.round(from + (n - from) * t); el.style.transform = `scale(${1 + .12 * Math.sin(Math.PI * t)})`; if (t < 1) requestAnimationFrame(f); })(t0);
 }
-async function finishEvidence(R, host, pass, lines, f) {
-  await Think.reason(R, host, lines);
-  await R.wait(300);
-  host.appendChild(Think.hero(pass
-    ? { title: 'Confirm approval', sub: `${f.surgeon} · Proposed → Reviewed`, onClick: e => confirmApproval(e.currentTarget, f) }
-    : { title: 'Approval locked', sub: 'Fix the form and drop it again', disabled: true }));
-}
-function confirmApproval(btn, f) {
-  if (S.reviewed) return;
-  btn.disabled = true;
-  btn.classList.add('done');
-  btn.querySelector('.ht').textContent = 'Approved';
-  S.reviewed = { at: new Date().toTimeString().slice(0, 5), surgeon: f.surgeon, request_id: f.request_id, token: f.candidate_token };
-  Source.post('/ui', { type: 'review.confirmed', request_id: f.request_id, candidate_token: f.candidate_token, t: Date.now() / 1000 });
-  setTimeout(() => show(6), REDUCED ? 0 : 1200);
-}
-function renderDone() {
-  const r = S.reviewed, p = S.review?.proposal;
-  $('legs').innerHTML = r && p ? `Elena → <span class="mono">${esc(p.candidate_token)}</span><br><span class="mono">${esc(p.candidate_token)}</span>'s donor → Maria<br><span style="color:var(--tint); font-size:18px">${esc(r.surgeon)} · ${r.at}</span>` : '';
+const PHASE = { search: ['Step 1 · all three hospitals', 'Find matches'], approve: ['Step 2 · each surgeon decides', 'Approve'], chain: ['Step 3 · a stranger gives', 'The chain'] };
+async function startPhase(phase) {
+  if (S.busy) return;
+  S.busy = true; S.phase = phase;
+  $('phaseEyebrow').textContent = PHASE[phase][0]; $('phaseTitle').textContent = PHASE[phase][1];
+  colInner('alder').innerHTML = ''; alderFeed = AgentFeed(colInner('alder'), 'alder', { post: Source.post });
+  remoteHead('harbor'); remoteHead('riverbend'); drawNet();
+  $('planbar').innerHTML = '';
+  show(3);
+  if (Source.live) {
+    const r = await Source.post('/start', { phase });
+    if (!r.ok) { $('planbar').innerHTML = `<div class="note">${esc(r.error || 'Could not start the Flower run.')}</div>`; S.busy = false; }
+  }
 }
 
-// ---------------- Events ----------------
-function wire(dir, html) {
-  const el = document.createElement('span');
-  el.className = 'pkt ' + dir; el.innerHTML = html;
-  $('wire').prepend(el);
-  while ($('wire').children.length > 5) $('wire').lastChild.remove();
-}
+// ---------------- events ----------------
+function wire(dir, html) { const el = document.createElement('span'); el.className = 'pkt ' + dir; el.innerHTML = html; $('wire').prepend(el); while ($('wire').children.length > 5) $('wire').lastChild.remove(); }
 function onEvent(e) {
   if (!e) return;
-  $('log').textContent += (e.type === 'flwr.log' ? `flwr │ ${e.line}` : `${e.who || ''} · ${e.type} ${JSON.stringify(Object.fromEntries(Object.entries(e).filter(([k]) => !['type', 'who', 't', 'seq'].includes(k))))}`).slice(0, 600) + '\n';
+  $('log').textContent += (e.type === 'flwr.log' ? `flwr │ ${e.line}` : `${e.who || ''} · ${e.type} ${JSON.stringify(Object.fromEntries(Object.entries(e).filter(([k]) => !['type', 'who', 't', 'seq'].includes(k))))}`).slice(0, 500) + '\n';
+  if (e.who === 'alder') { alderFeed.push(e); return; }
   switch (e.type) {
-    case 'launch': $('findNote').textContent = 'Starting a Flower run…'; break;
     case 'run.start': S.runId = e.run_id; badge(); break;
-    case 'hospitals': S.nodes = e.nodes; break;
-    case 'ask.sent': wire('out', `<b>→ ${HOSP[e.to].short}</b> · query.screen · ${short(e.message_id)} · ${e.bytes} B`); break;
-    case 'reply.received': S.replies[e.from] = e.response; wire('in', `<b>← ${HOSP[e.from].short}</b> · reply · ${e.bytes} B`); break;
-    case 'review': S.review = { checks: e.checks, proposal: e.proposal }; break;
-    case 'flwr.exit': if (e.code) $('findNote').textContent = `Flower run failed (code ${e.code}). Open the Flower log.`; break;
+    case 'ask.sent':
+      wire('out', `<b>→ ${HOSP[e.to].short}</b> · query.${e.kind} · ${short(e.message_id)} · ${e.bytes} B`);
+      if (e.to !== 'alder') { fly(e.to, 'out', `${e.kind} · ${e.bytes} B`); remoteAsk(e); }
+      break;
+    case 'reply.received':
+      wire('in', `<b>← ${HOSP[e.from].short}</b> · ${e.kind} · ${e.bytes} B`);
+      if (e.from !== 'alder') { fly(e.from, 'in', `${e.kind} · ${e.bytes} B`, '#A7D8C9'); remoteReply(e); }
+      break;
+    case 'hold.request': wire('in', `<b>Riverbend</b> asks everyone to wait until ${e.hold_until}`); break;
+    case 'plan': S.plan[e.kind] = e; setCount(e.counter); setTimeout(() => planBar(e), 1200); break;
+    case 'phase.end': S.busy = false; break;
+    case 'flwr.exit': if (e.code) { S.busy = false; $('planbar').innerHTML = `<div class="note">Flower run failed (code ${e.code}). Open the Flower log.</div>`; } break;
   }
-  S.log.push(e);
 }
 Source.on((e, meta) => { if (!meta.catchUp) onEvent(e); });
-
-async function find() {
-  if (S.started) return;
-  S.started = true;
-  $('findBtn').disabled = true; $('findBtn').textContent = 'Searching…';
-  if (Source.live) {
-    const r = await Source.post('/start');
-    if (!r.ok) { $('findNote').textContent = r.error || 'Could not start the Flower run.'; S.started = false; $('findBtn').disabled = false; $('findBtn').textContent = 'Find an exchange'; return; }
-  }
-  drawNet();
-  startPlayer('alder', playAlder);
-  LANES.forEach(h => startPlayer('lane-' + h, playLane, h));
-  setTimeout(() => show(3), 500);
-  if (!Source.live && RECORDING) Source.replay(RECORDING.events.map(e => ({ ...e })));
+function renderFinal() {
+  const legs = [...(S.plan.swap?.legs || []), ...(S.plan.chain?.legs || [])];
+  const name = l => l.donor_pair === 'ALT' ? `The stranger → <b>${STORY[l.patient_pair][0]}</b>` : `${STORY[l.donor_pair][1]} → <b>${STORY[l.patient_pair][0]}</b>`;
+  $('finalCount').textContent = S.counter || 7;
+  $('legs').innerHTML = legs.map(name).join('<br>') + (S.plan.chain?.bridge_donor ? `<br><span style="color:var(--tint)">${STORY[S.plan.chain.bridge_donor][1]} starts the next chain.</span>` : '');
 }
 
-// ---------------- Inputs ----------------
-$('findBtn').onclick = find;
-$('nextBtn').onclick = () => next();
-$('backBtn').onclick = () => back();
+// ---------------- inputs ----------------
+$('findBtn').onclick = () => startPhase('search');
+$('nextBtn').onclick = () => next(); $('backBtn').onclick = () => back();
 $('logBtn').onclick = () => $('logOverlay').classList.toggle('on');
 $('logOverlay').onclick = e => { if (e.target.id === 'logOverlay') $('logOverlay').classList.remove('on'); };
 document.querySelectorAll('#nav span').forEach(el => { el.onclick = () => show(Number(el.dataset.b.split(',')[0])); });
-const drop = $('drop');
-const takeForm = src => startPlayer('evidence', playEvidence, src);
-drop.onclick = () => $('file').click();
-$('file').onchange = e => { const f = e.target.files[0]; if (f) takeForm(URL.createObjectURL(f)); e.target.value = ''; };
-['dragenter', 'dragover'].forEach(ev => addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
-['dragleave', 'drop'].forEach(ev => addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
-addEventListener('drop', e => { const f = [...(e.dataTransfer?.files || [])].find(x => x.type.startsWith('image/')); if (f) takeForm(URL.createObjectURL(f)); });
-addEventListener('paste', e => { const it = [...(e.clipboardData?.items || [])].find(x => x.type.startsWith('image/')); if (it) takeForm(URL.createObjectURL(it.getAsFile())); });
 addEventListener('keydown', e => {
   const k = e.key;
   if (k === 'Escape') { $('logOverlay').classList.remove('on'); return; }
@@ -615,10 +373,8 @@ addEventListener('keydown', e => {
   else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); back(); }
   else if (k === 'l' || k === 'L') $('logOverlay').classList.toggle('on');
   else if (k === 'f' || k === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
-  else if (k === 'r' || k === 'R') location.reload();
 });
-
-renderNet(); badge(); show(0, 0);
+badge(); show(0, 0);
 </script>
 </body>
 </html>

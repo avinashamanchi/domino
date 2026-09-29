@@ -11,6 +11,38 @@ A surgeon then reviews a signed approval form, and the exchange goes from **Prop
 
 All patients, donors and hospitals are fictional. The data is synthetic and hardcoded.
 
+## The story (three Macs, three phases)
+
+| Mac | Runs | Opens | Says |
+| --- | --- | --- | --- |
+| **Mac 1 · Alder, San Jose** | Flower **SuperLink**, the coordinator **ServerApp**, and **Alder's own agent** (a SuperNode) | `http://127.0.0.1:8765/projector.html` (the projector) | **Yes.** When asked to wait, it checks Elena's file: she's free until Oct 31. The stranger's surgery also happens here. |
+| **Mac 2 · Harbor Point, Oakland** | Harbor Point's SuperNode and agent | `http://127.0.0.1:8766/console.html` | **No.** When asked to wait, it checks Priya's file: her time off ends Friday. Only Harbor Point knows why. |
+| **Mac 3 · Riverbend, Sacramento** | Riverbend's SuperNode and agent | `http://127.0.0.1:8767/console.html` | **Asks everyone to wait.** A scan shows Grace has pneumonia. The agent reads it and applies rule §1.1: "not this week". The surgeon clicks **Ask everyone to wait until Oct 9**. |
+
+How it plays out on the projector (the counter goes 0 → 3 → 2 → 7):
+1. **Find matches:** the loop Elena → James, Priya → Grace, Sam → Maria. **3** transplants.
+2. **Ask for approval:** Riverbend asks everyone to wait (the surgeon clicks on Mac 3). Alder says yes, Harbor Point says no, so there is no consensus. The plan becomes the swap Elena → James, Priya → Maria. **2** transplants.
+3. **A stranger gives a kidney:** the chain Stranger → Kenji, Aiko → Hannah, Mark → David, Ruth → Fatima, Samir → Aisha. **7** transplants. Malik starts the next chain.
+
+### Run it on three Macs
+
+Do this once on every Mac:
+```bash
+git clone https://github.com/avinashamanchi/domino.git ~/Desktop/domino
+cd ~/Desktop/domino && git checkout story-v3
+cd flower && uv venv --python 3.11 && uv pip install "flwr>=1.22,<2.0"
+```
+
+1. **Mac 1 (Alder):** run `cd ~/Desktop/domino && ./scripts/run-alder.sh`. It prints its IP address; allow incoming connections if macOS asks.
+2. **Mac 2 (Harbor Point):** run `cd ~/Desktop/domino && ./scripts/run-hospital.sh harbor <Mac-1-IP>`.
+3. **Mac 3 (Riverbend):** run `cd ~/Desktop/domino && ./scripts/run-hospital.sh riverbend <Mac-1-IP>`.
+
+All three Macs must be on the same network, and Mac 1 must accept connections on port **9092**. Conference Wi-Fi often blocks one laptop from reaching another, so use a phone hotspot to be safe.
+
+**Rehearse on one Mac:** run `./scripts/run-all-local.sh` and open all three pages.
+
+**Stop:** press Ctrl+C, or run `./scripts/stop.sh`.
+
 ## What runs where
 
 | Machine | Processes | Reads |
