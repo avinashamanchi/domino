@@ -36,6 +36,10 @@ h1.display { font-size: 64px; margin: 8px 0 0; }
 .foot { position: absolute; left: 0; right: 0; bottom: 0; height: 62px; background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; }
 .foot .fine { font-size: 14px; color: var(--tint); }
 .foot .keys { font-size: 13px; color: var(--offline); }
+.navbtns { display: flex; gap: 10px; }
+.navbtns .btn { font-size: 16px; padding: 9px 16px; }
+.topnav span { cursor: pointer; }
+.topnav span:hover { color: var(--gold); opacity: 1; }
 .badge { font-weight: 700; font-size: 13px; letter-spacing: .06em; padding: 7px 12px; border-radius: 3px; border: 1px solid var(--gold); color: var(--gold); }
 .badge.live { border-color: var(--teal); color: var(--teal); }
 
@@ -377,7 +381,11 @@ td.f { color: #a86b00 !important; font-weight: 700; }
   <div class="foot">
     <span class="badge" id="badge">…</span>
     <span class="fine">All patients, donors and hospitals are fictional. Synthetic data.</span>
-    <span class="keys">→ next · ← back · L Flower log · H help</span>
+    <span class="navbtns">
+      <button class="btn outline" id="logBtn" title="Flower run log (L)">Flower log</button>
+      <button class="btn outline" id="backBtn">← Back</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </span>
   </div>
 
   <div class="overlay" id="logOverlay"><div class="panel"><h2>Flower run log</h2><div class="log" id="log"></div></div></div>
@@ -433,6 +441,12 @@ function caption() {
   const el = $('caption');
   el.classList.toggle('narrow', [2, 4, 6].includes(b));
   el.classList.toggle('left', b === 5);
+  const nb = $('nextBtn');
+  if (nb) {
+    nb.textContent = b === 2 && !S.started ? 'Find an exchange →' : b === 5 && !S.reviewed ? 'Confirm approval first' : b === 6 ? 'End' : 'Next →';
+    nb.disabled = (b === 5 && !S.reviewed) || b === 6;
+    nb.classList.toggle('locked', nb.disabled);
+  }
   if (el.textContent !== c) { el.style.opacity = 0; setTimeout(() => { el.textContent = c; el.style.opacity = 1; }, 200); }
 }
 function answerLine() {
@@ -806,6 +820,11 @@ async function find() {
 
 // ---------------- Inputs ----------------
 $('findBtn').onclick = find;
+$('nextBtn').onclick = () => next();
+$('backBtn').onclick = () => back();
+$('logBtn').onclick = () => $('logOverlay').classList.toggle('on');
+$('logOverlay').onclick = e => { if (e.target.id === 'logOverlay') $('logOverlay').classList.remove('on'); };
+document.querySelectorAll('#nav span').forEach(el => { el.onclick = () => show(Number(el.dataset.b.split(',')[0])); });
 $('confirmBtn').onclick = confirmApproval;
 $('ack').onchange = lockConfirm;
 const drop = $('drop');

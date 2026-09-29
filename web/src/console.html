@@ -161,7 +161,7 @@ function reset() {
   S = { runId: null, request: null, files: [], reads: new Set(), screen: null, ledger: S?.ledger || [] };
   $('flow').innerHTML = STEPS.map(([t, s], i) => `<li id="st${i}"><span class="n">${i + 1}</span><article class="card"><header><h2>${t}<small>${s}</small></h2><span class="meta" id="sm${i}"></span></header><div class="body" id="sb${i}"><div class="empty">waiting…</div></div></article></li>`).join('');
   $('qa').innerHTML = QUESTIONS.map((q, i) => `<li><div class="q">${i + 1}. ${q}</div><div class="a pending" id="qa${i}">not answered yet</div></li>`).join('');
-  banner('idle', 'Standing by', 'Waiting for a form', 'Alder\'s coordinator will send one over Flower.');
+  banner('idle', 'Standing by · nothing to press here', 'Waiting for a form', 'This agent starts on its own when Alder sends a form over Flower. To start: on Alder\'s projector, go to the map and click <b style="color:#fff">Find an exchange</b>. This page updates by itself.');
 }
 function banner(cls, eyebrow, big, small) { $('answer').className = 'answer ' + cls; $('answer').innerHTML = `<div class="eyebrow">${eyebrow}</div><div class="big">${big}</div><div class="small">${small}</div>`; }
 function step(i, html, meta, done = true) {
