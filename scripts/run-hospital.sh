@@ -12,6 +12,10 @@ POD="${DOMINO_POD:-$ROOT/pods/$H}"
 case "$H" in harbor) PORT=8766; RT=9094 ;; riverbend) PORT=8767; RT=9095 ;; *) echo "unknown hospital $H"; exit 1 ;; esac
 export FLWR_HOME="$ROOT/.flwr-home/$H"
 mkdir -p "$FLWR_HOME" "$ROOT/logs"
+busy() { lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1; }
+for p in "$PORT" "$RT"; do
+  if busy "$p"; then echo "Port $p is already in use (an earlier Domino run?). Run scripts/stop.sh, then try again."; exit 1; fi
+done
 python3 "$ROOT/web/build.py" >/dev/null
 echo "Starting $H SuperNode → SuperLink $SUPERLINK_IP:9092 · pod $POD"
 "$BIN/flower-supernode" --insecure --superlink "$SUPERLINK_IP:9092" --port "$RT" \

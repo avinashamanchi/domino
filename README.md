@@ -92,6 +92,8 @@ Then open <http://127.0.0.1:8767/console.html>.
 
 **Rehearsing on one Mac:** `scripts/run-all-local.sh` starts all of it.
 
+**Stopping:** Ctrl+C, or `scripts/stop.sh` to clear anything left running. The launch scripts refuse to start while a port is still in use, and tell you to run `scripts/stop.sh`.
+
 **No network at all:** open `web/dist/A-alder-projector.html`, `B-harbor-console.html` or `C-riverbend-console.html` from disk. They play a **recorded real Flower run** (run `13554069240519904883`), and the badge reads **REPLAY** instead of **LIVE**.
 
 ### Projector keys

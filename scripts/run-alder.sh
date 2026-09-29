@@ -7,6 +7,10 @@ BIN="$ROOT/flower/.venv/bin"
 export PATH="$BIN:$PATH"
 export FLWR_HOME="$ROOT/.flwr-home/alder"
 mkdir -p "$FLWR_HOME" "$ROOT/logs"
+busy() { lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1; }
+for p in 8765 8000 9092; do
+  if busy "$p"; then echo "Port $p is already in use (an earlier Domino run?). Run scripts/stop.sh, then try again."; exit 1; fi
+done
 cat > "$FLWR_HOME/config.toml" <<TOML
 [superlink]
 default = "domino-local"
