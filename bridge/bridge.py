@@ -167,7 +167,7 @@ def main():
     p.add_argument("--flwr", default=str(ROOT / "flower" / ".venv" / "bin" / "flwr"))
     p.add_argument("--alder-pod", default=str(ROOT / "pods" / "alder"))
     p.add_argument("--request-id", default="REQ-2026-0929-A1")
-    p.add_argument("--pace", type=float, default=1.0)
+    p.add_argument("--pace", type=float, default=2.0)
     args = p.parse_args()
     if args.role == "coordinator":
         args.hospital = "alder"

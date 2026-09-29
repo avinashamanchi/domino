@@ -29,6 +29,16 @@ All patients, donors and hospitals are fictional. The data is synthetic and hard
 - `availability/*.md`: donor availability notes, each with an `available_from / available_to / workup` header.
 - `rulebook.md`: one program rulebook, with `### §` sections.
 
+## What you see
+
+The screens are built to show agents thinking, not paragraphs of text. Each step appears as a card with a spinner, then resolves into a check and a one-line result, about two seconds per card. A shimmering **Reasoning** box follows, then a **Conclusion**, then a single action button.
+
+- **Projector, Step 1:** three live columns: Alder, Harbor Point and Riverbend.
+  - Flower messages fly between them on the network bar and are listed on the bottom **FLOWER** strip.
+  - The hospital columns show only that each hospital is working inside its own pod ("stays inside Harbor Point"). Alder never sees their data, only the five-field reply.
+- **Hospital consoles:** the same card sequence, but with each hospital's real private reasoning: names, the pair that matched, readiness notes and rulebook sections. They also show which files in the pod were read.
+- **Pacing:** the agents run at `pace=2.0` (`DOMINO_PACE`), so the real Flower round trip lines up with the on-screen rhythm. Set `DOMINO_PACE=1.0` for a faster run.
+
 ## What the agents do
 
 **Coordinator (A):**

@@ -99,394 +99,309 @@ button { font-family: var(--font); }
   *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }
 
+/* Staged "agent at work" components: connect panel, work boxes, reasoning, conclusion, hero action. */
+.seq { display: flex; flex-direction: column; gap: 10px; }
+.rise { animation: rise 220ms ease-out both; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+.connect { border: 2px solid var(--divider); background: #fff; border-radius: 8px; padding: 12px 16px; color: var(--body); }
+.connect .ch { display: flex; align-items: center; gap: 12px; }
+.connect .mk { width: 30px; height: 30px; flex: none; }
+.connect .mk svg { width: 100%; height: 100%; display: block; }
+.connect .nm { display: block; font-weight: 700; font-size: 18px; color: var(--navy); }
+.connect .sb { display: block; font-size: 14px; color: #5b6b82; }
+.chips2 { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.chip2 { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--divider); border-radius: 999px; padding: 4px 12px; font-size: 14px; font-weight: 700; color: #6b778c; background: #fff; transition: border-color .2s, color .2s; }
+.chip2 .d { width: 9px; height: 9px; border-radius: 50%; background: var(--c, #8A97B5); }
+.chip2.pending .d { animation: pulseDot .9s ease-in-out infinite; }
+@keyframes pulseDot { 50% { opacity: .2; transform: scale(.7); } }
+.chip2 .st { font-size: 12px; font-weight: 700; opacity: .75; }
+.chip2.ok { border-color: var(--c); color: var(--c); }
+.chip2.ok .st::before { content: "\2713 "; }
+.chip2.off { color: #9aa5b8; border-style: dashed; }
+.chip2.off .d { background: #c9d0da; }
+.chip2.off .nmx { text-decoration: line-through; }
+
+.work { display: flex; gap: 14px; align-items: flex-start; border: 2px solid var(--am); background: var(--aw); border-radius: 8px; padding: 12px 16px; color: var(--body); }
+.work .ic { flex: none; width: 26px; height: 26px; margin-top: 1px; display: flex; align-items: center; justify-content: center; }
+.spin { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--am); border-top-color: var(--as); animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.okc { width: 26px; height: 26px; border-radius: 50%; background: var(--as); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.work .tt { display: block; font-size: 17px; font-weight: 700; color: var(--as); }
+.work .rs { display: block; font-size: 17px; color: #14181f; margin-top: 2px; line-height: 1.4; }
+.work .rs.lock { color: #5b6b82; display: flex; align-items: center; gap: 6px; }
+.work .rs.lock svg { width: 14px; height: 14px; flex: none; }
+.work .more { margin-top: 8px; }
+.work .more summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--as); }
+
+.think { border: 2px solid #cdbdf5; border-radius: 8px; padding: 14px 16px; color: #14181f;
+  background: linear-gradient(100deg, #f5f2ff 0%, #eef4ff 50%, #f5f2ff 100%); background-size: 220% 100%; animation: shimmer 1.8s linear infinite; }
+@keyframes shimmer { to { background-position: -220% 0; } }
+.think.done { animation: none; background: #f5f2ff; border-color: #b9a6ee; }
+.think .th { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; color: #5b32c9; }
+.think .th svg { width: 20px; height: 20px; color: #6d28d9; }
+.think .dots { display: inline-flex; gap: 4px; }
+.think .dots span { width: 6px; height: 6px; border-radius: 50%; background: #8b5cf6; animation: bounce 1s ease-in-out infinite; }
+.think .dots span:nth-child(2) { animation-delay: .15s; } .think .dots span:nth-child(3) { animation-delay: .3s; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); opacity: .4; } 50% { transform: translateY(-4px); opacity: 1; } }
+.think.done .dots { display: none; }
+.think .ls { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+.think .l { font-size: 17px; opacity: 0; transform: translateY(4px); transition: opacity .3s, transform .3s; }
+.think .l.show { opacity: 1; transform: none; }
+.think .l:last-child { font-weight: 800; color: #5b32c9; }
+
+.concl { border: 2px solid var(--cb, #1b4d8f); background: var(--cw, #eaf1fa); border-radius: 8px; padding: 14px 18px; color: #14181f; }
+.concl .cl { display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--cb, #1b4d8f); }
+.concl .ct { display: block; font-size: 22px; font-weight: 800; margin-top: 3px; line-height: 1.3; }
+.concl .cx { margin-top: 8px; }
+.concl.ok { --cb: #0E7C61; --cw: #E6F4EF; }
+.concl.warn { --cb: #B45309; --cw: #FDF3E7; }
+.concl.bad { --cb: #B3261E; --cw: #FDECEA; }
+
+.hero { width: 100%; display: flex; align-items: center; gap: 16px; text-align: left; border: 2px solid var(--blue); background: var(--blue); color: #fff; border-radius: 8px; padding: 14px 20px; cursor: pointer; font-family: var(--font); transition: background .12s; }
+.hero:hover { background: var(--blue-press); }
+.hero .ht { display: block; font-size: 22px; font-weight: 700; line-height: 1.2; }
+.hero .hs { display: block; margin-top: 3px; font-size: 15px; font-weight: 400; opacity: .9; }
+.hero .ha { margin-left: auto; font-size: 26px; font-weight: 700; }
+.hero:disabled { background: var(--offline); border-color: var(--offline); cursor: not-allowed; }
+.hero.done, .hero.done:disabled { background: #0E7C61; border-color: #0E7C61; cursor: default; }
+
+.fields5 { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; font-family: var(--font-mono); font-size: 14px; }
+.fields5 span:nth-child(odd) { color: #6b778c; }
+.fields5 span:nth-child(even) { color: #0A3C6E; font-weight: 700; }
+.regions2 { display: flex; gap: 6px; flex-wrap: wrap; }
+.regions2 span { font-size: 13px; border: 1px dashed #d8a54a; color: #8a5a00; padding: 2px 8px; border-radius: 999px; background: #fff; }
+
 html, body { height: 100%; }
 body { background: var(--navy); overflow: hidden; color: #fff; }
 #stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; overflow: hidden;
   background: radial-gradient(ellipse at 30% 40%, transparent 55%, rgba(8, 20, 36, .55) 100%), linear-gradient(135deg, #0E2740 0%, #13345C 55%, #1B4F8A 100%); }
 .topbar { position: relative; z-index: 6; }
-.topnav span { font-size: 15px; opacity: .75; }
+.topnav span { font-size: 15px; opacity: .7; cursor: pointer; }
 .topnav span.on { opacity: 1; }
-.topnav span i { font-style: normal; color: var(--tint); margin-right: 6px; font-weight: 400; }
-.hero { position: absolute; left: 0; right: 0; top: 70px; height: 900px; }
+.topnav span:hover { color: var(--gold); opacity: 1; }
+.hero-area { position: absolute; left: 0; right: 0; top: 70px; height: 890px; }
 .beat { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .5s ease; }
 .beat.on { opacity: 1; pointer-events: auto; }
 .reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
 .reveal.in { opacity: 1; transform: none; }
-.caption { position: absolute; right: 72px; bottom: 26px; max-width: 1100px; text-align: right; color: var(--gold); font-weight: 500; font-size: 34px; line-height: 1.22; z-index: 5; transition: opacity .3s; }
-.caption.narrow { max-width: 700px; }
-.caption.left { left: 60px; right: auto; max-width: 900px; text-align: left; }
 .eyebrow { font-size: 20px; }
-h1.display { font-size: 64px; margin: 8px 0 0; }
+h1.display { font-size: 60px; margin: 6px 0 0; }
 
-/* footer: wire strip + bar */
-.wirebar { position: absolute; left: 0; right: 0; top: 970px; height: 48px; background: rgba(8, 20, 36, .6); border-top: 1px solid rgba(196, 228, 247, .12); display: flex; align-items: center; gap: 12px; padding: 0 28px; overflow: hidden; }
-.wirebar .lbl { font-weight: 700; font-size: 12px; letter-spacing: .12em; color: var(--tint); flex: none; }
-.pkt { flex: none; background: #fff; color: var(--navy); font-family: var(--font-mono); font-size: 14px; padding: 4px 11px; border-radius: 13px; white-space: nowrap; animation: pktIn .5s ease; }
-.pkt b { color: var(--blue); font-weight: 400; }
-.pkt.in b { color: #2d7f81; }
-@keyframes pktIn { from { opacity: 0; transform: translateX(-16px); } }
-.foot { position: absolute; left: 0; right: 0; bottom: 0; height: 62px; background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; }
+/* Bigger thinking components for the projector */
+#stage .work .tt { font-size: 20px; } #stage .work .rs { font-size: 19px; }
+#stage .work { padding: 12px 16px; }
+#stage .think .th { font-size: 20px; } #stage .think .l { font-size: 20px; }
+#stage .concl .ct { font-size: 26px; } #stage .concl .cl { font-size: 14px; }
+#stage .connect .nm { font-size: 20px; } #stage .connect .sb { font-size: 16px; }
+#stage .chip2 { font-size: 15px; }
+#stage .hero .ht { font-size: 24px; } #stage .hero .hs { font-size: 16px; }
+#stage .fields5 { font-size: 16px; }
+
+/* Footer: Flower strip + bar */
+.wirebar { position: absolute; left: 0; right: 0; top: 960px; height: 50px; background: rgba(8, 20, 36, .6); border-top: 1px solid rgba(196, 228, 247, .12); display: flex; align-items: center; gap: 12px; padding: 0 28px; overflow: hidden; }
+.wirebar .lbl { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; letter-spacing: .12em; color: var(--tint); flex: none; }
+.wirebar .lbl svg { width: 22px; height: 22px; }
+.pkt { flex: none; background: #fff; color: var(--navy); font-family: var(--font-mono); font-size: 15px; padding: 4px 12px; border-radius: 13px; white-space: nowrap; animation: rise .4s ease; }
+.pkt b { color: var(--blue); font-weight: 400; } .pkt.in b { color: #0E7C61; }
+.foot { position: absolute; left: 0; right: 0; bottom: 0; height: 70px; background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; }
 .foot .fine { font-size: 14px; color: var(--tint); }
-.foot .keys { font-size: 13px; color: var(--offline); }
-.navbtns { display: flex; gap: 10px; }
-.navbtns .btn { font-size: 16px; padding: 9px 16px; }
-.topnav span { cursor: pointer; }
-.topnav span:hover { color: var(--gold); opacity: 1; }
 .badge { font-weight: 700; font-size: 13px; letter-spacing: .06em; padding: 7px 12px; border-radius: 3px; border: 1px solid var(--gold); color: var(--gold); }
 .badge.live { border-color: var(--teal); color: var(--teal); }
+.navbtns { display: flex; gap: 10px; } .navbtns .btn { font-size: 16px; padding: 9px 16px; }
 
 /* Beat 0 · situation */
-.b0 { position: absolute; left: 72px; top: 50px; right: 72px; }
-.families { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
-.fam { background: #fff; color: var(--body); border-radius: 3px; box-shadow: var(--shadow); overflow: hidden; }
-.fam header { background: var(--navy-2); color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid var(--teal); }
-.fam header b { font-weight: 500; font-size: 22px; }
-.fam header span { color: var(--tint); font-size: 16px; font-style: italic; }
-.fam .people { display: grid; grid-template-columns: 1fr 70px 1fr; align-items: center; padding: 26px 24px 10px; }
-.person { display: flex; gap: 16px; align-items: center; }
-.av { width: 72px; height: 72px; border-radius: 50%; background: var(--heading); color: #fff; font-weight: 700; font-size: 24px; display: flex; align-items: center; justify-content: center; flex: none; }
-.person .n { font-weight: 500; font-size: 24px; color: var(--heading); }
-.person .r { font-size: 17px; color: #5b6b82; margin: 3px 0 6px; }
-.fam .x { text-align: center; }
-.fam .why { margin: 8px 24px 22px; padding: 12px 16px; background: var(--pale); border-left: 4px solid var(--gold); font-size: 18px; color: var(--heading); }
-.stat { margin-top: 44px; display: flex; align-items: baseline; gap: 26px; }
-.stat .num { font-family: var(--font-cond); font-size: 140px; line-height: .9; color: var(--gold); font-variant-numeric: tabular-nums; }
-.stat .txt { font-size: 32px; font-weight: 500; max-width: 700px; line-height: 1.25; }
-.stat .src { font-size: 14px; color: var(--offline); margin-top: 8px; font-weight: 400; }
+.b0 { position: absolute; left: 90px; right: 90px; top: 60px; }
+.b0 h1 { font-size: 72px; }
+.fams { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 50px; }
+.fam { background: #fff; color: var(--body); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); }
+.fam header { background: var(--navy-2); color: #fff; padding: 12px 22px; font-size: 20px; font-weight: 500; border-bottom: 4px solid var(--teal); display: flex; justify-content: space-between; }
+.fam header i { color: var(--tint); font-weight: 400; }
+.fam .row { display: flex; align-items: center; justify-content: space-between; padding: 26px 30px; }
+.who { display: flex; align-items: center; gap: 14px; }
+.av { width: 76px; height: 76px; border-radius: 50%; background: var(--heading); color: #fff; font-weight: 700; font-size: 26px; display: flex; align-items: center; justify-content: center; }
+.who .n { font-size: 26px; font-weight: 700; color: var(--heading); }
+.who .r { font-size: 18px; color: #6b778c; }
+.who .chip { margin-top: 6px; font-size: 16px; height: 28px; }
+.nope { display: flex; flex-direction: column; align-items: center; color: #B3261E; font-weight: 700; font-size: 18px; }
+.nope svg { width: 90px; }
+.stat { margin-top: 56px; display: flex; align-items: baseline; gap: 26px; }
+.stat .num { font-family: var(--font-cond); font-size: 150px; line-height: .9; color: var(--gold); }
+.stat .txt { font-size: 34px; font-weight: 500; }
+.stat .src { font-size: 14px; color: var(--offline); margin-top: 8px; }
 
 /* Beat 1 · question */
-.b1 { position: absolute; left: 0; right: 0; top: 60px; text-align: center; }
-.b1 h1 { font-size: 78px; max-width: 1500px; margin: 16px auto 0; }
-.b1 p { font-size: 26px; color: var(--tint); margin: 22px auto 0; max-width: 1100px; line-height: 1.4; }
-.b1 svg { margin-top: 26px; }
+.b1 { position: absolute; left: 0; right: 0; top: 110px; text-align: center; }
+.b1 h1 { font-size: 84px; max-width: 1500px; margin: 0 auto; }
+.b1 svg { margin-top: 50px; }
 
-/* Map (shared by beats 2, 4, 6) */
-#map { position: absolute; left: 0; top: 0; width: 1920px; height: 900px; opacity: 0; transition: opacity .5s; }
+/* Map */
+#map { position: absolute; left: 0; top: 0; width: 1920px; height: 890px; opacity: 0; transition: opacity .5s; }
 #map.on { opacity: 1; }
 #map .land { fill: var(--county); stroke: var(--county-stroke); stroke-width: 1.5; fill-rule: evenodd; }
 #map .river { fill: none; stroke: #1F4A7A; stroke-width: 3; }
 #map .hwy { fill: none; stroke: rgba(196, 228, 247, .14); stroke-width: 2; stroke-dasharray: 2 5; }
 #map .city { fill: var(--offline); font-size: 17px; font-style: italic; font-family: var(--font); }
 #map .lbl-box { fill: rgba(14, 39, 64, .9); stroke: rgba(196, 228, 247, .25); }
-#map .lbl-name { fill: #fff; font-size: 21px; font-weight: 500; font-family: var(--font); }
-#map .lbl-sub { fill: var(--tint); font-size: 15px; font-family: var(--font); }
-#map .lbl-state { font-size: 14px; font-weight: 700; letter-spacing: .06em; font-family: var(--font); }
-#map .arc { fill: none; stroke-width: 6; stroke-linecap: round; }
+#map .lbl-name { fill: #fff; font-size: 22px; font-weight: 500; font-family: var(--font); }
+#map .lbl-sub { fill: var(--tint); font-size: 16px; font-family: var(--font); }
+#map .lbl-state { font-size: 15px; font-weight: 700; letter-spacing: .06em; font-family: var(--font); }
+#map .arc { fill: none; stroke-width: 7; stroke-linecap: round; }
 #map .arc.proposed { stroke: var(--gold); stroke-dasharray: 14 12; animation: flow 1.6s linear infinite; }
 #map .arc.reviewed { stroke: var(--teal); }
 @keyframes flow { to { stroke-dashoffset: -52; } }
 #map .out { fill: none; stroke: rgba(242, 182, 50, .7); stroke-width: 2.5; stroke-dasharray: 5 7; }
-#map .outlbl { fill: var(--gold); font-size: 15px; font-family: var(--font); }
+#map .outlbl { fill: var(--gold); font-size: 16px; font-family: var(--font); }
+.rpanel { position: absolute; left: 1140px; top: 36px; width: 720px; }
+.rpanel h1.display { font-size: 52px; }
+.netlist { list-style: none; padding: 0; margin: 30px 0 0; }
+.netlist li { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid rgba(196, 228, 247, .14); font-size: 22px; }
+.netlist li small { margin-left: auto; color: var(--tint); font-size: 16px; }
+.netlist svg { width: 22px; height: 26px; }
+.findbtn { margin-top: 30px; font-size: 28px; padding: 22px 38px; }
+.findnote { margin-top: 12px; color: var(--tint); font-size: 16px; min-height: 22px; }
 
-.rpanel { position: absolute; left: 1140px; top: 40px; width: 720px; }
-.rpanel p.lede { font-size: 20px; color: var(--tint); line-height: 1.45; margin: 16px 0 0; }
-.netlist { list-style: none; padding: 0; margin: 26px 0 0; }
-.netlist li { display: grid; grid-template-columns: 26px 1fr auto; gap: 12px; align-items: center; padding: 14px 0; border-top: 1px solid rgba(196, 228, 247, .14); font-size: 20px; }
-.netlist li small { color: var(--tint); font-size: 15px; }
-.findbtn { margin-top: 30px; font-size: 26px; padding: 20px 34px; }
-.findnote { margin-top: 14px; color: var(--tint); font-size: 16px; }
+/* Beat 3 · three columns */
+.head { position: absolute; left: 50px; top: 18px; }
+.head h1.display { font-size: 42px; }
+#net { position: absolute; left: 0; top: 96px; width: 1920px; height: 96px; }
+.col { position: absolute; top: 196px; width: 560px; height: 684px; overflow: hidden; }
+.col .seq { gap: 10px; }
+.colhead { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.colhead small { font-weight: 400; color: var(--tint); font-size: 16px; }
+.colhead .lk { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--gold); border: 1px solid rgba(242, 182, 50, .6); padding: 3px 10px; border-radius: 999px; }
+.colhead .lk svg { width: 13px; height: 13px; }
 
-/* Beat 3 · flowchart */
-.b3head { position: absolute; left: 60px; top: 26px; right: 60px; }
-.b3head h1 { font-size: 44px; }
-.formcard { position: absolute; left: 60px; top: 150px; width: 500px; background: #fff; color: var(--body); border-radius: 3px; box-shadow: var(--shadow); overflow: hidden; }
-.formcard header { background: var(--navy-2); color: #fff; padding: 12px 18px; border-bottom: 4px solid var(--teal); }
-.formcard header b { font-weight: 500; font-size: 19px; display: block; }
-.formcard header span { font-family: var(--font-mono); font-size: 14px; color: var(--tint); }
-.frow { display: grid; grid-template-columns: 116px 1fr; gap: 10px; padding: 9px 18px; border-bottom: 1px solid #f0f2f5; font-size: 15px; align-items: center; }
-.frow .k { color: #6b778c; font-size: 13px; }
-.frow .v { color: var(--heading); }
-.mono { font-family: var(--font-mono); }
-.qs { padding: 10px 18px 6px; font-size: 14px; color: var(--heading); }
-.qs ol { margin: 6px 0 0; padding-left: 20px; line-height: 1.5; }
-.formcard .not { padding: 8px 18px 12px; font-size: 13px; color: #6b778c; }
-.formcard .not s { color: #9aa5b8; }
-.formcard .pending { padding: 60px 18px; text-align: center; color: #6b778c; font-size: 17px; }
-
-#flowsvg { position: absolute; left: 0; top: 0; width: 1920px; height: 900px; pointer-events: none; }
-.hub { position: absolute; left: 600px; top: 400px; width: 160px; text-align: center; }
-.hub .lb { font-size: 15px; color: var(--tint); margin-top: 8px; line-height: 1.3; }
-.hub .lb b { color: #fff; font-weight: 500; display: block; font-size: 17px; }
-
-.lane { position: absolute; left: 800px; width: 1060px; height: 318px; border: 1px solid rgba(196, 228, 247, .16); border-radius: 4px; background: rgba(8, 20, 36, .32); padding: 14px 18px; }
-.lane .lh { display: flex; justify-content: space-between; align-items: baseline; }
-.lane .lh b { font-size: 22px; font-weight: 500; }
-.lane .lh b small { font-size: 15px; color: var(--tint); font-weight: 400; margin-left: 10px; }
-.lane .lh em { font-size: 14px; color: var(--offline); font-style: italic; }
-.boxes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 26px; margin-top: 14px; position: relative; }
-.box { position: relative; background: rgba(14, 39, 64, .85); border: 1px solid rgba(196, 228, 247, .18); border-top: 4px solid rgba(196, 228, 247, .18); border-radius: 3px; padding: 9px 12px; height: 98px; opacity: .45; transition: opacity .3s, border-color .3s; }
-.box:not(:last-child)::after { content: "→"; position: absolute; right: -22px; top: 32px; color: var(--offline); font-size: 18px; }
-.box .bn { font-size: 12px; color: var(--tint); letter-spacing: .06em; }
-.box .bt { font-size: 17px; font-weight: 500; margin: 4px 0 4px; }
-.box .bs { font-size: 13px; color: var(--tint); line-height: 1.3; }
-.box.active { opacity: 1; border-top-color: var(--gold); animation: glow 1.2s ease-in-out infinite; }
-.box.done { opacity: 1; border-top-color: var(--teal); }
-.box.done .bn::after { content: " ✓"; color: var(--teal); }
-@keyframes glow { 50% { box-shadow: 0 0 0 3px rgba(242, 182, 50, .18); } }
-.box svg.pod { position: absolute; right: 10px; top: 10px; }
-.result { display: grid; grid-template-columns: 560px 1fr; gap: 20px; margin-top: 12px; }
-.reply { background: #fff; color: var(--body); border-radius: 3px; overflow: hidden; min-height: 140px; }
-.reply header { background: var(--pale); padding: 7px 12px; font-size: 13px; color: #5b6b82; display: flex; justify-content: space-between; border-bottom: 1px solid var(--divider); }
-.reply .rr { display: grid; grid-template-columns: 170px 1fr; padding: 2px 12px; font-family: var(--font-mono); font-size: 14px; opacity: 0; transition: opacity .3s; }
-.reply .rr.in { opacity: 1; }
-.reply .rr span:first-child { color: #6b778c; }
-.reply .rr span:last-child { color: var(--heading); font-weight: 700; }
-.reply .wait { padding: 50px 12px; text-align: center; color: #8a97b5; font-size: 15px; }
-.verdict { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
-.chipbig { align-self: flex-start; font-weight: 700; font-size: 26px; letter-spacing: .04em; padding: 10px 16px; border-radius: 3px; border: 2px solid var(--offline); color: var(--offline); }
-.chipbig.yes { border-color: var(--teal); color: var(--teal); }
-.chipbig.no { border-color: var(--gold); color: var(--gold); }
-.verdict .sub { font-size: 16px; color: var(--tint); line-height: 1.4; }
-.verdict .regions { display: flex; gap: 8px; flex-wrap: wrap; }
-.verdict .regions span { font-size: 13px; border: 1px dashed rgba(242, 182, 50, .7); color: var(--gold); padding: 3px 8px; border-radius: 3px; }
-
-/* Beat 4 · review */
-.card { background: #fff; color: var(--body); border-radius: 3px; box-shadow: var(--shadow); overflow: hidden; }
-.card > header { background: var(--navy-2); color: #fff; padding: 11px 18px; border-bottom: 4px solid var(--teal); font-size: 18px; font-weight: 500; display: flex; justify-content: space-between; align-items: baseline; }
-.card > header span { font-size: 13px; color: var(--tint); font-weight: 400; font-family: var(--font-mono); }
-table.resp { width: 100%; border-collapse: collapse; font-size: 15px; }
-table.resp th { text-align: left; font-weight: 500; color: #6b778c; font-size: 13px; padding: 8px 14px; border-bottom: 1px solid var(--divider); }
-table.resp td { padding: 8px 14px; border-bottom: 1px solid #f0f2f5; font-family: var(--font-mono); color: var(--heading); }
-table.resp td.k { font-family: var(--font); color: #6b778c; }
-td.t { color: #2d7f81 !important; font-weight: 700; }
-td.f { color: #a86b00 !important; font-weight: 700; }
-.checks { padding: 10px 18px; }
-.checks .cl { display: grid; grid-template-columns: 24px 1fr; gap: 10px; padding: 6px 0; font-size: 16px; color: var(--heading); }
-.ok { color: #2d7f81; font-weight: 700; }
-.bad { color: #b3261e; font-weight: 700; }
-.proposal { margin: 4px 18px 16px; padding: 12px 14px; background: var(--pale); border-left: 4px solid var(--gold); font-size: 16px; line-height: 1.55; color: var(--heading); }
-.proposal b { font-weight: 700; }
-.aside { margin-top: 14px; font-size: 16px; color: var(--tint); font-style: italic; }
+/* Beat 4 · review table */
+.rtable { background: #fff; color: var(--body); border-radius: 8px; border: 2px solid var(--divider); overflow: hidden; }
+.rtable table { width: 100%; border-collapse: collapse; font-size: 17px; }
+.rtable th { text-align: left; font-weight: 700; color: #5b6b82; font-size: 14px; padding: 8px 14px; background: var(--pale); }
+.rtable td { padding: 6px 14px; border-top: 1px solid #f0f2f5; font-family: var(--font-mono); color: var(--heading); opacity: 0; transition: opacity .3s; }
+.rtable tr.in td { opacity: 1; }
+.rtable td.k { font-family: var(--font); color: #6b778c; }
+td.t { color: #0E7C61 !important; font-weight: 700; } td.f { color: #B45309 !important; font-weight: 700; }
 
 /* Beat 5 · doctor review */
-.drop { position: absolute; left: 60px; top: 150px; width: 900px; height: 610px; border: 2px dashed rgba(196, 228, 247, .45); border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(8, 20, 36, .25); cursor: pointer; text-align: center; transition: border-color .2s, background .2s; }
+.drop { position: absolute; left: 50px; top: 110px; width: 930px; height: 770px; border: 2px dashed rgba(196, 228, 247, .45); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(8, 20, 36, .25); cursor: pointer; text-align: center; transition: border-color .2s, background .2s; }
 .drop.over { border-color: var(--gold); background: rgba(242, 182, 50, .08); }
 .drop .t { font-size: 28px; font-weight: 500; margin-top: 12px; }
-.drop .s { font-size: 17px; color: var(--tint); margin-top: 8px; }
-.drop canvas { max-width: 880px; max-height: 590px; display: none; }
-.drop.has canvas { display: block; }
-.drop.has .hint { display: none; }
-.evidence { position: absolute; left: 1000px; top: 150px; width: 860px; }
-.xf { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; padding: 8px 18px 10px; }
-.xf div { padding: 6px 0; border-bottom: 1px solid #f0f2f5; font-size: 15px; }
-.xf .k { color: #6b778c; font-size: 12px; display: block; }
-.xf .v { font-family: var(--font-mono); color: var(--heading); }
-.confirm { padding: 12px 18px 18px; border-top: 1px solid var(--divider); }
-.confirm label { display: flex; gap: 10px; align-items: center; font-size: 17px; color: var(--heading); cursor: pointer; }
-.confirm input { width: 22px; height: 22px; }
-.confirm .btn { margin-top: 12px; font-size: 20px; padding: 14px 24px; }
-.stamp { display: none; margin-top: 12px; border: 3px solid var(--teal); border-radius: 4px; padding: 10px 14px; align-items: center; gap: 14px; }
-.stamp.on { display: flex; }
-.stamp b { font-size: 26px; letter-spacing: .08em; color: #2d7f81; }
-.stamp span { font-size: 14px; color: #6b778c; }
+.drop .s { font-size: 17px; color: var(--tint); margin-top: 6px; }
+.drop canvas { max-width: 910px; max-height: 750px; display: none; border-radius: 4px; }
+.drop.has canvas { display: block; } .drop.has .hint { display: none; }
+.evid { position: absolute; left: 1030px; top: 110px; width: 830px; }
 
 /* Beat 6 */
-.done-panel .big { font-family: var(--font-cond); font-size: 110px; color: var(--teal); line-height: 1; }
+.done-big { display: flex; align-items: center; gap: 18px; margin-top: 20px; }
+.done-big .ck { width: 70px; height: 70px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; }
+.done-big b { font-size: 58px; font-weight: 700; letter-spacing: .02em; }
+.legs { margin-top: 26px; font-size: 22px; line-height: 1.8; }
+.legs .mono { color: var(--gold); }
+.closing { margin-top: 40px; font-size: 32px; font-weight: 500; color: var(--gold); line-height: 1.3; }
 
-/* Overlays */
-.overlay { position: absolute; inset: 0; background: rgba(8, 20, 36, .82); display: none; align-items: center; justify-content: center; z-index: 20; }
+.overlay { position: absolute; inset: 0; background: rgba(8, 20, 36, .85); display: none; align-items: center; justify-content: center; z-index: 20; }
 .overlay.on { display: flex; }
-.panel { background: #fff; color: var(--body); border-radius: 4px; padding: 24px 30px; width: 1300px; max-height: 860px; overflow: auto; }
+.panel { background: #fff; color: var(--body); border-radius: 6px; padding: 24px 30px; width: 1300px; max-height: 860px; overflow: auto; }
 .panel h2 { margin: 0 0 10px; color: var(--heading); font-weight: 500; }
 .log { font-family: var(--font-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; color: #333; }
-.help kbd { font-family: var(--font-mono); background: var(--pale); border: 1px solid var(--divider); padding: 1px 8px; border-radius: 3px; margin-right: 10px; }
-.help div { font-size: 18px; line-height: 2; }
 </style>
 </head>
 <body>
 <div id="stage">
   <header class="topbar">
-    <div class="brand"><span class="wordmark">DOMINO</span><span class="sub">kidney exchange across hospitals</span></div>
+    <div class="brand"><span class="wordmark">DOMINO</span></div>
     <nav class="topnav" id="nav">
-      <span data-b="0,1">The situation</span>
-      <span data-b="2">The network</span>
-      <span data-b="3"><i>1</i>Ask</span>
-      <span data-b="4"><i>2</i>Review</span>
-      <span data-b="5,6"><i>3</i>Doctor review</span>
+      <span data-b="0,1">Situation</span><span data-b="2">Network</span><span data-b="3">1 · Ask</span><span data-b="4">2 · Review</span><span data-b="5,6">3 · Doctor</span>
     </nav>
   </header>
   <div class="stripe"></div>
 
-  <div class="hero">
-    <svg id="map" viewBox="0 0 1920 900" aria-label="Map of the San Francisco Bay Area and Sacramento"></svg>
+  <div class="hero-area">
+    <svg id="map" viewBox="0 0 1920 890"></svg>
 
-    <!-- 0 · The situation -->
-    <section class="beat" id="b0">
-      <div class="b0">
-        <div class="eyebrow">The situation</div>
-        <h1 class="display">A willing donor. The wrong blood type.</h1>
-        <div class="families">
-          <div class="fam reveal" id="fam1">
-            <header><b>Alder Medical Center</b><span>San Jose</span></header>
-            <div class="people">
-              <div class="person"><div class="av">MA</div><div><div class="n">Maria, 46</div><div class="r">needs a kidney</div><span class="chip A">A</span></div></div>
-              <div class="x"><svg width="56" height="40" viewBox="0 0 56 40"><path d="M50 20H8m0 0l10-9M8 20l10 9" stroke="#8A97B5" stroke-width="3" fill="none"/><path d="M22 8l12 24M34 8L22 32" stroke="#EC8017" stroke-width="4"/></svg></div>
-              <div class="person"><div class="av">EA</div><div><div class="n">Elena, her sister</div><div class="r">wants to give one</div><span class="chip B">B</span></div></div>
-            </div>
-            <div class="why">Elena's kidney can't go to Maria: blood type B can't go to A.</div>
-          </div>
-          <div class="fam reveal" id="fam2">
-            <header><b>Harbor Point Hospital</b><span>Oakland</span></header>
-            <div class="people">
-              <div class="person"><div class="av">JO</div><div><div class="n">James, 52</div><div class="r">needs a kidney</div><span class="chip B">B</span></div></div>
-              <div class="x"><svg width="56" height="40" viewBox="0 0 56 40"><path d="M50 20H8m0 0l10-9M8 20l10 9" stroke="#8A97B5" stroke-width="3" fill="none"/><path d="M22 8l12 24M34 8L22 32" stroke="#EC8017" stroke-width="4"/></svg></div>
-              <div class="person"><div class="av">PO</div><div><div class="n">Priya, his wife</div><div class="r">wants to give one</div><span class="chip A">A</span></div></div>
-            </div>
-            <div class="why">Priya's kidney can't go to James: blood type A can't go to B.</div>
-          </div>
-        </div>
-        <div class="stat reveal" id="stat">
-          <div class="num">95,492</div>
-          <div><div class="txt">people in the U.S. are waiting for a kidney.</div>
-            <div class="src">Source: organdonor.gov (HRSA), waiting list as of July 30, 2026.</div></div>
-        </div>
+    <section class="beat" id="b0"><div class="b0">
+      <h1 class="display">A willing donor.<br>The wrong blood type.</h1>
+      <div class="fams">
+        <div class="fam reveal" id="fam1"><header>Alder Medical Center<i>San Jose</i></header>
+          <div class="row">
+            <div class="who"><div class="av">MA</div><div><div class="n">Maria</div><div class="r">needs a kidney</div><span class="chip A">A</span></div></div>
+            <div class="nope"><svg viewBox="0 0 90 30"><path d="M86 15H10m0 0l10-9M10 15l10 9" stroke="#8A97B5" stroke-width="3" fill="none"/><path d="M40 4l12 22M52 4L40 26" stroke="#B3261E" stroke-width="4"/></svg>no match</div>
+            <div class="who"><div class="av">EA</div><div><div class="n">Elena</div><div class="r">her sister</div><span class="chip B">B</span></div></div>
+          </div></div>
+        <div class="fam reveal" id="fam2"><header>Harbor Point Hospital<i>Oakland</i></header>
+          <div class="row">
+            <div class="who"><div class="av">JO</div><div><div class="n">James</div><div class="r">needs a kidney</div><span class="chip B">B</span></div></div>
+            <div class="nope"><svg viewBox="0 0 90 30"><path d="M86 15H10m0 0l10-9M10 15l10 9" stroke="#8A97B5" stroke-width="3" fill="none"/><path d="M40 4l12 22M52 4L40 26" stroke="#B3261E" stroke-width="4"/></svg>no match</div>
+            <div class="who"><div class="av">PO</div><div><div class="n">Priya</div><div class="r">his wife</div><span class="chip A">A</span></div></div>
+          </div></div>
       </div>
-    </section>
+      <div class="stat reveal" id="stat"><div class="num">95,492</div><div><div class="txt">people in the U.S. are waiting for a kidney.</div><div class="src">organdonor.gov (HRSA) · as of July 30, 2026</div></div></div>
+    </div></section>
 
-    <!-- 1 · The question -->
-    <section class="beat" id="b1">
-      <div class="b1">
-        <div class="eyebrow">The question</div>
-        <h1 class="display">What if the person who could help your patient is at another hospital?</h1>
-        <svg width="1000" height="300" viewBox="0 0 1000 300" aria-hidden="true">
-          <text x="140" y="24" fill="#C4E4F7" font-size="18" text-anchor="middle" font-family="Ubuntu, Helvetica">Alder · San Jose</text>
-          <text x="860" y="24" fill="#C4E4F7" font-size="18" text-anchor="middle" font-family="Ubuntu, Helvetica">Harbor Point · Oakland</text>
-          <g font-family="Ubuntu, Helvetica" font-weight="700" font-size="22" text-anchor="middle">
-            <circle cx="140" cy="90" r="40" fill="#0A3C6E"/><text x="140" y="98" fill="#fff">MA</text>
-            <circle cx="140" cy="230" r="40" fill="#0A3C6E"/><text x="140" y="238" fill="#fff">EA</text>
-            <circle cx="860" cy="90" r="40" fill="#0A3C6E"/><text x="860" y="98" fill="#fff">JO</text>
-            <circle cx="860" cy="230" r="40" fill="#0A3C6E"/><text x="860" y="238" fill="#fff">PO</text>
-          </g>
-          <g font-family="Ubuntu, Helvetica" font-size="16" fill="#C4E4F7">
-            <text x="80" y="96" text-anchor="end">Maria · A</text><text x="80" y="236" text-anchor="end">Elena · B</text>
-            <text x="920" y="96">James · B</text><text x="920" y="236">Priya · A</text>
-          </g>
-          <path d="M190 225 C 420 225, 580 95, 808 95" stroke="#F2B632" stroke-width="3" stroke-dasharray="10 9" fill="none"/>
-          <path d="M810 225 C 580 225, 420 95, 192 95" stroke="#F2B632" stroke-width="3" stroke-dasharray="10 9" fill="none"/>
-          <circle cx="500" cy="160" r="30" fill="#0E2740" stroke="#F2B632" stroke-width="3"/>
-          <text x="500" y="172" fill="#F2B632" font-size="34" font-weight="700" text-anchor="middle" font-family="Ubuntu, Helvetica">?</text>
-        </svg>
-        <p>But hospitals can't look at each other's patients. Their records are private, and they should stay that way.</p>
-      </div>
-    </section>
+    <section class="beat" id="b1"><div class="b1">
+      <h1 class="display">What if the person who could help your patient is at another hospital?</h1>
+      <svg width="1000" height="300" viewBox="0 0 1000 300" aria-hidden="true">
+        <g font-family="Ubuntu, Helvetica" font-size="18" fill="#C4E4F7"><text x="140" y="24" text-anchor="middle">Alder</text><text x="860" y="24" text-anchor="middle">Harbor Point</text></g>
+        <g font-family="Ubuntu, Helvetica" font-weight="700" font-size="22" text-anchor="middle">
+          <circle cx="140" cy="90" r="40" fill="#0A3C6E"/><text x="140" y="98" fill="#fff">MA</text>
+          <circle cx="140" cy="230" r="40" fill="#0A3C6E"/><text x="140" y="238" fill="#fff">EA</text>
+          <circle cx="860" cy="90" r="40" fill="#0A3C6E"/><text x="860" y="98" fill="#fff">JO</text>
+          <circle cx="860" cy="230" r="40" fill="#0A3C6E"/><text x="860" y="238" fill="#fff">PO</text>
+        </g>
+        <path d="M190 225 C 420 225, 580 95, 808 95" stroke="#F2B632" stroke-width="3" stroke-dasharray="10 9" fill="none"/>
+        <path d="M810 225 C 580 225, 420 95, 192 95" stroke="#F2B632" stroke-width="3" stroke-dasharray="10 9" fill="none"/>
+        <circle cx="500" cy="160" r="30" fill="#0E2740" stroke="#F2B632" stroke-width="3"/>
+        <text x="500" y="172" fill="#F2B632" font-size="34" font-weight="700" text-anchor="middle" font-family="Ubuntu, Helvetica">?</text>
+      </svg>
+    </div></section>
 
-    <!-- 2 · The network -->
-    <section class="beat" id="b2">
-      <div class="rpanel">
-        <div class="eyebrow">The network</div>
-        <h1 class="display">Three hospitals. Three private pods.</h1>
-        <p class="lede">Each hospital keeps its patients in its own data pod, on its own machine. A Flower network connects their agents. Records never move; questions and short answers do.</p>
-        <ul class="netlist" id="netlist"></ul>
-        <button class="btn findbtn" id="findBtn">Find an exchange</button>
-        <div class="findnote" id="findNote"></div>
-      </div>
-    </section>
+    <section class="beat" id="b2"><div class="rpanel">
+      <h1 class="display">Three hospitals.<br>Three private pods.</h1>
+      <ul class="netlist" id="netlist"></ul>
+      <button class="btn findbtn" id="findBtn">Find an exchange</button>
+      <div class="findnote" id="findNote"></div>
+    </div></section>
 
-    <!-- 3 · Step 1 · Ask -->
     <section class="beat" id="b3">
-      <svg id="flowsvg" viewBox="0 0 1920 900"></svg>
-      <div class="b3head">
-        <div class="eyebrow">Step 1 · Ask</div>
-        <h1 class="display">Alder sends one form. Each hospital fills it from its own pod.</h1>
-      </div>
-      <div class="formcard" id="formcard"><header><b>Screening form</b><span>waiting for the Flower run…</span></header><div class="pending">The coordinator reads Alder's own pod and builds the form.</div></div>
-      <div class="hub">
-        <svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
-          <line x1="30" y1="60" x2="60" y2="30" stroke="#1F4A7A" stroke-width="4"/><line x1="60" y1="30" x2="90" y2="60" stroke="#1F4A7A" stroke-width="4"/>
-          <line x1="30" y1="60" x2="60" y2="90" stroke="#1F4A7A" stroke-width="4"/><line x1="60" y1="90" x2="90" y2="60" stroke="#1F4A7A" stroke-width="4"/>
-          <circle cx="60" cy="30" r="9" fill="#0E2740" stroke="#C4E4F7" stroke-width="3"/><circle cx="60" cy="90" r="9" fill="#0E2740" stroke="#C4E4F7" stroke-width="3"/>
-          <circle cx="30" cy="60" r="12" fill="#0E2740" stroke="#4FA3A5" stroke-width="5"/><circle cx="90" cy="60" r="12" fill="#0E2740" stroke="#EC8017" stroke-width="5"/>
-        </svg>
-        <div class="lb"><b>Flower SuperLink</b><span id="runLbl">at Alder</span></div>
-      </div>
-      <div class="lane" id="lane-harbor" style="top:140px"></div>
-      <div class="lane" id="lane-riverbend" style="top:478px"></div>
+      <div class="head"><div class="eyebrow">Step 1 · Ask</div><h1 class="display">One form. Three private pods.</h1></div>
+      <svg id="net" viewBox="0 0 1920 96"></svg>
+      <div class="col" id="col-alder" style="left:50px"></div>
+      <div class="col" id="col-harbor" style="left:680px"></div>
+      <div class="col" id="col-riverbend" style="left:1310px"></div>
     </section>
 
-    <!-- 4 · Step 2 · Review -->
-    <section class="beat" id="b4">
-      <div class="rpanel">
-        <div class="eyebrow">Step 2 · Review</div>
-        <h1 class="display" style="font-size:52px">The answers come back as a form.</h1>
-        <div class="card" style="margin-top:22px">
-          <header>Replies at Alder<span id="respReq"></span></header>
-          <table class="resp" id="respTable"></table>
-        </div>
-        <div class="card" style="margin-top:16px">
-          <header>Alder's review · code</header>
-          <div class="checks" id="reviewChecks"></div>
-          <div class="proposal" id="proposal"></div>
-        </div>
-        <div class="aside" id="aside"></div>
-      </div>
-    </section>
+    <section class="beat" id="b4"><div class="rpanel">
+      <div class="eyebrow">Step 2 · Review</div>
+      <h1 class="display">The answers come back.</h1>
+      <div class="seq" id="seqReview" style="margin-top:18px"></div>
+    </div></section>
 
-    <!-- 5 · Step 3 · Doctor review -->
     <section class="beat" id="b5">
-      <div class="b3head">
-        <div class="eyebrow">Step 3 · Evidence and doctor review</div>
-        <h1 class="display">A surgeon signs. A person confirms.</h1>
-      </div>
+      <div class="head"><div class="eyebrow">Step 3 · Doctor review</div><h1 class="display">A surgeon signs. A person confirms.</h1></div>
       <div class="drop" id="drop">
         <div class="hint">
           <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><rect x="14" y="8" width="44" height="56" rx="3" fill="none" stroke="#C4E4F7" stroke-width="2.5"/><path d="M22 22h28M22 30h28M22 38h16" stroke="#C4E4F7" stroke-width="2"/><path d="M22 52c5-7 8-8 10-4s4 4 7-1 5-5 7 0" fill="none" stroke="#F2B632" stroke-width="3" stroke-linecap="round"/></svg>
-          <div class="t">Drop the signed approval form</div>
-          <div class="s">or click to choose an image · or paste it</div>
+          <div class="t">Drop the signed approval form</div><div class="s">or click to choose · or paste</div>
         </div>
         <canvas id="formCanvas"></canvas>
         <input type="file" id="file" accept="image/*" hidden>
       </div>
-      <div class="evidence">
-        <div class="card">
-          <header>Extracted from the form<span id="xfSrc">nothing yet</span></header>
-          <div class="xf" id="xf"><div style="grid-column:1/3; color:#6b778c; border:0">Fields are read from the form's QR code, on this machine.</div></div>
-        </div>
-        <div class="card" style="margin-top:16px">
-          <header>Checks · computer vision and code</header>
-          <div class="checks" id="evChecks"><div class="cl"><span>·</span><span style="color:#6b778c">Waiting for a form.</span></div></div>
-          <div class="confirm">
-            <label><input type="checkbox" id="ack" disabled> I am the reviewing surgeon and I have checked this evidence.</label>
-            <button class="btn locked" id="confirmBtn" disabled>Confirm approval</button>
-            <div class="stamp" id="stamp"><b>REVIEWED</b><span id="stampTxt"></span></div>
-          </div>
-        </div>
-      </div>
+      <div class="evid seq" id="seqEvid"></div>
     </section>
 
-    <!-- 6 · Reviewed -->
-    <section class="beat" id="b6">
-      <div class="rpanel done-panel">
-        <div class="eyebrow">Reviewed</div>
-        <h1 class="display">Proposed → Reviewed.</h1>
-        <div class="card" style="margin-top:24px">
-          <header>Exchange<span id="doneReq"></span></header>
-          <div class="checks" id="doneLines"></div>
-        </div>
-        <p class="lede" style="font-size:22px">No shared database. No chart left its hospital. A person approved every step.</p>
-      </div>
-    </section>
-
-    <div class="caption" id="caption"></div>
+    <section class="beat" id="b6"><div class="rpanel">
+      <div class="done-big"><div class="ck">✓</div><b>REVIEWED</b></div>
+      <div class="legs" id="legs"></div>
+      <div class="closing">No shared database.<br>A person at every step.</div>
+    </div></section>
   </div>
 
-  <div class="wirebar"><span class="lbl">FLOWER</span><div id="wire" style="display:flex; gap:10px; overflow:hidden"></div></div>
+  <div class="wirebar"><span class="lbl" id="flowerLbl">FLOWER</span><div id="wire" style="display:flex; gap:10px; overflow:hidden"></div></div>
   <div class="foot">
     <span class="badge" id="badge">…</span>
-    <span class="fine">All patients, donors and hospitals are fictional. Synthetic data.</span>
-    <span class="navbtns">
-      <button class="btn outline" id="logBtn" title="Flower run log (L)">Flower log</button>
-      <button class="btn outline" id="backBtn">← Back</button>
-      <button class="btn" id="nextBtn">Next →</button>
-    </span>
+    <span class="fine">Fictional patients · synthetic data</span>
+    <span class="navbtns"><button class="btn outline" id="logBtn">Flower log</button><button class="btn outline" id="backBtn">← Back</button><button class="btn" id="nextBtn">Next →</button></span>
   </div>
-
   <div class="overlay" id="logOverlay"><div class="panel"><h2>Flower run log</h2><div class="log" id="log"></div></div></div>
-  <div class="overlay" id="helpOverlay"><div class="panel help" style="width:760px">
-    <h2>Keys</h2>
-    <div><kbd>→ Space</kbd>next</div><div><kbd>←</kbd>back</div>
-    <div><kbd>L</kbd>Flower run log: run id, message ids, every event</div>
-    <div><kbd>R</kbd>reset the story (does not touch Flower)</div><div><kbd>F</kbd>fullscreen</div>
-  </div></div>
 </div>
 
 <script>(function webpackUniversalModuleDefinition(root, factory) {
@@ -10646,8 +10561,132 @@ const Source = (() => {
   };
 })();
 </script>
+<script>/* Staged "agent at work" components + a small cancellable timeline and event log. */
+const Think = (() => {
+  const ACC = {
+    indigo: { s: '#4F46E5', m: '#C7C3FF', w: '#EEEDFF' },
+    amber: { s: '#B45309', m: '#F3C98B', w: '#FDF3E7' },
+    teal: { s: '#0E7C61', m: '#A7D8C9', w: '#E6F4EF' },
+    purple: { s: '#6D28D9', m: '#D2BEF3', w: '#F2ECFC' },
+    blue: { s: '#0C7AC9', m: '#B9DAF2', w: '#EAF4FB' },
+    red: { s: '#B3261E', m: '#F1B8B4', w: '#FDECEA' },
+  };
+  const CYCLE = ['indigo', 'amber', 'teal', 'purple', 'blue'];
+  const LOCK = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+  const SPARK = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.7 5.1a4 4 0 0 0 2.5 2.5L21.5 11l-5.3 1.4a4 4 0 0 0-2.5 2.5L12 20l-1.7-5.1a4 4 0 0 0-2.5-2.5L2.5 11l5.3-1.4a4 4 0 0 0 2.5-2.5z"/></svg>';
+  const FLOWER = '<svg viewBox="0 0 32 32" aria-hidden="true"><g fill="#4FA3A5"><ellipse cx="16" cy="8" rx="5" ry="7"/><ellipse cx="16" cy="24" rx="5" ry="7"/><ellipse cx="8" cy="16" rx="7" ry="5"/><ellipse cx="24" cy="16" rx="7" ry="5"/></g><circle cx="16" cy="16" r="5" fill="#EC8017"/></svg>';
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const make = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const CANCEL = Symbol('cancel');
+
+  /* A timeline that can be cancelled (new run, reset) or fast-forwarded (catch-up). */
+  class Run {
+    constructor(fast = false) { this.alive = true; this.fast = fast || REDUCED; }
+    cancel() { this.alive = false; }
+    check() { if (!this.alive) throw CANCEL; }
+    async wait(ms) { if (!this.fast) await sleep(ms); this.check(); }
+  }
+  /* Events seen so far, and promises waiting for one that matches. */
+  class Log {
+    constructor() { this.events = []; this.waiters = []; }
+    push(e) { this.events.push(e); this.waiters = this.waiters.filter(w => !w(e)); }
+    find(pred) { return this.events.find(pred); }
+    count(pred) { return this.events.filter(pred).length; }
+    waitFor(pred, run) {
+      const hit = this.events.find(pred);
+      if (hit) return Promise.resolve(hit);
+      return new Promise((res, rej) => {
+        const w = e => { if (!run.alive) { rej(CANCEL); return true; } if (pred(e)) { res(e); return true; } return false; };
+        this.waiters.push(w);
+        const poll = setInterval(() => { if (!run.alive) { clearInterval(poll); rej(CANCEL); } }, 250);
+      });
+    }
+  }
+
+  function connect({ mark = FLOWER, name, working, done, chips }) {
+    const el = make(`<div class="connect rise"><div class="ch"><span class="mk">${mark}</span><span><span class="nm">${esc(name)}</span><span class="sb">${esc(working)}</span></span></div><div class="chips2"></div></div>`);
+    const wrap = el.querySelector('.chips2');
+    const els = chips.map(c => {
+      const ch = make(`<span class="chip2 pending" style="--c:${c.color || '#0E7C61'}"><span class="d"></span><span class="nmx">${esc(c.name)}</span><span class="st">${esc(c.pending || 'connecting…')}</span></span>`);
+      wrap.appendChild(ch);
+      return ch;
+    });
+    return {
+      el,
+      set(i, state, label) { const c = els[i]; if (!c) return; c.className = 'chip2 ' + state; c.querySelector('.st').textContent = label; },
+      finish() { el.querySelector('.sb').textContent = done; },
+    };
+  }
+
+  let n = 0;
+  function work({ accent, working, done, more }) {
+    const a = ACC[accent || CYCLE[n++ % CYCLE.length]];
+    const el = make(`<div class="work rise" style="--as:${a.s};--am:${a.m};--aw:${a.w}"><span class="ic"><span class="spin"></span></span><span class="bd"><span class="tt">${esc(working)}</span><span class="rs" style="display:none"></span></span></div>`);
+    return {
+      el,
+      resolve({ title = done, result = '', lock = false, ok = true, html = false, details = more } = {}) {
+        if (!ok) { const r = ACC.red; el.style.setProperty('--as', r.s); el.style.setProperty('--am', r.m); el.style.setProperty('--aw', r.w); }
+        el.querySelector('.ic').innerHTML = `<span class="okc">${ok ? '✓' : '✗'}</span>`;
+        el.querySelector('.tt').textContent = title;
+        const rs = el.querySelector('.rs');
+        rs.className = 'rs rise' + (lock ? ' lock' : '');
+        rs.innerHTML = (lock ? LOCK : '') + (html ? result : esc(result));
+        rs.style.display = result ? '' : 'none';
+        if (details) el.querySelector('.bd').insertAdjacentHTML('beforeend', `<details class="more"><summary>details</summary>${details}</details>`);
+      },
+    };
+  }
+
+  function think(lines, title = 'Reasoning') {
+    const el = make(`<div class="think rise"><div class="th">${SPARK}<span>${esc(title)}</span><span class="dots"><span></span><span></span><span></span></span></div><div class="ls">${lines.map(l => `<div class="l">${esc(l)}</div>`).join('')}</div></div>`);
+    const ls = [...el.querySelectorAll('.l')];
+    return { el, show(i) { ls[i]?.classList.add('show'); }, all() { ls.forEach(l => l.classList.add('show')); }, done() { el.classList.add('done'); } };
+  }
+
+  function conclusion({ label = 'Conclusion', text, tone = '', extra = '' }) {
+    return make(`<div class="concl rise ${tone}"><span class="cl">${esc(label)}</span><span class="ct">${esc(text)}</span>${extra ? `<div class="cx">${extra}</div>` : ''}</div>`);
+  }
+
+  function hero({ title, sub = '', onClick, disabled = false }) {
+    const el = make(`<button type="button" class="hero rise"><span><span class="ht">${esc(title)}</span>${sub ? `<span class="hs">${esc(sub)}</span>` : ''}</span><span class="ha">→</span></button>`);
+    el.disabled = disabled;
+    if (onClick) el.addEventListener('click', onClick);
+    return el;
+  }
+
+  /* One step: show a spinner box, wait for its event (and a minimum beat), then resolve it. */
+  async function step(run, host, spec, waitPromise, resolveWith, { minMs = 1300, gapMs = 900, scroll } = {}) {
+    const box = work(spec);
+    host.appendChild(box.el);
+    scroll?.();
+    const t0 = performance.now();
+    const ev = await waitPromise;
+    run.check();
+    await run.wait(Math.max(0, minMs - (performance.now() - t0)));
+    box.resolve(resolveWith(ev));
+    scroll?.();
+    await run.wait(gapMs);
+    return ev;
+  }
+
+  async function reason(run, host, lines, { title, lineMs = 650, scroll } = {}) {
+    const t = think(lines, title);
+    host.appendChild(t.el);
+    scroll?.();
+    await run.wait(500);
+    for (let i = 0; i < lines.length; i++) { t.show(i); scroll?.(); await run.wait(lineMs); }
+    await run.wait(400);
+    t.done();
+    return t;
+  }
+
+  return { ACC, LOCK, SPARK, FLOWER, CANCEL, Run, Log, connect, work, think, conclusion, hero, step, reason, esc, sleep };
+})();
+</script>
 <script>
-const RECORDING = {"run_id": "13554069240519904883", "events": [{"type": "run.start", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717574.619, "request_id": "REQ-2026-0929-A1", "seq": 24}, {"type": "nodes", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717574.629, "node_ids": ["11449127784324032537", "12010711270466415556"], "seq": 25}, {"type": "flwr.log", "who": "flwr", "line": "Successfully installed domino to /Users/avi/Desktop/stanfordhacx/domino-demo/.flwr-home/alder/apps/domino.domino.0.2.0.03fef5b3.", "t": 1790717575.11339, "seq": 26}, {"type": "hospitals", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717577.727, "nodes": {"11449127784324032537": "riverbend", "12010711270466415556": "harbor"}, "seq": 27}, {"type": "pod.read", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717578.531, "file": "pairs.json", "detail": "2 pair records", "seq": 28}, {"type": "form", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717578.533, "request": {"request_id": "REQ-2026-0929-A1", "from": "alder", "donor": {"token": "AL-C2A264-D", "blood": "B", "hla": ["A2", "A24", "B7", "B44", "DR4", "DR15"]}, "patient": {"token": "AL-C2A264-P", "blood": "A", "unacceptable_antigens": ["A1", "B8", "DR17"]}, "window": {"from": "2026-10-12", "to": "2026-10-23"}, "questions": ["Can one of your patients receive our donor's kidney? (blood type + crossmatch)", "Can that patient's donor give to our patient? (blood type + crossmatch)", "Is that pair ready in the proposed window? (your availability notes)", "Does your program's rulebook allow this exchange?"]}, "bytes": 565, "seq": 29}, {"type": "ask.sent", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717580.069, "to": "riverbend", "node_id": "11449127784324032537", "message_id": "8660ab788ba38787f514dd49a48a2d1a3bdd7172ad03a6497dc5c1161e8d292e", "bytes": 565, "fields": ["donor", "from", "patient", "questions", "request_id", "window"], "seq": 30}, {"type": "ask.sent", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717580.07, "to": "harbor", "node_id": "12010711270466415556", "message_id": "41d16719b3f8b197fb1757d7e38b6d9a984b6cd050efe8aa3ffed4e31c53dae9", "bytes": 565, "fields": ["donor", "from", "patient", "questions", "request_id", "window"], "seq": 31}, {"type": "reply.received", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717589.751, "from": "harbor", "message_id": "656d93828f876d2fc37695df8a456fc0e49f9666eaf7ed70a9780524fa6d7a35", "reply_to": "41d16719b3f8b197fb1757d7e38b6d9a984b6cd050efe8aa3ffed4e31c53dae9", "bytes": 134, "response": {"request_id": "REQ-2026-0929-A1", "candidate_token": "HP-39AEF0", "candidate_found": true, "readiness": "ready", "reason": "reciprocal_match"}, "seq": 32}, {"type": "reply.received", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717590.035, "from": "riverbend", "message_id": "e6f2a50db39a930728153aa8397538d0725248bd4b3caac8f4483de9e77b0909", "reply_to": "8660ab788ba38787f514dd49a48a2d1a3bdd7172ad03a6497dc5c1161e8d292e", "bytes": 140, "response": {"request_id": "REQ-2026-0929-A1", "candidate_token": "", "candidate_found": false, "readiness": "searching_other_regions", "reason": "one_way_only"}, "seq": 33}, {"type": "review", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717591.303, "checks": [{"hospital": "harbor", "candidate_found": true, "readiness": "ready", "reason": "reciprocal_match", "usable": true}, {"hospital": "riverbend", "candidate_found": false, "readiness": "searching_other_regions", "reason": "one_way_only", "usable": false}], "proposal": {"status": "proposed", "request_id": "REQ-2026-0929-A1", "partner": "harbor", "candidate_token": "HP-39AEF0", "legs": [{"from": "alder", "to": "harbor", "what": "Alder's donor \u2192 partner's candidate patient"}, {"from": "harbor", "to": "alder", "what": "partner's candidate donor \u2192 Alder's patient"}], "requires": "\u00a72.4", "rule": "\u00a72.4 Surgeon review\nEvery exchange proposal must be reviewed by the recipient's transplant surgeon and approved on a signed approval form before anything is scheduled."}, "seq": 34}, {"type": "run.end", "who": "coordinator", "run_id": "13554069240519904883", "t": 1790717591.305, "ok": true, "seq": 35}]};
+const RECORDING = {"run_id": "15955702193234519527", "events": [{"type": "run.start", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720065.462, "request_id": "REQ-2026-0929-A1", "seq": 5}, {"type": "nodes", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720065.475, "node_ids": ["1066394980990524269", "4003955890558046235"], "seq": 6}, {"type": "flwr.log", "who": "flwr", "line": "\u001b[92mINFO \u001b[0m:      Start `flwr-serverapp` process", "t": 1790720065.702184, "seq": 7}, {"type": "flwr.log", "who": "flwr", "line": "Successfully installed domino to /Users/avi/Desktop/domino/.flwr-home/alder/apps/domino.domino.0.2.0.fe3b2e91.", "t": 1790720065.702345, "seq": 8}, {"type": "hospitals", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720071.612, "nodes": {"4003955890558046235": "harbor", "1066394980990524269": "riverbend"}, "seq": 9}, {"type": "pod.read", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720073.217, "file": "pairs.json", "detail": "2 pair records", "seq": 10}, {"type": "form", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720073.219, "request": {"request_id": "REQ-2026-0929-A1", "from": "alder", "donor": {"token": "AL-C2A264-D", "blood": "B", "hla": ["A2", "A24", "B7", "B44", "DR4", "DR15"]}, "patient": {"token": "AL-C2A264-P", "blood": "A", "unacceptable_antigens": ["A1", "B8", "DR17"]}, "window": {"from": "2026-10-12", "to": "2026-10-23"}, "questions": ["Can one of your patients receive our donor's kidney? (blood type + crossmatch)", "Can that patient's donor give to our patient? (blood type + crossmatch)", "Is that pair ready in the proposed window? (your availability notes)", "Does your program's rulebook allow this exchange?"]}, "bytes": 565, "seq": 11}, {"type": "ask.sent", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720076.268, "to": "harbor", "node_id": "4003955890558046235", "message_id": "b6e2752187ec90c3befe32f0660fb0f44f64586198e56ed57ac8df6ad1f32f6e", "bytes": 565, "fields": ["donor", "from", "patient", "questions", "request_id", "window"], "seq": 12}, {"type": "ask.sent", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720076.269, "to": "riverbend", "node_id": "1066394980990524269", "message_id": "86f12941ee48407a38b4878e16adcb242d7c6122c1ba84032655e9db91b72d98", "bytes": 565, "fields": ["donor", "from", "patient", "questions", "request_id", "window"], "seq": 13}, {"type": "reply.received", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720092.488, "from": "harbor", "message_id": "e658b972db4f576252d5ab86aabb0be6d47cfd530b037bbf1f8bd4bf17643b03", "reply_to": "b6e2752187ec90c3befe32f0660fb0f44f64586198e56ed57ac8df6ad1f32f6e", "bytes": 134, "response": {"request_id": "REQ-2026-0929-A1", "candidate_token": "HP-39AEF0", "candidate_found": true, "readiness": "ready", "reason": "reciprocal_match"}, "seq": 14}, {"type": "reply.received", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720097.277, "from": "riverbend", "message_id": "1bd75e0a68521188d0e290045f05f8ba6f0d9f84f6c6541c01244ce35498e9e2", "reply_to": "86f12941ee48407a38b4878e16adcb242d7c6122c1ba84032655e9db91b72d98", "bytes": 140, "response": {"request_id": "REQ-2026-0929-A1", "candidate_token": "", "candidate_found": false, "readiness": "searching_other_regions", "reason": "one_way_only"}, "seq": 15}, {"type": "review", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720099.54, "checks": [{"hospital": "harbor", "candidate_found": true, "readiness": "ready", "reason": "reciprocal_match", "usable": true}, {"hospital": "riverbend", "candidate_found": false, "readiness": "searching_other_regions", "reason": "one_way_only", "usable": false}], "proposal": {"status": "proposed", "request_id": "REQ-2026-0929-A1", "partner": "harbor", "candidate_token": "HP-39AEF0", "legs": [{"from": "alder", "to": "harbor", "what": "Alder's donor \u2192 partner's candidate patient"}, {"from": "harbor", "to": "alder", "what": "partner's candidate donor \u2192 Alder's patient"}], "requires": "\u00a72.4", "rule": "\u00a72.4 Surgeon review\nEvery exchange proposal must be reviewed by the recipient's transplant surgeon and approved on a signed approval form before anything is scheduled."}, "seq": 16}, {"type": "run.end", "who": "coordinator", "run_id": "15955702193234519527", "t": 1790720099.542, "ok": true, "seq": 17}]};
 const HOSP = {
   alder: { name: 'Alder Medical Center', short: 'Alder', city: 'San Jose', lat: 37.335, lon: -121.89 },
   harbor: { name: 'Harbor Point Hospital', short: 'Harbor Point', city: 'Oakland', lat: 37.805, lon: -122.27 },
@@ -10655,57 +10694,23 @@ const HOSP = {
 };
 const LANES = ['harbor', 'riverbend'];
 const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const { esc } = Think;
 const chip = b => `<span class="chip ${b}">${b}</span>`;
-
+const short = s => String(s || '').slice(0, 8);
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); $('stage').style.transform = `translate(-50%,-50%) scale(${s})`; }
 addEventListener('resize', fit); fit();
+$('flowerLbl').insertAdjacentHTML('afterbegin', Think.FLOWER);
 
 // ---------------- State ----------------
-const S = { beat: 0, step: 0, runId: null, nodes: {}, form: null, formBytes: 0, asks: {}, replies: {}, review: null,
-  evidence: null, reviewed: null, started: false, log: [] };
+const S = { beat: 0, step: 0, runId: null, nodes: {}, replies: {}, review: null, proposed: false, reviewed: null,
+  started: false, log: new Think.Log(), runs: {} };
+const POD = c => `<svg width="22" height="26" viewBox="0 0 22 26"><ellipse cx="11" cy="5" rx="9" ry="3.5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 5v15c0 2 4 3.5 9 3.5s9-1.5 9-3.5V5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 12.5c0 2 4 3.5 9 3.5s9-1.5 9-3.5" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
 
-// ---------------- Captions ----------------
-function caption() {
-  const b = S.beat;
-  let c = '';
-  if (b === 0) c = ["Maria's sister wants to give her a kidney. Their blood types don't match.",
-    'Across the bay, James and Priya have the same problem.',
-    'Neither hospital knows the other family exists.'][S.step];
-  else if (b === 1) c = 'The answer may already exist. It is just in someone else\'s records.';
-  else if (b === 2) c = S.started ? 'Starting a Flower run…' : 'One click. One form. Three private pods.';
-  else if (b === 3) {
-    const n = Object.keys(S.replies).length;
-    if (!S.form) c = 'Alder reads only its own pod to write the form.';
-    else if (n === 0) c = 'Each hospital\'s agent opens its own pod. Nothing else.';
-    else if (n < 2) c = 'Answers come back as five fields. Nothing more.';
-    else c = `${answerLine()}`;
-  } else if (b === 4) c = S.review?.proposal ? `Alder only sees ${S.review.proposal.candidate_token}. You know it's James and Priya.` : 'No usable candidate yet.';
-  else if (b === 5) c = S.reviewed ? 'Confirmed by a person.' : (S.evidence?.pass ? 'The evidence checks out. The surgeon still has to confirm.' : 'The form is read here. The image never leaves Alder.');
-  else c = 'No shared database. A person at every step.';
-  const el = $('caption');
-  el.classList.toggle('narrow', [2, 4, 6].includes(b));
-  el.classList.toggle('left', b === 5);
-  const nb = $('nextBtn');
-  if (nb) {
-    nb.textContent = b === 2 && !S.started ? 'Find an exchange →' : b === 5 && !S.reviewed ? 'Confirm approval first' : b === 6 ? 'End' : 'Next →';
-    nb.disabled = (b === 5 && !S.reviewed) || b === 6;
-    nb.classList.toggle('locked', nb.disabled);
-  }
-  if (el.textContent !== c) { el.style.opacity = 0; setTimeout(() => { el.textContent = c; el.style.opacity = 1; }, 200); }
-}
-function answerLine() {
-  const h = S.replies.harbor, r = S.replies.riverbend;
-  return `Harbor Point: ${h?.candidate_found ? 'candidate found' : 'no candidate'}. Riverbend: ${r?.candidate_found ? 'candidate found' : 'no candidate, so it widens the search'}.`;
-}
-
-// ---------------- Badge ----------------
 function badge() {
   const b = $('badge');
-  if (Source.live) { b.className = 'badge live'; b.textContent = `LIVE · Flower${S.runId ? ' run ' + S.runId : ''} · ${Object.keys(S.nodes).length || '–'} SuperNodes`; }
-  else { b.className = 'badge'; b.textContent = `REPLAY · recorded Flower run ${RECORDING?.run_id ?? '—'}`; }
+  if (Source.live) { b.className = 'badge live'; b.textContent = `LIVE · Flower${S.runId ? ' run ' + S.runId : ''}`; }
+  else { b.className = 'badge'; b.textContent = `REPLAY · Flower run ${RECORDING?.run_id ?? '—'}`; }
 }
 
 // ---------------- Navigation ----------------
@@ -10716,9 +10721,12 @@ function show(beat, step = 0) {
   $('map').classList.toggle('on', [2, 4, 6].includes(S.beat));
   if (S.beat === 0) ['fam1', 'fam2', 'stat'].forEach((id, i) => $(id).classList.toggle('in', i <= S.step));
   if ([2, 4, 6].includes(S.beat)) drawMap();
-  if (S.beat === 4) renderReview();
+  if (S.beat === 4 && !S.runs.review) startPlayer('review', playReview);
   if (S.beat === 6) renderDone();
-  caption();
+  const nb = $('nextBtn');
+  nb.textContent = S.beat === 2 && !S.started ? 'Find an exchange →' : S.beat === 6 ? 'End' : 'Next →';
+  nb.disabled = (S.beat === 5 && !S.reviewed) || S.beat === 6;
+  nb.classList.toggle('locked', nb.disabled);
 }
 function next() {
   if (S.beat === 0 && S.step < 2) return show(0, S.step + 1);
@@ -10727,23 +10735,16 @@ function next() {
   show(S.beat + 1);
 }
 function back() { if (S.beat === 0 && S.step > 0) return show(0, S.step - 1); show(S.beat - 1, S.beat - 1 === 0 ? 2 : 0); }
-
-// ---------------- Network list (beat 2) ----------------
-const POD = (c = '#4FA3A5') => `<svg class="pod" width="22" height="26" viewBox="0 0 22 26"><ellipse cx="11" cy="5" rx="9" ry="3.5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 5v15c0 2 4 3.5 9 3.5s9-1.5 9-3.5V5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 12.5c0 2 4 3.5 9 3.5s9-1.5 9-3.5" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
-function renderNet() {
-  const rows = [
-    ['alder', 'coordinator · Flower SuperLink + ServerApp'],
-    ['harbor', 'hospital agent · Flower SuperNode + ClientApp'],
-    ['riverbend', 'hospital agent · Flower SuperNode + ClientApp'],
-  ];
-  $('netlist').innerHTML = rows.map(([id, role]) => {
-    const node = Object.entries(S.nodes).find(([, h]) => h === id);
-    return `<li>${POD()}<span>${HOSP[id].name} · ${HOSP[id].city}<br><small>${role}</small></span><small>${node ? 'node ' + String(node[0]).slice(0, 8) : 'own data pod'}</small></li>`;
-  }).join('');
+function startPlayer(name, fn, ...args) {
+  S.runs[name]?.cancel();
+  const R = new Think.Run();
+  S.runs[name] = R;
+  fn(R, ...args).catch(e => { if (e !== Think.CANCEL) console.error(e); });
+  return R;
 }
 
 // ---------------- Map ----------------
-const LAT_MAX = 38.66, LAT_MIN = 37.22, K = 900 / (LAT_MAX - LAT_MIN), LON_MIN = -123.2, COS = 0.79;
+const LAT_MAX = 38.66, LAT_MIN = 37.22, K = 890 / (LAT_MAX - LAT_MIN), LON_MIN = -123.2, COS = 0.79;
 const P = (lat, lon) => [(lon - LON_MIN) * COS * K, (LAT_MAX - lat) * K];
 const path = (pts, close) => pts.map((p, i) => (i ? 'L' : 'M') + P(p[0], p[1]).map(n => n.toFixed(1)).join(' ')).join('') + (close ? 'Z' : '');
 const COAST = [[39.5, -123.78], [39.0, -123.72], [38.75, -123.5], [38.6, -123.34], [38.45, -123.12], [38.31, -123.06], [38.24, -122.97], [38.1, -122.96], [38.0, -123.02], [37.99, -122.83], [37.94, -122.74], [37.9, -122.68], [37.83, -122.53], [37.826, -122.48], [37.79, -122.505], [37.73, -122.51], [37.63, -122.495], [37.5, -122.5], [37.4, -122.42], [37.25, -122.41], [37.11, -122.33], [37.0, -122.18], [36.96, -122.03], [36.97, -121.95], [36.95, -121.88], [36.85, -121.8], [36.6, -121.9], [36.5, -121.95], [36.5, -119.5], [39.5, -119.5]];
@@ -10757,178 +10758,158 @@ const HWYS = [
 function marker(id, state) {
   const h = HOSP[id]; const [x, y] = P(h.lat, h.lon);
   const ring = { yes: '#4FA3A5', no: '#F2B632', home: '#4FA3A5' }[state] || '#C4E4F7';
-  const stateTxt = { yes: 'CANDIDATE FOUND', no: 'NO CANDIDATE', home: 'COORDINATOR' }[state] || '';
-  const w = 260, ly = y < 150 ? y + 24 : y - 106, lx = id === 'riverbend' ? x - 24 - w : x + 24;
-  return `<g>
-    <circle cx="${x}" cy="${y}" r="28" fill="${ring}" opacity=".16"/>
-    <circle cx="${x}" cy="${y}" r="11" fill="#0E2740" stroke="${ring}" stroke-width="5"/>
-    <rect class="lbl-box" x="${lx}" y="${ly}" width="${w}" height="${stateTxt ? 98 : 78}" rx="3"/>
-    <text class="lbl-name" x="${lx + 12}" y="${ly + 28}">${h.name}</text>
-    <g transform="translate(${lx + 12} ${ly + 40}) scale(.7)">${POD('#C4E4F7').replace('class="pod" ', '')}</g>
-    <text class="lbl-sub" x="${lx + 34}" y="${ly + 56}">${h.city} · own data pod</text>
-    ${stateTxt ? `<text class="lbl-state" x="${lx + 12}" y="${ly + 84}" fill="${ring}">${stateTxt}</text>` : ''}
-  </g>`;
+  const tag = { yes: 'CANDIDATE FOUND', no: 'NO CANDIDATE' }[state] || '';
+  const w = 270, ly = y < 150 ? y + 24 : y - 100, lx = id === 'riverbend' ? x - 24 - w : x + 24;
+  return `<g><circle cx="${x}" cy="${y}" r="28" fill="${ring}" opacity=".16"/><circle cx="${x}" cy="${y}" r="11" fill="#0E2740" stroke="${ring}" stroke-width="5"/>
+    <rect class="lbl-box" x="${lx}" y="${ly}" width="${w}" height="${tag ? 90 : 66}" rx="4"/>
+    <text class="lbl-name" x="${lx + 14}" y="${ly + 29}">${h.name}</text>
+    <g transform="translate(${lx + 14} ${ly + 38}) scale(.7)">${POD('#C4E4F7')}</g><text class="lbl-sub" x="${lx + 36}" y="${ly + 54}">${h.city} · own pod</text>
+    ${tag ? `<text class="lbl-state" x="${lx + 14}" y="${ly + 80}" fill="${ring}">${tag}</text>` : ''}</g>`;
 }
-function arc(a, b, bend, cls) {
+function arc(a, b, bend) {
   const [x1, y1] = P(HOSP[a].lat, HOSP[a].lon), [x2, y2] = P(HOSP[b].lat, HOSP[b].lon);
   const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
-  const cx = mx - dy / len * bend, cy = my + dx / len * bend;
-  return { d: `M${x1} ${y1}Q${cx} ${cy} ${x2} ${y2}`, cx, cy, cls };
+  return { d: `M${x1} ${y1}Q${mx - dy / len * bend} ${my + dx / len * bend} ${x2} ${y2}`, cx: mx - dy / len * bend, cy: my + dx / len * bend };
 }
 function drawMap() {
-  const rh = S.replies.harbor, rr = S.replies.riverbend;
-  const exchange = S.beat >= 4 && S.review?.proposal;
-  const reviewed = S.beat >= 6 && S.reviewed;
-  const arcs = exchange ? [arc('alder', 'harbor', 70, reviewed ? 'reviewed' : 'proposed'), arc('harbor', 'alder', 70, reviewed ? 'reviewed' : 'proposed')] : [];
+  const rh = S.replies.harbor, rr = S.replies.riverbend, showAns = S.beat >= 4;
+  const ex = S.proposed && S.review?.proposal, rv = !!S.reviewed && S.beat >= 6;
+  const arcs = ex ? [arc('alder', 'harbor', 70), arc('harbor', 'alder', 70)] : [];
   const [sx, sy] = P(HOSP.riverbend.lat, HOSP.riverbend.lon);
-  const outreach = S.beat >= 4 && rr?.readiness === 'searching_other_regions' ? `
-    <path class="out" d="M${sx} ${sy}L1040 120"/><text class="outlbl" x="1034" y="146" text-anchor="end">→ Sierra Nevada · Reno</text>
-    <path class="out" d="M${sx} ${sy}L1010 290"/><text class="outlbl" x="1004" y="316" text-anchor="end">→ Central Valley · Fresno</text>
-    <path class="out" d="M${sx} ${sy}L720 8"/><text class="outlbl" x="712" y="26" text-anchor="end">Pacific Northwest · Portland ←</text>
-    <text class="outlbl" x="1004" y="338" text-anchor="end" style="fill:#8A97B5; font-size:13px">partner regions · illustrative, outside this network</text>` : '';
+  const out = showAns && rr?.readiness === 'searching_other_regions' ? `
+    <path class="out" d="M${sx} ${sy}L1040 120"/><text class="outlbl" x="1034" y="146" text-anchor="end">Reno</text>
+    <path class="out" d="M${sx} ${sy}L1010 290"/><text class="outlbl" x="1004" y="316" text-anchor="end">Fresno</text>
+    <path class="out" d="M${sx} ${sy}L720 8"/><text class="outlbl" x="712" y="26" text-anchor="end">Portland</text>` : '';
   const [fx, fy] = P(37.775, -122.42), [tx, ty] = P(37.4275, -122.17);
-  const tag = exchange ? (() => {
-    const a = arcs[0]; const label = reviewed ? 'REVIEWED' : 'PROPOSED';
-    return `<g transform="translate(${a.cx + 70} ${a.cy - 10})"><rect x="-6" y="-26" width="${reviewed ? 138 : 136}" height="38" rx="3" fill="${reviewed ? '#4FA3A5' : '#F2B632'}"/><text x="8" y="0" fill="#0E2740" font-weight="700" font-size="20" letter-spacing="2" font-family="Ubuntu, Helvetica">${label}</text></g>
-      <text x="${a.cx + 64}" y="${a.cy + 34}" fill="#C4E4F7" font-size="15" font-family="Ubuntu, Helvetica">Elena → candidate ${esc(S.review.proposal.candidate_token)}</text>
-      <text x="${a.cx + 64}" y="${a.cy + 54}" fill="#C4E4F7" font-size="15" font-family="Ubuntu, Helvetica">candidate's donor → Maria</text>`;
-  })() : '';
+  const tag = ex ? `<g transform="translate(${arcs[0].cx + 70} ${arcs[0].cy - 10})"><rect x="-6" y="-26" width="140" height="38" rx="4" fill="${rv ? '#4FA3A5' : '#F2B632'}"/><text x="8" y="0" fill="#0E2740" font-weight="700" font-size="20" letter-spacing="2" font-family="Ubuntu, Helvetica">${rv ? 'REVIEWED' : 'PROPOSED'}</text></g>` : '';
   $('map').innerHTML = `
     <defs><linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="#0E2740" stop-opacity="0"/><stop offset="1" stop-color="#0E2740" stop-opacity=".95"/></linearGradient></defs>
-    <rect width="1920" height="900" fill="#081424" opacity=".45"/>
-    <path class="land" d="${path(COAST, true)}${path(BAY, true)}"/>
-    <path class="river" d="${path(RIVER)}"/>
+    <rect width="1920" height="890" fill="#081424" opacity=".45"/>
+    <path class="land" d="${path(COAST, true)}${path(BAY, true)}"/><path class="river" d="${path(RIVER)}"/>
     ${HWYS.map(h => `<path class="hwy" d="${path(h)}"/>`).join('')}
     <text class="city" x="${fx - 120}" y="${fy + 6}">San Francisco</text>
     <circle cx="${tx}" cy="${ty}" r="5" fill="#F2B632"/><text class="city" x="${tx - 12}" y="${ty + 26}" text-anchor="end" style="fill:#F2B632">Stanford · you are here</text>
-    ${arcs.map(a => `<path class="arc ${a.cls}" d="${a.d}"/>`).join('')}
-    ${outreach}
-    ${marker('alder', 'home')}
-    ${marker('harbor', S.beat >= 4 && rh ? (rh.candidate_found ? 'yes' : 'no') : '')}
-    ${marker('riverbend', S.beat >= 4 && rr ? (rr.candidate_found ? 'yes' : 'no') : '')}
-    ${tag}
-    <rect x="1000" y="0" width="120" height="900" fill="url(#fade)"/><rect x="1120" y="0" width="800" height="900" fill="#0E2740" opacity=".95"/>`;
+    ${arcs.map(a => `<path class="arc ${rv ? 'reviewed' : 'proposed'}" d="${a.d}"/>`).join('')}${out}
+    ${marker('alder', 'home')}${marker('harbor', showAns && rh ? (rh.candidate_found ? 'yes' : 'no') : '')}${marker('riverbend', showAns && rr ? (rr.candidate_found ? 'yes' : 'no') : '')}${tag}
+    <rect x="1000" y="0" width="120" height="890" fill="url(#fade)"/><rect x="1120" y="0" width="800" height="890" fill="#0E2740" opacity=".95"/>`;
+}
+function renderNet() {
+  $('netlist').innerHTML = [['alder', 'coordinator'], ['harbor', 'agent'], ['riverbend', 'agent']]
+    .map(([id, role]) => `<li>${POD('#4FA3A5')}<span>${HOSP[id].name}</span><small>${role}</small></li>`).join('');
 }
 
-// ---------------- Wire strip + log ----------------
-function wire(dir, text) {
-  const el = document.createElement('span');
-  el.className = 'pkt ' + dir;
-  el.innerHTML = text;
-  $('wire').prepend(el);
-  while ($('wire').children.length > 5) $('wire').lastChild.remove();
+// ---------------- Flower network bar (beat 3) ----------------
+const NODE_X = { alder: 330, harbor: 960, riverbend: 1590 };
+function drawNet() {
+  const node = (id, sub) => `<g><circle cx="${NODE_X[id]}" cy="40" r="15" fill="#0E2740" stroke="${id === 'alder' ? '#4FA3A5' : '#EC8017'}" stroke-width="5"/>
+    <text x="${NODE_X[id]}" y="86" text-anchor="middle" fill="#C4E4F7" font-size="16" font-family="Ubuntu, Helvetica">${sub}</text></g>`;
+  $('net').innerHTML = `<path id="p-harbor" d="M${NODE_X.alder} 40 L${NODE_X.harbor} 40" stroke="#1F4A7A" stroke-width="3" stroke-dasharray="8 8" fill="none"/>
+    <path id="p-riverbend" d="M${NODE_X.alder} 40 Q${NODE_X.harbor} -10 ${NODE_X.riverbend} 40" stroke="#1F4A7A" stroke-width="3" stroke-dasharray="8 8" fill="none"/>
+    ${node('alder', 'Alder · Flower SuperLink')}${node('harbor', 'Harbor Point · SuperNode')}${node('riverbend', 'Riverbend · SuperNode')}<g id="pkts"></g>`;
 }
-function log(e) {
-  S.log.push(e);
-  const line = e.type === 'flwr.log' ? `flwr │ ${e.line}` : `${e.who || ''} · ${e.type} ${JSON.stringify(Object.fromEntries(Object.entries(e).filter(([k]) => !['type', 'who', 't', 'seq'].includes(k))))}`;
-  const div = $('log');
-  div.textContent += line.slice(0, 600) + '\n';
-}
-
-// ---------------- Step 1: form, hub, lanes ----------------
-const LANE_STEPS = [
-  { t: 'Form arrives', s: 'Flower message from Alder' },
-  { t: 'Opens its own pod', s: 'pairs · availability notes · rulebook', pod: true },
-  { t: 'Retrieves', s: 'relevant pairs and rules (BM25)' },
-  { t: 'Screens in code', s: 'blood type + crossmatch, both ways' },
-  { t: 'Decides', s: 'readiness, or what to do next' },
-];
-function renderLane(h) {
-  const node = Object.entries(S.nodes).find(([, x]) => x === h);
-  $('lane-' + h).innerHTML = `
-    <div class="lh"><b>${HOSP[h].name}<small>${HOSP[h].city} · SuperNode ${node ? String(node[0]).slice(0, 10) : '…'}</small></b><em>Runs on ${HOSP[h].short}'s machine. Alder sees only the reply.</em></div>
-    <div class="boxes">${LANE_STEPS.map((s, i) => `<div class="box" id="bx-${h}-${i}">${s.pod ? POD() : ''}<div class="bn">STEP ${i + 1}</div><div class="bt">${s.t}</div><div class="bs" id="bs-${h}-${i}">${s.s}</div></div>`).join('')}</div>
-    <div class="result">
-      <div class="reply" id="rp-${h}"><header><span>Reply · restricted to 5 fields</span><span id="rpb-${h}"></span></header><div class="wait">waiting for ${HOSP[h].short}'s reply…</div></div>
-      <div class="verdict" id="vd-${h}"><span class="chipbig">WORKING</span><div class="sub">Alder cannot see inside ${HOSP[h].short}'s pod.</div></div>
-    </div>`;
-}
-const laneTimers = {};
-function setBox(h, i, cls) { const el = $(`bx-${h}-${i}`); if (el) { el.classList.remove('active', 'done'); if (cls) el.classList.add(cls); } }
-function startLane(h, bytes) {
-  (laneTimers[h] || []).forEach(clearTimeout);
-  laneTimers[h] = [];
-  $(`bs-${h}-0`).textContent = `Flower message · ${bytes} B`;
-  const step = REDUCED ? 50 : 1350;
-  LANE_STEPS.forEach((_, i) => {
-    laneTimers[h].push(setTimeout(() => { if (S.replies[h]) return; if (i) setBox(h, i - 1, 'done'); setBox(h, i, 'active'); }, i * step + 700));
-  });
-}
-async function finishLane(h, r, bytes) {
-  (laneTimers[h] || []).forEach(clearTimeout);
-  for (let i = 0; i < 5; i++) { setBox(h, i, 'done'); }
-  $(`bs-${h}-4`).textContent = r.candidate_found ? `readiness: ${r.readiness}` : (r.readiness === 'searching_other_regions' ? 'no local match → partner regions' : 'no local match');
-  $(`rpb-${h}`).textContent = `${bytes} B`;
-  const rows = [['request_id', r.request_id], ['candidate_token', r.candidate_token || '—'], ['candidate_found', String(r.candidate_found)], ['readiness', r.readiness], ['reason', r.reason]];
-  $('rp-' + h).innerHTML = `<header><span>Reply · restricted to 5 fields</span><span>${bytes} B</span></header>` + rows.map(([k, v]) => `<div class="rr"><span>${k}</span><span>${esc(v)}</span></div>`).join('');
-  const rr = $('rp-' + h).querySelectorAll('.rr');
-  for (const el of rr) { await sleep(REDUCED ? 0 : 260); el.classList.add('in'); }
-  $('vd-' + h).innerHTML = r.candidate_found
-    ? `<span class="chipbig yes">CANDIDATE FOUND</span><div class="sub">A pair at ${HOSP[h].short} fits both ways and is ready. Alder gets a token, not a name.</div>`
-    : `<span class="chipbig no">NO CANDIDATE FOUND</span><div class="sub">${r.reason === 'one_way_only' ? 'Only one direction works.' : 'No pair fits.'}${r.readiness === 'searching_other_regions' ? ` ${HOSP[h].short} is widening the search to partner regions:` : ''}</div>
-       ${r.readiness === 'searching_other_regions' ? '<div class="regions"><span>Reno</span><span>Fresno</span><span>Portland</span><span style="border-style:solid;color:#8A97B5;border-color:#8A97B5">illustrative</span></div>' : ''}`;
-}
-function renderForm() {
-  const f = S.form;
-  if (!f) return;
-  $('formcard').innerHTML = `<header><b>Screening form · from Alder</b><span>${esc(f.request_id)} · ${S.formBytes} B · built from Alder's own ${esc(S.alderRead?.file || 'pod')}</span></header>
-    <div class="frow"><span class="k">Our donor</span><span class="v"><span class="mono">${esc(f.donor.token)}</span> · ${chip(f.donor.blood)}<br><span class="mono" style="font-size:13px">HLA ${f.donor.hla.join(' ')}</span></span></div>
-    <div class="frow"><span class="k">Our patient</span><span class="v"><span class="mono">${esc(f.patient.token)}</span> · ${chip(f.patient.blood)}<br><span class="mono" style="font-size:13px">avoid ${f.patient.unacceptable_antigens.join(' ')}</span></span></div>
-    <div class="frow"><span class="k">Window</span><span class="v">${f.window.from} → ${f.window.to}</span></div>
-    <div class="qs">Please answer from your own records:<ol>${f.questions.map(q => `<li>${esc(q)}</li>`).join('')}</ol></div>
-    <div class="not">Not on the form: <s>names</s> · <s>charts</s> · <s>notes</s> · <s>calendars</s></div>`;
-}
-function drawFlowLines(active = {}) {
-  const hubX = 680, hubY = 460;
-  const lane = h => h === 'harbor' ? 190 : 528;
-  const line = (d, c, dash) => `<path d="${d}" stroke="${c}" stroke-width="3" fill="none" ${dash ? 'stroke-dasharray="8 8"' : ''}/>`;
-  $('flowsvg').innerHTML = [
-    line(`M560 460 L${hubX - 60} ${hubY}`, S.form ? '#4FA3A5' : '#1F4A7A', !S.form),
-    ...LANES.map(h => line(`M${hubX + 60} ${hubY} C 760 ${hubY}, 760 ${lane(h)}, 800 ${lane(h)}`,
-      S.replies[h] ? (S.replies[h].candidate_found ? '#4FA3A5' : '#F2B632') : active[h] ? '#C4E4F7' : '#1F4A7A', !S.replies[h])),
-    `<g id="pkts"></g>`,
-  ].join('');
-}
-function flyPacket(h, dir, label) {
-  const g = $('pkts');
-  if (!g) return;
-  const lane = h === 'harbor' ? 190 : 528;
-  const pts = dir === 'out' ? [[560, 460], [740, 460], [800, lane]] : [[800, lane], [740, 460], [560, 460]];
+function flyPacket(h, dir, label, color = '#fff') {
+  const p = $('p-' + h), g = $('pkts');
+  if (!p || !g) return;
+  p.setAttribute('stroke', dir === 'out' ? '#C4E4F7' : '#4FA3A5');
+  const L = p.getTotalLength();
   const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  el.innerHTML = `<rect x="-58" y="-15" width="116" height="30" rx="15" fill="#fff"/><text x="0" y="5" text-anchor="middle" fill="#0E2740" font-size="14" font-family="Ubuntu Mono, monospace">${esc(label)}</text>`;
+  el.innerHTML = `<rect x="-62" y="-15" width="124" height="30" rx="15" fill="${color}"/><text x="0" y="5" text-anchor="middle" fill="#0E2740" font-size="15" font-family="Ubuntu Mono, monospace">${esc(label)}</text>`;
   g.appendChild(el);
-  const dur = REDUCED ? 10 : 1100, t0 = performance.now();
+  const dur = REDUCED ? 10 : 1300, t0 = performance.now();
   (function frame(now) {
-    const t = Math.min(1, (now - t0) / dur), seg = t < .5 ? 0 : 1, lt = seg ? (t - .5) * 2 : t * 2;
-    const [a, b] = [pts[seg], pts[seg + 1]];
-    el.setAttribute('transform', `translate(${a[0] + (b[0] - a[0]) * lt} ${a[1] + (b[1] - a[1]) * lt})`);
-    if (t < 1) requestAnimationFrame(frame); else setTimeout(() => el.remove(), 250);
+    const t = Math.min(1, (now - t0) / dur), e = t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+    const pt = p.getPointAtLength(L * (dir === 'out' ? e : 1 - e));
+    el.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
+    if (t < 1) requestAnimationFrame(frame); else setTimeout(() => el.remove(), 300);
   })(t0);
 }
 
-// ---------------- Step 2: review ----------------
-function renderReview() {
-  const f = S.form, cols = LANES.filter(h => S.replies[h]);
-  $('respReq').textContent = f ? f.request_id : '';
+// ---------------- Step 1 players ----------------
+const is = t => e => e.type === t;
+async function playAlder(R) {
+  const col = $('col-alder');
+  col.innerHTML = `<div class="colhead">Alder<small>San Jose · coordinator</small></div><div class="seq"></div>`;
+  const host = col.querySelector('.seq');
+  const con = Think.connect({ name: 'Flower SuperLink', working: 'Waiting for hospitals…', done: 'Hospitals connected',
+    chips: [{ name: 'Harbor Point', color: '#0E7C61' }, { name: 'Riverbend', color: '#0E7C61' }] });
+  host.appendChild(con.el);
+  const hs = await S.log.waitFor(is('hospitals'), R);
+  const nodeOf = h => Object.keys(hs.nodes).find(n => hs.nodes[n] === h);
+  await R.wait(400); con.set(0, 'ok', 'node ' + short(nodeOf('harbor')));
+  await R.wait(400); con.set(1, 'ok', 'node ' + short(nodeOf('riverbend'))); con.finish();
+  await R.wait(600);
+  await Think.step(R, host, { working: "Reading Alder's pod…", done: "Read Alder's pod" }, S.log.waitFor(e => e.type === 'pod.read' && e.who === 'coordinator', R),
+    () => ({ html: true, result: `Maria ${chip('A')} · Elena ${chip('B')}` }));
+  await Think.step(R, host, { working: 'Building the form…', done: 'Built the form' }, S.log.waitFor(is('form'), R),
+    () => ({ result: 'Blood types · HLA · tokens · no names' }));
+  await Think.step(R, host, { working: 'Sending over Flower…', done: 'Sent to 2 hospitals' }, waitCount(R, 'ask.sent', 2),
+    e => ({ result: `${e.bytes} B each · query.screen` }));
+  await Think.step(R, host, { accent: 'blue', working: 'Waiting for replies…', done: '2 replies' }, waitCount(R, 'reply.received', 2),
+    () => ({ result: '5 fields each · nothing else' }), { minMs: 800 });
+  await S.log.waitFor(is('review'), R);
+  host.appendChild(Think.hero({ title: 'Review the answers', sub: 'Step 2', onClick: () => show(4) }));
+}
+function waitCount(R, type, n) {
+  return new Promise((res, rej) => {
+    const tick = () => {
+      if (!R.alive) return rej(Think.CANCEL);
+      const evs = S.log.events.filter(is(type));
+      if (evs.length >= n) return res(evs[n - 1]);
+      setTimeout(tick, 150);
+    };
+    tick();
+  });
+}
+async function playLane(R, h) {
+  const col = $('col-' + h);
+  col.innerHTML = `<div class="colhead">${HOSP[h].short}<small>${HOSP[h].city} · agent</small><span class="lk">${Think.LOCK} own pod</span></div><div class="seq"></div>`;
+  const host = col.querySelector('.seq');
+  const ask = await S.log.waitFor(e => e.type === 'ask.sent' && e.to === h, R);
+  flyPacket(h, 'out', `form · ${ask.bytes} B`);
+  await R.wait(1100);
+  const replyP = S.log.waitFor(e => e.type === 'reply.received' && e.from === h, R);
+  const priv = { result: `Stays inside ${HOSP[h].short}`, lock: true };
+  await Think.step(R, host, { working: 'Receiving the form…', done: 'Received the form' }, Promise.resolve(ask), e => ({ result: `Flower message ${short(e.message_id)}` }), { minMs: 1000, gapMs: 800 });
+  await Think.step(R, host, { working: 'Opening its own pod…', done: 'Opened its own pod' }, Think.sleep(0), () => priv, { minMs: 1500, gapMs: 900 });
+  await Think.step(R, host, { working: 'Screening its pairs…', done: 'Screened its pairs' }, Think.sleep(0), () => priv, { minMs: 1700, gapMs: 900 });
+  await Think.step(R, host, { working: 'Checking its rules…', done: 'Checked its rules' }, Think.sleep(0), () => priv, { minMs: 1600, gapMs: 900 });
+  const rep = await Think.step(R, host, { accent: 'blue', working: 'Replying…', done: 'Replied over Flower' }, replyP, e => ({ result: `5 fields · ${e.bytes} B` }), { minMs: 900, gapMs: 300 });
+  flyPacket(h, 'in', `5 fields · ${rep.bytes} B`, rep.response.candidate_found ? '#A7D8C9' : '#F3C98B');
+  await R.wait(1200);
+  const r = rep.response;
+  host.appendChild(r.candidate_found
+    ? Think.conclusion({ label: HOSP[h].short, text: 'Candidate found', tone: 'ok', extra: `<span class="fields5"><span>token</span><span>${esc(r.candidate_token)}</span><span>readiness</span><span>${esc(r.readiness)}</span></span>` })
+    : Think.conclusion({ label: HOSP[h].short, text: 'No candidate found', tone: 'warn', extra: r.readiness === 'searching_other_regions' ? '<span class="regions2"><span>Reno</span><span>Fresno</span><span>Portland</span><span style="border-style:solid">searching · illustrative</span></span>' : '' }));
+}
+
+// ---------------- Step 2 player ----------------
+async function playReview(R) {
+  const host = $('seqReview');
+  host.innerHTML = '';
+  const rv = await S.log.waitFor(is('review'), R);
+  const cols = LANES.filter(h => S.replies[h]);
   const fields = ['request_id', 'candidate_token', 'candidate_found', 'readiness', 'reason'];
-  $('respTable').innerHTML = `<tr><th>Field</th>${cols.map(h => `<th>${HOSP[h].short}</th>`).join('')}</tr>` +
-    fields.map(k => `<tr><td class="k">${k}</td>${cols.map(h => {
-      const v = S.replies[h][k]; const cls = k === 'candidate_found' ? (v ? 't' : 'f') : '';
-      return `<td class="${cls}">${esc(v === '' ? '—' : String(v))}</td>`;
-    }).join('')}</tr>`).join('');
-  const rv = S.review;
-  $('reviewChecks').innerHTML = rv ? rv.checks.map(c => `<div class="cl"><span class="${c.usable ? 'ok' : 'bad'}">${c.usable ? '✓' : '–'}</span><span>${HOSP[c.hospital].short}: ${c.candidate_found ? 'candidate found' : 'no candidate'} · ${c.readiness.replaceAll('_', ' ')} · ${c.reason.replaceAll('_', ' ')} → <b>${c.usable ? 'propose exchange' : (c.readiness === 'searching_other_regions' ? 'keep on file; it is searching other regions' : 'no action')}</b></span></div>`).join('')
-    : '<div class="cl"><span>·</span><span>Waiting for replies.</span></div>';
-  const p = rv?.proposal;
-  $('proposal').innerHTML = p ? `<b>Proposed exchange · ${esc(p.request_id)}</b><br>
-    Alder's donor (Elena) → ${HOSP[p.partner].short} candidate <span class="mono">${esc(p.candidate_token)}</span><br>
-    ${HOSP[p.partner].short} candidate's donor → Alder's patient (Maria)<br>
-    <span style="color:#a86b00">Needs a signed surgeon approval (AMC-KTP-04 ${esc(p.requires)}).</span>` : 'No exchange to propose.';
-  $('aside').textContent = p ? 'Code proposes. It does not decide. A surgeon does.' : '';
+  const tbl = document.createElement('div');
+  tbl.className = 'rtable rise';
+  tbl.innerHTML = `<table><tr><th></th>${cols.map(h => `<th>${HOSP[h].short}</th>`).join('')}</tr>${fields.map(k => `<tr><td class="k">${k}</td>${cols.map(h => {
+    const v = S.replies[h][k]; return `<td class="${k === 'candidate_found' ? (v ? 't' : 'f') : ''}">${esc(v === '' ? '—' : String(v))}</td>`;
+  }).join('')}</tr>`).join('')}</table>`;
+  host.appendChild(tbl);
+  for (const tr of tbl.querySelectorAll('tr')) { await R.wait(220); tr.classList.add('in'); }
+  await R.wait(500);
+  const p = rv.proposal;
+  const lines = rv.checks.map(c => c.usable ? `${HOSP[c.hospital].short} fits both ways, and is ready.` : `${HOSP[c.hospital].short}: ${c.reason.replaceAll('_', ' ')}. Still searching.`);
+  lines.push(p ? `→ Propose Alder ↔ ${HOSP[p.partner].short}.` : '→ Nothing to propose yet.');
+  await Think.reason(R, host, lines);
+  await R.wait(300);
+  if (!p) return;
+  host.appendChild(Think.conclusion({ label: 'Proposed exchange', text: `Elena → ${p.candidate_token}  ·  ${p.candidate_token}'s donor → Maria`, tone: 'warn' }));
+  S.proposed = true; drawMap();
+  await R.wait(900);
+  host.appendChild(Think.hero({ title: 'Send to the surgeon', sub: `Signed approval required · AMC-KTP-04 ${p.requires}`, onClick: () => show(5) }));
 }
 
 // ---------------- Step 3: evidence ----------------
-const FIELD_LABELS = { form: 'Form ID', request_id: 'Request ID', candidate_token: 'Candidate token', recipient_token: 'Recipient token', partner: 'Partner program', surgeon: 'Surgeon', date: 'Date' };
 function loadImage(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; }); }
 function inkRatio(data, w, h, poly, inset) {
   const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
@@ -10942,10 +10923,8 @@ function inkRatio(data, w, h, poly, inset) {
   }
   return n ? ink / n : 0;
 }
-async function handleForm(src) {
-  show(5);
-  let img;
-  try { img = await loadImage(src); } catch { return; }
+async function analyzeForm(src) {
+  const img = await loadImage(src);
   const sc = Math.min(1, 1800 / img.naturalWidth);
   const w = Math.round(img.naturalWidth * sc), h = Math.round(img.naturalHeight * sc);
   const cv = $('formCanvas'); cv.width = w; cv.height = h;
@@ -10953,116 +10932,107 @@ async function handleForm(src) {
   ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
   const data = ctx.getImageData(0, 0, w, h).data;
   $('drop').classList.add('has');
-  S.reviewed = null; $('stamp').classList.remove('on');
-  const checks = [];
   const qr = typeof jsQR === 'function' ? jsQR(data, w, h) : null;
-  let fields = null;
-  try { fields = qr ? JSON.parse(qr.data) : null; } catch { fields = null; }
-  checks.push({ ok: !!fields, t: fields ? 'Form QR code read' : 'No readable form QR code found' });
-  if (fields) {
-    const L = fields.layout, loc = qr.location;
-    const [qx, qy, qs] = L.qr;
-    const map = (fx, fy) => {
-      const u = (fx - qx) / qs, v = (fy - qy) / qs;
-      return [loc.topLeftCorner.x + u * (loc.topRightCorner.x - loc.topLeftCorner.x) + v * (loc.bottomLeftCorner.x - loc.topLeftCorner.x),
-        loc.topLeftCorner.y + u * (loc.topRightCorner.y - loc.topLeftCorner.y) + v * (loc.bottomLeftCorner.y - loc.topLeftCorner.y)];
-    };
-    const poly = b => [map(b[0], b[1]), map(b[2], b[1]), map(b[2], b[3]), map(b[0], b[3])];
-    const sig = inkRatio(data, w, h, poly(L.sig), 0.06), apr = inkRatio(data, w, h, poly(L.approve), 0.2), dec = inkRatio(data, w, h, poly(L.decline), 0.2);
-    const draw = (b, color, label) => {
-      const p = poly(b); ctx.strokeStyle = color; ctx.lineWidth = Math.max(4, w / 300); ctx.beginPath();
-      p.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); ctx.stroke();
-      ctx.fillStyle = color; ctx.font = `${Math.round(w / 60)}px Ubuntu, Helvetica`; ctx.fillText(label, p[0][0], p[0][1] - 8);
-    };
-    const qp = [loc.topLeftCorner, loc.topRightCorner, loc.bottomRightCorner, loc.bottomLeftCorner];
-    ctx.strokeStyle = '#4FA3A5'; ctx.lineWidth = Math.max(4, w / 300); ctx.beginPath(); qp.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y))); ctx.closePath(); ctx.stroke();
-    draw(L.sig, '#EC8017', `signature · ink ${(sig * 100).toFixed(1)}%`);
-    draw(L.approve, '#EC8017', `approve · ${(apr * 100).toFixed(0)}%`);
-    draw(L.decline, '#8A97B5', `decline · ${(dec * 100).toFixed(0)}%`);
-    const reqId = S.form?.request_id, token = S.review?.proposal?.candidate_token;
-    checks.push({ ok: !!reqId && fields.request_id === reqId, t: `Request ID matches this run${reqId ? '' : ' (no run yet)'}`, v: fields.request_id });
-    checks.push({ ok: !!token && fields.candidate_token === token, t: `Candidate token matches ${HOSP.harbor.short}'s reply`, v: `${fields.candidate_token}${token && fields.candidate_token !== token ? ' ≠ ' + token : ''}` });
-    checks.push({ ok: apr > 0.04, t: '"Approve" box is marked', v: `${(apr * 100).toFixed(0)}% ink` });
-    checks.push({ ok: dec < 0.02, t: '"Do not approve" box is empty', v: `${(dec * 100).toFixed(0)}% ink` });
-    checks.push({ ok: sig > 0.008, t: 'Signature present in the signature box', v: `${(sig * 100).toFixed(1)}% ink` });
-    $('xf').innerHTML = Object.entries(FIELD_LABELS).map(([k, l]) => `<div><span class="k">${l}</span><span class="v">${esc(fields[k] ?? '—')}</span></div>`).join('');
-    $('xfSrc').textContent = 'from the form QR · on this machine';
-  } else {
-    $('xf').innerHTML = '<div style="grid-column:1/3;border:0;color:#b3261e">Could not read the form. Try a sharper image.</div>';
-  }
-  const pass = checks.every(c => c.ok);
-  S.evidence = { pass, fields, checks };
-  $('evChecks').innerHTML = checks.map(c => `<div class="cl"><span class="${c.ok ? 'ok' : 'bad'}">${c.ok ? '✓' : '✗'}</span><span>${esc(c.t)}${c.v ? ` <span class="mono" style="color:#6b778c;font-size:13px">· ${esc(c.v)}</span>` : ''}</span></div>`).join('') +
-    `<div class="cl"><span></span><span style="color:${pass ? '#2d7f81' : '#b3261e'};font-weight:500">${pass ? 'Evidence complete. Waiting for the surgeon to confirm.' : 'Evidence incomplete. Approval stays locked.'}</span></div>`;
-  $('ack').disabled = !pass; $('ack').checked = false;
-  lockConfirm();
-  caption();
+  let f = null;
+  try { f = qr ? JSON.parse(qr.data) : null; } catch { f = null; }
+  if (!f) return { f: null };
+  const L = f.layout, loc = qr.location, [qx, qy, qs] = L.qr;
+  const map = (fx, fy) => { const u = (fx - qx) / qs, v = (fy - qy) / qs;
+    return [loc.topLeftCorner.x + u * (loc.topRightCorner.x - loc.topLeftCorner.x) + v * (loc.bottomLeftCorner.x - loc.topLeftCorner.x),
+      loc.topLeftCorner.y + u * (loc.topRightCorner.y - loc.topLeftCorner.y) + v * (loc.bottomLeftCorner.y - loc.topLeftCorner.y)]; };
+  const poly = b => [map(b[0], b[1]), map(b[2], b[1]), map(b[2], b[3]), map(b[0], b[3])];
+  const draw = (pts, color) => { ctx.strokeStyle = color; ctx.lineWidth = Math.max(5, w / 260); ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); ctx.stroke(); };
+  const res = { f, sig: inkRatio(data, w, h, poly(L.sig), 0.06), apr: inkRatio(data, w, h, poly(L.approve), 0.2), dec: inkRatio(data, w, h, poly(L.decline), 0.2),
+    overlay: () => {
+      draw([loc.topLeftCorner, loc.topRightCorner, loc.bottomRightCorner, loc.bottomLeftCorner].map(p => [p.x, p.y]), '#4FA3A5');
+      draw(poly(L.approve), '#EC8017'); draw(poly(L.decline), '#8A97B5'); draw(poly(L.sig), '#EC8017');
+    } };
+  return res;
 }
-function lockConfirm() {
-  const ok = S.evidence?.pass && $('ack').checked && !S.reviewed;
-  $('confirmBtn').disabled = !ok; $('confirmBtn').classList.toggle('locked', !ok);
+async function playEvidence(R, src) {
+  const host = $('seqEvid');
+  host.innerHTML = '';
+  S.reviewed = null; show(5);
+  let a;
+  try { a = await analyzeForm(src); } catch { a = { f: null }; }
+  const token = S.review?.proposal?.candidate_token, reqId = S.log.find(is('form'))?.request?.request_id;
+  const opt = { minMs: 1100, gapMs: 700 };
+  const read = await Think.step(R, host, { working: 'Reading the form…', done: 'Read the form' }, Promise.resolve(a),
+    x => x.f ? { result: `${x.f.form} · ${x.f.surgeon}` } : { ok: false, title: 'Could not read the form', result: 'No form QR code found' }, opt);
+  if (!read.f) return finishEvidence(R, host, false, ['No readable form.', '→ Approval stays locked.']);
+  a.overlay();
+  const runOk = !!reqId && a.f.request_id === reqId, tokOk = !!token && a.f.candidate_token === token;
+  await Think.step(R, host, { working: 'Matching this run…', done: 'Matches this run' }, Promise.resolve(a),
+    x => (runOk && tokOk) ? { result: `${x.f.request_id} · ${x.f.candidate_token}` }
+      : { ok: false, title: 'Does not match this run', result: !tokOk ? `Token ${x.f.candidate_token} ≠ ${token || '—'}` : `Request ${x.f.request_id} ≠ ${reqId || '—'}` }, opt);
+  const boxOk = a.apr > 0.04 && a.dec < 0.02;
+  await Think.step(R, host, { working: 'Checking the boxes…', done: '"Approve" is marked' }, Promise.resolve(a),
+    x => boxOk ? { result: `Approve ${(x.apr * 100).toFixed(0)}% ink · decline empty` } : { ok: false, title: 'Decision unclear', result: `Approve ${(x.apr * 100).toFixed(0)}% · decline ${(x.dec * 100).toFixed(0)}%` }, opt);
+  const sigOk = a.sig > 0.008;
+  await Think.step(R, host, { working: 'Looking for a signature…', done: 'Signed' }, Promise.resolve(a),
+    x => sigOk ? { result: `Ink in the signature box · ${(x.sig * 100).toFixed(1)}%` } : { ok: false, title: 'No signature', result: 'The signature box is empty' }, opt);
+  const pass = runOk && tokOk && boxOk && sigOk;
+  const lines = [runOk && tokOk ? 'Right request, right candidate.' : 'Wrong request or candidate.', boxOk ? 'Approved on paper.' : 'Decision not clear.', sigOk ? 'Signed by the surgeon.' : 'Not signed.',
+    pass ? '→ Ready for the surgeon to confirm.' : '→ Approval stays locked.'];
+  await finishEvidence(R, host, pass, lines, a.f);
 }
-function confirmApproval() {
-  if (!S.evidence?.pass || !$('ack').checked || S.reviewed) return;
-  const t = new Date().toTimeString().slice(0, 5);
-  S.reviewed = { at: t, surgeon: S.evidence.fields.surgeon, request_id: S.evidence.fields.request_id, token: S.evidence.fields.candidate_token };
-  $('stampTxt').textContent = `${t} · ${S.reviewed.surgeon} · status: Proposed → Reviewed`;
-  $('stamp').classList.add('on');
-  lockConfirm();
-  Source.post('/ui', { type: 'review.confirmed', request_id: S.reviewed.request_id, candidate_token: S.reviewed.token, t: Date.now() / 1000 });
-  caption();
-  setTimeout(() => show(6), REDUCED ? 0 : 1600);
+async function finishEvidence(R, host, pass, lines, f) {
+  await Think.reason(R, host, lines);
+  await R.wait(300);
+  host.appendChild(Think.hero(pass
+    ? { title: 'Confirm approval', sub: `${f.surgeon} · Proposed → Reviewed`, onClick: e => confirmApproval(e.currentTarget, f) }
+    : { title: 'Approval locked', sub: 'Fix the form and drop it again', disabled: true }));
+}
+function confirmApproval(btn, f) {
+  if (S.reviewed) return;
+  btn.disabled = true;
+  btn.classList.add('done');
+  btn.querySelector('.ht').textContent = 'Approved';
+  S.reviewed = { at: new Date().toTimeString().slice(0, 5), surgeon: f.surgeon, request_id: f.request_id, token: f.candidate_token };
+  Source.post('/ui', { type: 'review.confirmed', request_id: f.request_id, candidate_token: f.candidate_token, t: Date.now() / 1000 });
+  setTimeout(() => show(6), REDUCED ? 0 : 1200);
 }
 function renderDone() {
   const r = S.reviewed, p = S.review?.proposal;
-  $('doneReq').textContent = r?.request_id || '';
-  $('doneLines').innerHTML = r && p ? `
-    <div class="cl"><span class="ok">✓</span><span>Alder's donor (Elena) → ${HOSP[p.partner].short} candidate <span class="mono">${esc(p.candidate_token)}</span></span></div>
-    <div class="cl"><span class="ok">✓</span><span>${HOSP[p.partner].short} candidate's donor → Alder's patient (Maria)</span></div>
-    <div class="cl"><span class="ok">✓</span><span>Reviewed by ${esc(r.surgeon)} at ${r.at} · signed form checked on Alder's machine</span></div>
-    <div class="cl"><span style="color:#a86b00">→</span><span>Next: ${HOSP[p.partner].short}'s surgeon signs on their side (HPH-LD-12 §2.1).</span></div>` : '<div class="cl"><span>·</span><span>Not reviewed yet.</span></div>';
+  $('legs').innerHTML = r && p ? `Elena → <span class="mono">${esc(p.candidate_token)}</span><br><span class="mono">${esc(p.candidate_token)}</span>'s donor → Maria<br><span style="color:var(--tint); font-size:18px">${esc(r.surgeon)} · ${r.at}</span>` : '';
 }
 
 // ---------------- Events ----------------
+function wire(dir, html) {
+  const el = document.createElement('span');
+  el.className = 'pkt ' + dir; el.innerHTML = html;
+  $('wire').prepend(el);
+  while ($('wire').children.length > 5) $('wire').lastChild.remove();
+}
 function onEvent(e) {
   if (!e) return;
-  log(e);
+  $('log').textContent += (e.type === 'flwr.log' ? `flwr │ ${e.line}` : `${e.who || ''} · ${e.type} ${JSON.stringify(Object.fromEntries(Object.entries(e).filter(([k]) => !['type', 'who', 't', 'seq'].includes(k))))}`).slice(0, 600) + '\n';
   switch (e.type) {
-    case 'launch': $('findNote').textContent = 'Flower run starting…'; break;
-    case 'run.start': S.runId = e.run_id; $('runLbl').textContent = `run ${e.run_id}`; badge(); break;
-    case 'hospitals': S.nodes = e.nodes; LANES.forEach(renderLane); renderNet(); badge(); break;
-    case 'pod.read': if (e.who === 'coordinator') S.alderRead = e; break;
-    case 'form': S.form = e.request; S.formBytes = e.bytes; renderForm(); drawFlowLines(); caption(); break;
-    case 'ask.sent':
-      S.asks[e.to] = e; drawFlowLines(Object.fromEntries(Object.keys(S.asks).map(h => [h, 1])));
-      flyPacket(e.to, 'out', `form · ${e.bytes} B`); startLane(e.to, e.bytes);
-      wire('out', `<b>→ ${HOSP[e.to].short}</b> · query.screen · msg ${String(e.message_id).slice(0, 8)} · ${e.bytes} B`); caption(); break;
-    case 'reply.received':
-      S.replies[e.from] = e.response;
-      flyPacket(e.from, 'in', `5 fields · ${e.bytes} B`);
-      wire('in', `<b>← ${HOSP[e.from].short}</b> · reply · candidate_found=${e.response.candidate_found} · ${e.bytes} B`);
-      setTimeout(() => { finishLane(e.from, e.response, e.bytes); drawFlowLines(); caption(); }, REDUCED ? 0 : 1000);
-      break;
-    case 'review': S.review = { checks: e.checks, proposal: e.proposal }; if (S.beat === 4) renderReview(); break;
-    case 'run.end': $('findNote').textContent = 'Flower run finished. Press → to review the answers.'; break;
-    case 'flwr.exit': if (e.code) $('findNote').textContent = `flwr run exited with code ${e.code}. Press L for the log.`; break;
+    case 'launch': $('findNote').textContent = 'Starting a Flower run…'; break;
+    case 'run.start': S.runId = e.run_id; badge(); break;
+    case 'hospitals': S.nodes = e.nodes; break;
+    case 'ask.sent': wire('out', `<b>→ ${HOSP[e.to].short}</b> · query.screen · ${short(e.message_id)} · ${e.bytes} B`); break;
+    case 'reply.received': S.replies[e.from] = e.response; wire('in', `<b>← ${HOSP[e.from].short}</b> · reply · ${e.bytes} B`); break;
+    case 'review': S.review = { checks: e.checks, proposal: e.proposal }; break;
+    case 'flwr.exit': if (e.code) $('findNote').textContent = `Flower run failed (code ${e.code}). Open the Flower log.`; break;
   }
+  S.log.push(e);
 }
-Source.on((e, meta) => { if (meta.catchUp) return; onEvent(e); });
+Source.on((e, meta) => { if (!meta.catchUp) onEvent(e); });
 
 async function find() {
   if (S.started) return;
   S.started = true;
-  S.form = null; S.asks = {}; S.replies = {}; S.review = null;
-  LANES.forEach(renderLane); drawFlowLines(); renderForm();
   $('findBtn').disabled = true; $('findBtn').textContent = 'Searching…';
-  caption();
   if (Source.live) {
     const r = await Source.post('/start');
     if (!r.ok) { $('findNote').textContent = r.error || 'Could not start the Flower run.'; S.started = false; $('findBtn').disabled = false; $('findBtn').textContent = 'Find an exchange'; return; }
   }
-  setTimeout(() => show(3), 600);
-  if (!Source.live && RECORDING) Source.replay(RECORDING.events);
+  drawNet();
+  startPlayer('alder', playAlder);
+  LANES.forEach(h => startPlayer('lane-' + h, playLane, h));
+  setTimeout(() => show(3), 500);
+  if (!Source.live && RECORDING) Source.replay(RECORDING.events.map(e => ({ ...e })));
 }
 
 // ---------------- Inputs ----------------
@@ -11072,29 +11042,25 @@ $('backBtn').onclick = () => back();
 $('logBtn').onclick = () => $('logOverlay').classList.toggle('on');
 $('logOverlay').onclick = e => { if (e.target.id === 'logOverlay') $('logOverlay').classList.remove('on'); };
 document.querySelectorAll('#nav span').forEach(el => { el.onclick = () => show(Number(el.dataset.b.split(',')[0])); });
-$('confirmBtn').onclick = confirmApproval;
-$('ack').onchange = lockConfirm;
 const drop = $('drop');
+const takeForm = src => startPlayer('evidence', playEvidence, src);
 drop.onclick = () => $('file').click();
-$('file').onchange = e => { const f = e.target.files[0]; if (f) handleForm(URL.createObjectURL(f)); e.target.value = ''; };
+$('file').onchange = e => { const f = e.target.files[0]; if (f) takeForm(URL.createObjectURL(f)); e.target.value = ''; };
 ['dragenter', 'dragover'].forEach(ev => addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
 ['dragleave', 'drop'].forEach(ev => addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
-addEventListener('drop', e => { const f = [...(e.dataTransfer?.files || [])].find(x => x.type.startsWith('image/')); if (f) handleForm(URL.createObjectURL(f)); });
-addEventListener('paste', e => { const it = [...(e.clipboardData?.items || [])].find(x => x.type.startsWith('image/')); if (it) handleForm(URL.createObjectURL(it.getAsFile())); });
+addEventListener('drop', e => { const f = [...(e.dataTransfer?.files || [])].find(x => x.type.startsWith('image/')); if (f) takeForm(URL.createObjectURL(f)); });
+addEventListener('paste', e => { const it = [...(e.clipboardData?.items || [])].find(x => x.type.startsWith('image/')); if (it) takeForm(URL.createObjectURL(it.getAsFile())); });
 addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') return;
   const k = e.key;
-  if (k === 'Escape') { $('logOverlay').classList.remove('on'); $('helpOverlay').classList.remove('on'); return; }
-  if ($('logOverlay').classList.contains('on') && k !== 'l' && k !== 'L') return;
+  if (k === 'Escape') { $('logOverlay').classList.remove('on'); return; }
   if (k === 'ArrowRight' || k === ' ' || k === 'PageDown') { e.preventDefault(); next(); }
   else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); back(); }
   else if (k === 'l' || k === 'L') $('logOverlay').classList.toggle('on');
-  else if (k === 'h' || k === 'H') $('helpOverlay').classList.toggle('on');
   else if (k === 'f' || k === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
   else if (k === 'r' || k === 'R') location.reload();
 });
 
-renderNet(); LANES.forEach(renderLane); drawFlowLines(); badge(); show(0, 0);
+renderNet(); badge(); show(0, 0);
 </script>
 </body>
 </html>

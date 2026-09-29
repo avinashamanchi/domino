@@ -55,6 +55,8 @@ def handle_screen(request: dict, pod_dir: str, hospital: str, report, pace: floa
     by_id = {p["pair_id"]: p for p in pairs}
     report("screen", request_donor_blood=rd["blood"], request_patient_blood=rp["blood"], rows=[{
         **r, "patient_initials": by_id[r["pair_id"]]["patient"]["initials"],
+        "patient_name": by_id[r["pair_id"]]["patient"]["name"].split()[0],
+        "donor_name": by_id[r["pair_id"]]["donor"]["name"].split()[0],
         "patient_blood": by_id[r["pair_id"]]["patient"]["blood"],
         "donor_initials": by_id[r["pair_id"]]["donor"]["initials"],
         "donor_blood": by_id[r["pair_id"]]["donor"]["blood"],

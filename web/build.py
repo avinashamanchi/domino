@@ -65,7 +65,8 @@ def main():
                 shutil.copy(src, REC / f"{prefix}.jsonl")
                 print(f"recorded {src.name} -> web/recordings/{prefix}.jsonl")
     DIST.mkdir(exist_ok=True)
-    common = {"FONTS": fonts(), "SHARED": (SRC / "shared.css").read_text(), "SOURCE": (SRC / "source.js").read_text()}
+    common = {"FONTS": fonts(), "SHARED": (SRC / "shared.css").read_text(), "SOURCE": (SRC / "source.js").read_text(),
+              "THINKCSS": (SRC / "think.css").read_text(), "THINKJS": (SRC / "think.js").read_text()}
     alder = load_recording("alder")
     if alder:  # replay only the coordinator's run, not UI clicks from that session
         alder["events"] = [e for e in alder["events"] if e.get("who") in ("coordinator", "bridge", "flwr")]

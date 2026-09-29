@@ -27,4 +27,4 @@ trap 'kill $SUPERLINK 2>/dev/null' EXIT
 IP=$(ipconfig getifaddr en0 2>/dev/null || hostname -I 2>/dev/null | awk '{print $1}' || echo 127.0.0.1)
 echo "Hospitals connect with:  scripts/run-hospital.sh harbor $IP   /   scripts/run-hospital.sh riverbend $IP"
 echo "Projector: http://127.0.0.1:8765/projector.html"
-FLWR_HOME="$FLWR_HOME" python3 "$ROOT/bridge/bridge.py" coordinator --port 8765 --federation domino-local --pace "${DOMINO_PACE:-1.0}"
+FLWR_HOME="$FLWR_HOME" python3 "$ROOT/bridge/bridge.py" coordinator --port 8765 --federation domino-local --pace "${DOMINO_PACE:-2.0}"

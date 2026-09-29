@@ -3,138 +3,71 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Domino · hospital console</title>
+<title>Domino · hospital agent</title>
 <style>
 /*@FONTS@*/
 /*@SHARED@*/
-body { background: #fff; color: var(--body); min-height: 100vh; display: flex; flex-direction: column; }
-.wrap { max-width: 1280px; margin: 0 auto; padding: 0 32px; width: 100%; }
+/*@THINKCSS@*/
+body { background: #fbfbf9; color: var(--body); min-height: 100vh; display: flex; flex-direction: column; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; width: 100%; }
 .topbar .right { display: flex; align-items: center; gap: 14px; }
-.topbar .hosp { font-weight: 500; font-size: 14px; }
-.crumbs { height: 32px; background: var(--divider); font-size: 13px; display: flex; align-items: center; }
-.crumbs .wrap { display: flex; gap: 8px; }
-.band { background: var(--pale); padding: 24px 0 20px; border-bottom: 1px solid var(--divider); }
+.band { padding: 22px 0 6px; }
 .band .eyebrow { color: #5b6b82; font-size: 15px; }
-.band h1 { margin: 4px 0 6px; font-weight: 500; font-size: 32px; color: var(--heading); }
-.band p { margin: 0; max-width: 900px; line-height: 1.5; }
-main.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; padding-top: 24px; padding-bottom: 40px; flex: 1; }
-.col-main { grid-column: span 8; min-width: 0; }
-.col-side { grid-column: span 4; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-@media (max-width: 1000px) { .col-main, .col-side { grid-column: span 12; } }
-.card { background: #fff; border-radius: 3px; box-shadow: var(--shadow); border: 1px solid #edf0f4; overflow: hidden; }
-.card > header { padding: 12px 18px; border-bottom: 1px solid var(--divider); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.card > header h2 { margin: 0; font-size: 17px; font-weight: 500; color: var(--heading); }
-.card > header .meta { font-size: 12px; color: #6b778c; }
-.card .body { padding: 14px 18px; }
-.muted { color: #6b778c; font-size: 13px; }
-.mono { font-family: var(--font-mono); }
-.tag { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #fff; background: var(--navy); padding: 3px 7px; border-radius: 2px; }
-
-/* Answer banner */
-.answer { border-radius: 3px; padding: 22px 26px; background: var(--navy); color: #fff; position: relative; overflow: hidden; margin-bottom: 20px; }
-.answer::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: var(--offline); }
-.answer .eyebrow { font-size: 14px; }
-.answer .big { font-weight: 700; text-transform: uppercase; font-size: 40px; line-height: 1.05; margin: 6px 0 8px; }
-.answer .small { color: var(--tint); font-size: 15px; }
-.answer.yes::before { background: var(--teal); } .answer.yes .big em { color: var(--teal); font-style: normal; }
-.answer.no::before { background: var(--gold); } .answer.no .big em { color: var(--gold); font-style: normal; }
-.answer.working::before { background: var(--blue); animation: pulse 1.2s ease-in-out infinite; }
-@keyframes pulse { 50% { opacity: .35; } }
-
-/* Vertical flowchart */
-.flow { position: relative; list-style: none; margin: 0; padding: 0; }
-.flow::before { content: ""; position: absolute; left: 17px; top: 20px; bottom: 20px; width: 2px; background: var(--divider); }
-.flow > li { position: relative; display: grid; grid-template-columns: 36px 1fr; gap: 14px; margin-bottom: 16px; opacity: .35; transition: opacity .4s; }
-.flow > li.on { opacity: 1; }
-.flow .n { width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 2px solid var(--divider); color: var(--heading); display: flex; align-items: center; justify-content: center; font-weight: 700; z-index: 1; }
-.flow li.on .n { border-color: var(--gold); }
-.flow li.done .n { background: var(--teal); border-color: var(--teal); color: #fff; }
-.flow .card > header h2 small { font-weight: 400; color: #6b778c; font-size: 13px; margin-left: 6px; }
-.flow .empty { color: #8a97b5; font-style: italic; font-size: 14px; }
-
-.fields { display: flex; flex-wrap: wrap; gap: 6px; }
-.field { font-family: var(--font-mono); font-size: 13px; background: var(--pale); border: 1px solid var(--divider); padding: 3px 7px; border-radius: 3px; }
-.field b { color: var(--heading); }
-.pod { display: grid; grid-template-columns: 64px 1fr; gap: 16px; align-items: start; }
+.band h1 { margin: 2px 0 0; font-weight: 700; font-size: 30px; color: var(--heading); letter-spacing: -.01em; }
+main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; padding-top: 18px; padding-bottom: 40px; flex: 1; align-items: start; }
+@media (max-width: 960px) { main { grid-template-columns: 1fr; } }
+#seq { max-width: 720px; }
+.idle { border: 2px dashed #cfd6df; border-radius: 8px; padding: 30px; text-align: center; color: #5b6b82; }
+.idle b { display: block; font-size: 22px; color: var(--heading); margin-bottom: 4px; }
+.idle .dot { margin-right: 8px; }
+.side { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
+.card { background: #fff; border: 2px solid var(--divider); border-radius: 8px; padding: 14px 16px; }
+.card h2 { margin: 0 0 8px; font-size: 14px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #5b6b82; display: flex; align-items: center; gap: 8px; }
+.card h2 svg { width: 14px; height: 14px; color: var(--heading); }
 .files { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: 13px; }
-.files li { display: flex; justify-content: space-between; gap: 10px; padding: 5px 8px; border-radius: 3px; transition: background .4s; }
-.files li.read { background: #e6f4f4; }
-.files li span:last-child { font-family: var(--font); color: #2d7f81; font-size: 12px; }
-.walls { margin-top: 10px; font-size: 13px; color: #6b778c; display: flex; gap: 8px; flex-wrap: wrap; }
-.walls span { border: 1px dashed #c9d0da; padding: 3px 8px; border-radius: 3px; }
-.walls span s { color: #9aa5b8; }
-.hits { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-.hit { display: grid; grid-template-columns: 120px 1fr 90px; gap: 10px; align-items: center; font-size: 13px; }
-.hit .id { font-family: var(--font-mono); color: var(--heading); }
-.hit .txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bar { height: 6px; background: var(--pale); border-radius: 3px; overflow: hidden; }
-.bar i { display: block; height: 100%; background: var(--blue); }
-table.t { width: 100%; border-collapse: collapse; font-size: 13px; }
-table.t th { text-align: left; font-weight: 500; color: #6b778c; padding: 6px; border-bottom: 1px solid var(--divider); }
-table.t td { padding: 7px 6px; border-bottom: 1px solid #f1f3f6; vertical-align: middle; }
-table.t tr.pass td { background: #eef7f7; }
-.ok { color: #2d7f81; font-weight: 700; } .bad { color: #b3261e; font-weight: 700; }
-.av { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; background: var(--heading); color: #fff; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 4px; vertical-align: middle; }
-.quote { background: var(--pale); border-left: 3px solid var(--teal); padding: 8px 12px; font-size: 14px; line-height: 1.5; margin-top: 8px; }
-.quote cite { display: block; font-style: normal; font-size: 12px; color: var(--blue); margin-top: 4px; }
-.regions { display: grid; gap: 8px; margin-top: 8px; }
-.region { display: grid; grid-template-columns: 1fr auto; padding: 8px 12px; border: 1px dashed #d8b35c; border-radius: 3px; font-size: 14px; }
-.region span:last-child { font-size: 12px; color: #a86b00; }
-pre.wire { margin: 6px 0 0; background: var(--navy); color: var(--tint); font-family: var(--font-mono); font-size: 13px; padding: 10px 12px; border-radius: 3px; white-space: pre-wrap; }
-.okline { color: #2d7f81; font-weight: 500; font-size: 13px; margin-top: 6px; }
-
-/* Form being filled (side) */
-.qa { list-style: none; margin: 0; padding: 0; }
-.qa li { padding: 10px 0; border-bottom: 1px solid #f1f3f6; font-size: 14px; }
-.qa li:last-child { border-bottom: 0; }
-.qa .q { color: #6b778c; font-size: 13px; }
-.qa .a { color: var(--heading); font-weight: 500; margin-top: 4px; min-height: 20px; }
-.qa .a.pending { color: #b0b8c6; font-weight: 400; font-style: italic; }
-.ledger { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: 13px; }
-.ledger li { padding: 6px 0; border-bottom: 1px solid #f1f3f6; display: flex; justify-content: space-between; gap: 10px; }
-footer.foot { background: var(--navy); color: #fff; padding: 20px 0; }
-footer.foot .wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-footer.foot .private { font-weight: 700; letter-spacing: .06em; font-size: 14px; }
+.files li { padding: 4px 8px; border-radius: 4px; transition: background .4s; display: flex; justify-content: space-between; gap: 8px; }
+.files li.read { background: #e6f4ef; }
+.files li.read::after { content: "read"; font-family: var(--font); font-size: 11px; font-weight: 700; color: #0E7C61; }
+.walls { margin-top: 8px; font-size: 12px; color: #9aa5b8; }
+.ledger { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+.ledger li { padding: 5px 0; border-bottom: 1px solid #f1f3f6; display: flex; justify-content: space-between; }
+.ledger li:last-child { border-bottom: 0; }
+.muted { color: #8a97b5; font-size: 13px; }
+table.t { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 6px; }
+table.t th { text-align: left; font-weight: 500; color: #6b778c; padding: 4px; border-bottom: 1px solid var(--divider); }
+table.t td { padding: 5px 4px; border-bottom: 1px solid #f1f3f6; }
+table.t tr.pass td { background: #e6f4ef; }
+.ok { color: #0E7C61; font-weight: 700; } .bad { color: #B3261E; font-weight: 700; }
+footer.foot { background: var(--navy); color: #fff; padding: 16px 0; }
+footer.foot .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+footer.foot .private { font-weight: 700; letter-spacing: .06em; font-size: 13px; }
 footer.foot .fine { font-size: 12px; color: var(--tint); }
 </style>
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><span class="wordmark">DOMINO</span><span class="sub">kidney exchange across hospitals</span></div>
-  <div class="right"><span class="hosp" id="hospName"></span><span class="pill"><span class="dot" id="dot"></span><span id="pillText"></span></span></div>
+  <div class="brand"><span class="wordmark">DOMINO</span></div>
+  <div class="right"><span class="pill"><span class="dot" id="dot"></span><span id="pillText"></span></span></div>
 </header>
 <div class="stripe"></div>
-<div class="crumbs"><div class="wrap" id="crumbs"></div></div>
-<section class="band"><div class="wrap">
-  <div class="eyebrow" id="eyebrow"></div>
-  <h1 id="title"></h1>
-  <p id="lede"></p>
-</div></section>
+<section class="band"><div class="wrap"><div class="eyebrow" id="eyebrow"></div><h1 id="title"></h1></div></section>
 
-<main class="wrap grid">
-  <div class="col-main">
-    <div class="answer" id="answer"></div>
-    <ol class="flow" id="flow"></ol>
-  </div>
-  <aside class="col-side">
-    <article class="card">
-      <header><h2>Alder's form, as we fill it</h2><span class="tag">STAYS HERE</span></header>
-      <div class="body"><ul class="qa" id="qa"></ul></div>
-    </article>
-    <article class="card">
-      <header><h2>Everything this hospital has disclosed</h2><span class="meta" id="ledgerMeta">0 replies</span></header>
-      <div class="body"><ul class="ledger" id="ledger"><li class="muted" style="font-family:var(--font)">Nothing yet.</li></ul></div>
-    </article>
+<main class="wrap">
+  <div class="seq" id="seq"></div>
+  <aside class="side">
+    <div class="card"><h2 id="podTitle"></h2><ul class="files" id="files"><li class="muted" style="font-family:var(--font)">not opened yet</li></ul><div class="walls" id="walls"></div></div>
+    <div class="card"><h2>Sent to Alder</h2><ul class="ledger" id="ledger"><li class="muted">nothing yet</li></ul></div>
   </aside>
 </main>
 
 <footer class="foot"><div class="wrap">
-  <div class="private">PRIVATE — THIS SCREEN NEVER LEAVES THE HOSPITAL</div>
-  <button class="btn outline" id="replayBtn" hidden>Play the recorded run</button>
-  <div class="fine">All patients, donors and hospitals are fictional. Synthetic data.</div>
+  <span class="private">PRIVATE · NEVER LEAVES THIS HOSPITAL</span>
+  <button class="btn outline" id="replayBtn" hidden>Replay recorded run</button>
+  <span class="fine">Fictional patients · synthetic data</span>
 </div></footer>
 
 <script>/*@SOURCE@*/</script>
+<script>/*@THINKJS@*/</script>
 <script>
 const RECORDINGS = /*@RECORDINGS@*/;
 const HOSP = {
@@ -142,153 +75,134 @@ const HOSP = {
   riverbend: { name: 'Riverbend General', short: 'Riverbend', city: 'Sacramento', rulebook: 'SW-TX-07' },
 };
 const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const { esc } = Think;
 const chip = b => `<span class="chip ${b}">${b}</span>`;
-const clock = () => new Date().toTimeString().slice(0, 5);
+const mmdd = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 let me = new URLSearchParams(location.search).get('h') || window.DEFAULT_HOSPITAL || 'harbor';
 
-const STEPS = [
-  ['Form received via Flower', 'from Alder\'s coordinator'],
-  ['Open our own data pod', 'the only data this agent can reach'],
-  ['Retrieve', 'which of our pairs and rules matter'],
-  ['Screen in code', 'blood type + virtual crossmatch, both directions'],
-  ['Decide', 'readiness, or what to do next'],
-  ['Reply via Flower', 'five fields, checked against the allowlist'],
-];
-const QUESTIONS = ['Can one of our patients receive Alder\'s donor?', 'Can that patient\'s donor give to Alder\'s patient?', 'Is the pair ready in the window?', 'Does our rulebook allow it?'];
-let S;
-function reset() {
-  S = { runId: null, request: null, files: [], reads: new Set(), screen: null, ledger: S?.ledger || [] };
-  $('flow').innerHTML = STEPS.map(([t, s], i) => `<li id="st${i}"><span class="n">${i + 1}</span><article class="card"><header><h2>${t}<small>${s}</small></h2><span class="meta" id="sm${i}"></span></header><div class="body" id="sb${i}"><div class="empty">waiting…</div></div></article></li>`).join('');
-  $('qa').innerHTML = QUESTIONS.map((q, i) => `<li><div class="q">${i + 1}. ${q}</div><div class="a pending" id="qa${i}">not answered yet</div></li>`).join('');
-  banner('idle', 'Standing by · nothing to press here', 'Waiting for a form', 'This agent starts on its own when Alder sends a form over Flower. To start: on Alder\'s projector, go to the map and click <b style="color:#fff">Find an exchange</b>. This page updates by itself.');
-}
-function banner(cls, eyebrow, big, small) { $('answer').className = 'answer ' + cls; $('answer').innerHTML = `<div class="eyebrow">${eyebrow}</div><div class="big">${big}</div><div class="small">${small}</div>`; }
-function step(i, html, meta, done = true) {
-  for (let j = 0; j <= i; j++) $('st' + j).classList.add('on');
-  if (done) $('st' + i).classList.add('done');
-  if (html != null) $('sb' + i).innerHTML = html;
-  if (meta != null) $('sm' + i).textContent = meta;
-  $('st' + i).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-function answer(i, html) { const el = $('qa' + i); el.classList.remove('pending'); el.innerHTML = html; }
+let log = new Think.Log(), run = null, reads = new Set(), files = [], ledger = [], runId = null;
+const scroll = () => { const last = $('seq').lastElementChild; last?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
 
+function idle() {
+  $('seq').innerHTML = `<div class="idle"><b><span class="dot on"></span>Waiting for Alder's form</b>Starts on its own when Alder clicks <i>Find an exchange</i>.</div>`;
+}
 function renderPod() {
   const h = HOSP[me];
-  step(1, `<div class="pod">
-      <svg width="64" height="76" viewBox="0 0 64 76" aria-hidden="true"><ellipse cx="32" cy="12" rx="26" ry="9" fill="#EEF2F6" stroke="#4FA3A5" stroke-width="3"/><path d="M6 12v50c0 5 12 9 26 9s26-4 26-9V12" fill="#EEF2F6" stroke="#4FA3A5" stroke-width="3"/><path d="M6 37c0 5 12 9 26 9s26-4 26-9" fill="none" stroke="#4FA3A5" stroke-width="3"/><rect x="24" y="46" width="16" height="13" rx="2" fill="#0E2740"/><path d="M27 46v-4a5 5 0 0 1 10 0v4" fill="none" stroke="#0E2740" stroke-width="2.5"/></svg>
-      <div><div class="mono" style="font-size:13px; color:#0A3C6E">${esc(S.podRoot || '')}</div>
-      <ul class="files">${S.files.map(f => `<li class="${S.reads.has(f) ? 'read' : ''}"><span>${esc(f)}</span><span>${S.reads.has(f) ? esc(S.readDetail?.[f] || 'read') : ''}</span></li>`).join('')}</ul>
-      <div class="walls"><span>${h.short}'s pod: <b>mounted</b></span>${Object.keys(HOSP).filter(k => k !== me).map(k => `<span><s>${HOSP[k].short}'s pod</s> not reachable from this machine</span>`).join('')}<span><s>Alder's pod</s> not reachable</span></div></div></div>`,
-    `${S.reads.size} of ${S.files.length} files read`);
+  $('podTitle').innerHTML = `${Think.LOCK} ${esc(h.short)} pod`;
+  if (!files.length) return;
+  $('files').innerHTML = files.map(f => `<li class="${reads.has(f) ? 'read' : ''}"><span>${esc(f)}</span></li>`).join('');
+  $('walls').innerHTML = `Only this pod is mounted. ${Object.keys(HOSP).filter(k => k !== me).map(k => `<s>${HOSP[k].short}</s>`).join(' · ')} · <s>Alder</s>: not reachable`;
+}
+function renderLedger() {
+  $('ledger').innerHTML = ledger.length ? ledger.map(l => `<li><span>${l.t} · 5 fields</span><span>${l.bytes} B</span></li>`).join('') : '<li class="muted">nothing yet</li>';
 }
 
-function onEvent(e) {
+function onEvent(e, fast = false) {
   if (!e || (e.who && e.who !== me)) return;
-  switch (e.type) {
-    case 'hello': break;
-    case 'flower.message':
-      if (e.direction === 'in') { reset(); S.runId = e.run_id; S.msg = e; step(0, null, `run ${e.run_id} · msg ${String(e.message_id).slice(0, 8)}`, false); banner('working', 'Working · on this machine', 'Filling Alder\'s form…', 'Only this hospital\'s pod is open.'); pill(); }
-      break;
-    case 'form.received': {
-      if (!S.msg) { reset(); S.runId = e.run_id; }
-      const r = e.request; S.request = r;
-      step(0, `<div class="fields">
-        <span class="field">request_id=<b>${esc(r.request_id)}</b></span>
-        <span class="field">donor=<b>${esc(r.donor.token)}</b> ${chip(r.donor.blood)} <b>${r.donor.hla.join(' ')}</b></span>
-        <span class="field">patient=<b>${esc(r.patient.token)}</b> ${chip(r.patient.blood)} avoid <b>${r.patient.unacceptable_antigens.join(' ')}</b></span>
-        <span class="field">window=<b>${r.window.from} → ${r.window.to}</b></span></div>
-        <p class="muted" style="margin:10px 0 0">${e.bytes} bytes from Alder. No names, no charts, no notes.</p>`, S.msg ? undefined : `run ${e.run_id}`);
-      break;
-    }
-    case 'pod.open': S.podRoot = e.root; S.files = e.files; S.readDetail = {}; renderPod(); $('st1').classList.remove('done'); break;
-    case 'pod.read': S.reads.add(e.file); S.readDetail = { ...(S.readDetail || {}), [e.file]: e.detail }; renderPod(); break;
-    case 'retrieve': {
-      const idx = S.screen ? 4 : 2;
-      const max = e.hits[0]?.score || 1;
-      const html = `<div class="muted">${esc(e.purpose)} · query: <span class="mono">${esc(e.query)}</span> · searched ${e.searched}</div>
-        <div class="hits">${e.hits.map(h => `<div class="hit"><span class="id">${esc(h.id)}</span><span class="txt">${esc(h.text.split('\n')[0].slice(0, 120))}</span><span class="bar" title="BM25 ${h.score}"><i style="width:${(100 * h.score / max).toFixed(0)}%"></i></span></div>`).join('')}</div>`;
-      if (idx === 2) step(2, html, 'BM25 · on this machine');
-      else { S.ruleHits = e.hits; S.retrieveHtml = html; step(4, html, 'rulebook', false); }
-      break;
-    }
-    case 'screen': {
-      S.screen = e;
-      const cell = c => `${c.abo ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>'} blood · ${c.crossmatch ? '<span class="ok">✓</span> xm' : `<span class="bad">✗</span> xm <span class="mono">${c.conflicts.join(' ')}</span>`}`;
-      step(3, `<table class="t"><tr><th>Pair</th><th>Our patient</th><th>Alder donor ${chip(e.request_donor_blood)} → our patient</th><th>Our donor → Alder patient ${chip(e.request_patient_blood)}</th><th></th></tr>
-        ${e.rows.map(r => `<tr class="${r.reciprocal ? 'pass' : ''}"><td class="mono">${r.pair_id}</td><td><span class="av">${r.patient_initials}</span>${chip(r.patient_blood)} <span class="av">${r.donor_initials}</span>${chip(r.donor_blood)}</td><td>${cell(r.give)}</td><td>${cell(r.receive)}</td><td>${r.reciprocal ? '<span class="ok">both ways</span>' : ''}</td></tr>`).join('')}</table>
-        <p class="muted" style="margin:8px 0 0">Code, not a model: ABO rules and antigen lists. All ${e.rows.length} pairs checked.</p>`, `${e.rows.filter(r => r.reciprocal).length} reciprocal`);
-      const give = e.rows.filter(r => r.give.ok), recv = e.rows.filter(r => r.receive.ok), both = e.rows.find(r => r.reciprocal);
-      answer(0, both ? `Yes · pair ${both.pair_id} (<span class="av">${both.patient_initials}</span> blood ${both.patient_blood}), crossmatch negative` : give.length ? `Yes · ${give.map(r => r.pair_id).join(', ')}` : `No · none of our ${e.rows.length} patients`);
-      answer(1, both ? `Yes · <span class="av">${both.donor_initials}</span> blood ${both.donor_blood} → Alder's patient, crossmatch negative` : recv.length ? `Only one way · <span class="av">${recv[0].donor_initials}</span> (blood ${recv[0].donor_blood}) could give to Alder's patient` : 'No');
-      break;
-    }
-    case 'readiness': {
-      const c = e.checks;
-      step(4, `${S.retrieveHtml || ''}
-        <table class="t" style="margin-top:10px"><tr><th>Check</th><th>From</th><th></th></tr>
-        <tr><td>Donor available in the window</td><td class="mono">${esc(e.note)} · ${e.header.available_from} → ${e.header.available_to}</td><td class="${c.window_overlap ? 'ok' : 'bad'}">${c.window_overlap ? '✓' : '✗'}</td></tr>
-        <tr><td>Work-up complete, under 12 months</td><td class="mono">${esc(e.header.workup)} · §1.1</td><td class="${c.workup_complete ? 'ok' : 'bad'}">${c.workup_complete ? '✓' : '✗'}</td></tr>
-        <tr><td>Recipient active on the list</td><td class="mono">pairs.json · §1.2</td><td class="${c.recipient_active ? 'ok' : 'bad'}">${c.recipient_active ? '✓' : '✗'}</td></tr></table>
-        ${e.quote ? `<div class="quote">${esc(e.quote)}<cite>${esc(e.note)}</cite></div>` : ''}`, `readiness: ${e.status}`);
-      answer(2, `${e.status === 'ready' ? 'Ready' : e.status.replace('_', ' ')} · overlap ${e.overlap ? e.overlap.join(' → ') : 'none'}`);
-      const rule = (S.ruleHits || []).find(h => /paired exchange/i.test(h.text));
-      answer(3, rule ? `Allowed · ${HOSP[me].rulebook} ${rule.id}, both surgeons must sign` : 'See rulebook');
-      break;
-    }
-    case 'decision':
-      step(4, `<div class="quote" style="border-color:#F2B632">${esc(e.detail)}<cite>reason: ${esc(e.reason)}</cite></div>${S.retrieveHtml || ''}`, 'no reciprocal match', false);
-      answer(2, 'Not applicable · no candidate');
-      break;
-    case 'outreach': {
-      const rule = (S.ruleHits || []).find(h => h.id === e.rule);
-      step(4, `<div class="quote" style="border-color:#F2B632">No reciprocal match here. Our rulebook says what to do next:<cite>${HOSP[me].rulebook} ${esc(e.rule)}</cite></div>
-        ${rule ? `<div class="quote">${esc(rule.text.split('\n').slice(1).join(' '))}<cite>${HOSP[me].rulebook} ${esc(e.rule)}</cite></div>` : ''}
-        <div class="regions">${e.regions.map((r, i) => `<div class="region" style="animation: none"><span>Search forwarded to ${esc(r)}</span><span id="rg${i}">sending…</span></div>`).join('')}</div>
-        <p class="muted" style="margin:8px 0 0">${esc(e.note)}</p>`, 'widening the search');
-      e.regions.forEach((_, i) => setTimeout(() => { const el = $('rg' + i); if (el) el.textContent = 'sent · awaiting reply'; }, 700 + i * 600));
-      answer(3, `${HOSP[me].rulebook} ${esc(e.rule)} · widen the search to partner regions`);
-      break;
-    }
-    case 'reply.ready': {
-      const r = e.response;
-      step(5, `<pre class="wire">${esc(JSON.stringify(r, null, 1))}</pre><div class="okline">Allowlist passed: exactly ${e.fields.length} fields · ${e.bytes} bytes · sent to Alder over Flower</div>`, `${e.bytes} B`);
-      S.ledger.unshift({ t: clock(), fields: e.fields, bytes: e.bytes, run: S.runId });
-      $('ledger').innerHTML = S.ledger.map(l => `<li><span>→ ${l.t} · reply · ${l.fields.join(', ')}</span><span>${l.bytes} B</span></li>`).join('');
-      $('ledgerMeta').textContent = `${S.ledger.length} repl${S.ledger.length === 1 ? 'y' : 'ies'}`;
-      if (r.candidate_found) banner('yes', `Replied · run ${S.runId}`, '<em>Candidate found</em>', `Sent: token ${esc(r.candidate_token)} · ${r.readiness} · ${r.reason}. The pair's names, HLA and notes stayed here.`);
-      else banner('no', `Replied · run ${S.runId}`, '<em>No candidate found</em>', `Sent: ${r.readiness.replaceAll('_', ' ')} · ${r.reason.replaceAll('_', ' ')}. Nothing else left this hospital.`);
-      break;
-    }
-    case 'refused': banner('no', 'Refused', 'Form rejected', esc(e.error)); break;
+  if (e.type === 'flower.message' && e.direction === 'in') start(e, fast);
+  if (e.type === 'pod.open') { files = e.files; reads = new Set(); renderPod(); }
+  if (e.type === 'pod.read') { reads.add(e.file); renderPod(); }
+  if (e.type === 'reply.ready') { ledger.unshift({ t: new Date((e.t || Date.now() / 1000) * 1000).toTimeString().slice(0, 5), bytes: e.bytes }); renderLedger(); }
+  log.push(e);
+}
+
+function start(first, fast) {
+  run?.cancel();
+  log = new Think.Log();
+  run = new Think.Run(fast);
+  runId = first.run_id;
+  pill();
+  $('seq').innerHTML = '';
+  play(run).catch(err => { if (err !== Think.CANCEL) console.error(err); });
+}
+
+async function play(R) {
+  const host = $('seq'), h = HOSP[me];
+  const is = t => e => e.type === t;
+  const opt = { scroll };
+
+  const con = Think.connect({ name: 'Flower', working: 'Connecting…', done: 'Connected to the exchange network',
+    chips: [{ name: 'SuperNode', color: '#0E7C61' }, { name: `${h.short} pod`, color: '#0C7AC9' }, { name: 'Other pods', color: '#8A97B5' }] });
+  host.appendChild(con.el);
+  await R.wait(350); con.set(0, 'ok', 'connected');
+  await R.wait(350); con.set(1, 'ok', 'mounted');
+  await R.wait(350); con.set(2, 'off', 'unreachable'); con.finish();
+  await R.wait(500);
+
+  const form = await Think.step(R, host, { working: "Receiving Alder's form…", done: "Received Alder's form" }, log.waitFor(is('form.received'), R),
+    e => ({ html: true, result: `Donor ${chip(e.request.donor.blood)} · patient ${chip(e.request.patient.blood)} · ${mmdd(e.request.window.from)}–${mmdd(e.request.window.to)} · no names` }), opt);
+
+  await Think.step(R, host, { working: 'Opening our pod…', done: 'Opened our pod' }, log.waitFor(is('pod.open'), R),
+    e => {
+      const notes = e.files.filter(f => f.startsWith('availability/')).length;
+      return { result: `${pairsCount()} pairs · ${notes} notes · 1 rulebook`, lock: true };
+    }, opt);
+
+  await Think.step(R, host, { working: 'Searching our records…', done: 'Searched our records' }, log.waitFor(is('retrieve'), R),
+    e => ({ result: `Closest: ${e.hits.map(x => x.id).join(' · ')}` }), opt);
+
+  const sc = await Think.step(R, host, { working: 'Screening every pair…', done: 'Screened every pair' }, log.waitFor(is('screen'), R),
+    e => {
+      const both = e.rows.find(r => r.reciprocal), one = e.rows.find(r => r.receive.ok);
+      return { result: both ? `${both.patient_name} + ${both.donor_name} fit both ways` : one ? `None both ways · ${one.donor_name} fits one way` : 'None fit',
+        details: screenTable(e) };
+    }, opt);
+
+  const both = sc.rows.find(r => r.reciprocal);
+  let reply;
+  if (both) {
+    const rd = await Think.step(R, host, { working: 'Checking readiness…', done: 'Ready in the window' }, log.waitFor(is('readiness'), R),
+      e => ({ ok: e.status === 'ready', title: e.status === 'ready' ? 'Ready in the window' : 'Not ready', result: `${both.donor_name} free ${mmdd(e.header.available_from)}–${mmdd(e.header.available_to)} · work-up done · ${e.rules.slice(0, 2).join(' ')}` }), opt);
+    await Think.reason(R, host, [`Alder's donor fits ${both.patient_name}.`, `${both.donor_name} fits Alder's patient.`, `Ready ${mmdd(form.request.window.from)}–${mmdd(form.request.window.to)}.`, '→ Candidate found.'], opt);
+    reply = await log.waitFor(is('reply.ready'), R);
+    host.appendChild(Think.conclusion({ label: 'Conclusion', text: 'Candidate found', tone: 'ok',
+      extra: `<div class="muted">Alder gets a token, not a name: <b style="color:#0A3C6E">${esc(reply.response.candidate_token)}</b></div>` }));
+    void rd;
+  } else {
+    const one = sc.rows.find(r => r.receive.ok);
+    await Think.step(R, host, { working: 'Checking our rulebook…', done: `Rulebook ${h.rulebook}` }, log.waitFor(is('outreach'), R),
+      e => ({ result: `${e.rule}: no local match → widen the search` }), opt);
+    const out = log.find(is('outreach'));
+    await Think.step(R, host, { working: 'Reaching partner regions…', done: 'Asked partner regions' }, Promise.resolve(out),
+      e => ({ html: true, result: `<span class="regions2">${e.regions.map(r => `<span>${esc(r.split(' (')[1]?.replace(')', '') || r)}</span>`).join('')}<span style="border-style:solid">illustrative</span></span>` }), opt);
+    await Think.reason(R, host, [`Alder's donor is type ${form.request.donor.blood}.`, 'None of our patients can take it.', one ? `${one.donor_name} could help Alder's patient, one way only.` : 'Nothing fits either way.', '→ No candidate. Widen the search.'], opt);
+    reply = await log.waitFor(is('reply.ready'), R);
+    host.appendChild(Think.conclusion({ label: 'Conclusion', text: 'No candidate found', tone: 'warn' }));
   }
+  scroll();
+  await R.wait(700);
+  const r = reply.response;
+  await Think.step(R, host, { accent: 'blue', working: 'Replying over Flower…', done: 'Sent to Alder' }, Promise.resolve(reply),
+    () => ({ html: true, result: `<span class="fields5">${Object.entries(r).map(([k, v]) => `<span>${k}</span><span>${esc(v === '' ? '—' : String(v))}</span>`).join('')}</span><div class="muted" style="margin-top:6px">${reply.bytes} bytes · exactly 5 fields · nothing else left ${esc(h.short)}</div>` }), opt);
+}
+function pairsCount() { const s = log.find(e => e.type === 'pod.read' && e.file === 'pairs.json'); return s ? parseInt(s.detail, 10) : 4; }
+function screenTable(e) {
+  const c = x => `${x.abo ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>'}${x.crossmatch ? '<span class="ok">✓</span>' : `<span class="bad">✗</span> <span style="font-family:var(--font-mono)">${x.conflicts.join(' ')}</span>`}`;
+  return `<table class="t"><tr><th>Pair</th><th>Patient</th><th>Donor</th><th>Alder donor → ours</th><th>Ours → Alder patient</th></tr>${e.rows.map(r => `<tr class="${r.reciprocal ? 'pass' : ''}"><td>${r.pair_id}</td><td>${esc(r.patient_name)} ${chip(r.patient_blood)}</td><td>${esc(r.donor_name)} ${chip(r.donor_blood)}</td><td>${c(r.give)}</td><td>${c(r.receive)}</td></tr>`).join('')}</table>`;
 }
 
 function pill() {
   $('dot').className = 'dot ' + (Source.live ? 'on' : 'warn');
-  $('pillText').textContent = Source.live ? `LIVE · Flower SuperNode${S.runId ? ' · run ' + S.runId : ''}` : `REPLAY · recorded Flower run ${RECORDINGS[me]?.run_id ?? ''}`;
+  $('pillText').textContent = Source.live ? `LIVE · Flower SuperNode${runId ? ' · run ' + runId : ''}` : `REPLAY · Flower run ${RECORDINGS[me]?.run_id ?? ''}`;
 }
 function init() {
   const h = HOSP[me];
   document.title = `${h.short} · Domino`;
-  $('hospName').textContent = `${h.name} · ${h.city}`;
-  $('crumbs').innerHTML = `<span>${h.name}</span> » <span>Transplant</span> » <b>Exchange requests</b>`;
-  $('eyebrow').textContent = `Private console · ${h.city}`;
+  $('eyebrow').textContent = `Private agent · ${h.city}`;
   $('title').textContent = h.name;
-  $('lede').textContent = `This hospital's agent runs on this machine, inside ${h.short}'s Flower SuperNode. It can open exactly one data pod: ${h.short}'s. Whatever Alder asks, the only thing that goes back is a five-field reply.`;
-  reset(); pill();
-  if (!Source.live && RECORDINGS[me]) { $('replayBtn').hidden = false; $('replayBtn').onclick = () => { reset(); Source.replay(RECORDINGS[me].events); }; }
+  renderPod(); renderLedger(); idle(); pill();
+  if (!Source.live && RECORDINGS[me]) { $('replayBtn').hidden = false; $('replayBtn').onclick = () => Source.replay(RECORDINGS[me].events.map(e => ({ ...e }))); }
 }
 Source.on((e, meta) => {
-  if (meta.catchUp) {  // show the latest run this machine took part in
+  if (meta.catchUp) {  // show the latest run this machine took part in, instantly
     const evs = meta.events.filter(x => x.who === me);
-    const start = evs.map(x => x.type === 'flower.message' && x.direction === 'in').lastIndexOf(true);
-    if (start >= 0) { const hold = S.ledger; evs.slice(start).forEach(onEvent); S.ledger = hold; }
+    const i = evs.map(x => x.type === 'flower.message' && x.direction === 'in').lastIndexOf(true);
+    if (i >= 0) evs.slice(i).forEach(x => onEvent(x, true));
     return;
   }
   onEvent(e);
 });
-fetch('/config').then(r => r.json()).then(c => { if (c.hospital && HOSP[c.hospital]) { me = c.hospital; init(); } }).catch(() => {});
+fetch('/config').then(r => r.json()).then(c => { if (c.hospital && HOSP[c.hospital] && c.hospital !== me) { me = c.hospital; init(); } }).catch(() => {});
 init();
 </script>
 </body>
