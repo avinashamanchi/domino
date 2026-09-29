@@ -4,3 +4,4 @@ logs/
 runs/
 __pycache__/
 .pytest_cache/
+brag-output/work/

@@ -25,3 +25,5 @@ request-id = "REQ-2026-0929-A1"
 alder-pod = ""
 bridge-url = "http://127.0.0.1:8765"
 pace = 2.0
+phase = "search"
+state-path = ""

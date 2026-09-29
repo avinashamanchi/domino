@@ -54,6 +54,9 @@ class Bus:
             return self.events[seq:]
 
 
+DECISIONS: dict[str, dict] = {}  # a person's choices on this machine, read by this machine's own agent
+
+
 def make_handler(args, bus: Bus, runner):
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *a, **k):
@@ -91,6 +94,8 @@ def make_handler(args, bus: Bus, runner):
             if url.path == "/config":
                 return self._json({"role": args.role, "hospital": args.hospital, "live": True,
                                    "running": runner.running if runner else False, "seq": len(bus.events)})
+            if url.path == "/decision":
+                return self._json(DECISIONS.get(parse_qs(url.query).get("id", [""])[0], {}))
             if url.path == "/events":
                 q = parse_qs(url.query)
                 since = int(q.get("since", ["0"])[0])
@@ -111,7 +116,13 @@ def make_handler(args, bus: Bus, runner):
                     return self._json({"error": "bad json"}, 400)
                 return self._json({"ok": True})
             if url.path == "/start" and runner:
-                return self._json(runner.start())
+                phase = json.loads(body or b"{}").get("phase", "search")
+                return self._json(runner.start(phase))
+            if url.path == "/decision":
+                d = json.loads(body)
+                DECISIONS[d["id"]] = {"decision": d["decision"], "hold_until": d.get("hold_until", "")}
+                bus.publish({"type": "decision.clicked", "who": args.hospital, **d, "t": time.time()})
+                return self._json({"ok": True})
             if url.path == "/ui" :  # UI-only events (doctor review) recorded alongside the run
                 event = json.loads(body)
                 event["who"] = "alder-ui"
@@ -132,12 +143,16 @@ class Runner:
     def running(self) -> bool:
         return self.proc is not None and self.proc.poll() is None
 
-    def start(self) -> dict:
-        if self.running:
-            return {"ok": False, "error": "a run is already in progress"}
+    def start(self, phase: str = "search") -> dict:
+        if self.running:  # the previous phase has reported phase.end; give its flwr process a moment to exit
+            try:
+                self.proc.wait(timeout=20)
+            except subprocess.TimeoutExpired:
+                return {"ok": False, "error": "a run is already in progress"}
         a = self.args
         run_config = (f"alder-pod='{Path(a.alder_pod).resolve()}' bridge-url='http://127.0.0.1:{a.port}' "
-                      f"pace={a.pace} request-id='{a.request_id}'")
+                      f"pace={a.pace} request-id='{a.request_id}' phase='{phase}' state-path='{(RUNS / 'state.json').resolve()}'")
+        RUNS.mkdir(exist_ok=True)
         cmd = [a.flwr, "run", str(Path(a.flower_dir).resolve()), a.federation, "--stream", "--run-config", run_config]
         self.bus.publish({"type": "launch", "who": "bridge", "cmd": " ".join(shlex.quote(c) for c in cmd), "t": time.time()})
         self.proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1,

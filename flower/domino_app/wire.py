@@ -55,3 +55,40 @@ def check_response(resp: dict) -> dict:
 
 def size(obj: dict) -> int:
     return len(json.dumps(obj, separators=(",", ":")).encode())
+
+
+# ---------- three-phase story: profiles, compat, approve, hold ----------
+PROFILE = {"pair", "donor_blood", "donor_hla"}
+ANSWER = {"pair", "decision", "readiness", "reason", "hold_until"}
+ASKS = {
+    "profiles": {"phase"},
+    "compat": {"donors", "exclude"},
+    "approve": {"plan", "pairs", "surgery_date"},
+    "hold": {"plan", "pairs", "hold_until", "from"},
+}
+REPLIES = {"profiles": {"pairs"}, "compat": {"edges"}, "approve": {"answers"}, "hold": {"decision", "reason"}}
+DECISIONS = {"approve", "hold", "accept", "decline"}
+REASONS2 = {"none", "infection", "donor_availability", "recipient_readiness", "or_capacity"}
+
+
+def check_ask(kind: str, ask: dict) -> dict:
+    _keys_only(ask, ASKS[kind], f"{kind} ask")
+    for d in ask.get("donors", []):
+        _keys_only(d, PROFILE, "donor profile")
+    return ask
+
+
+def check_reply(kind: str, reply: dict) -> dict:
+    _keys_only(reply, REPLIES[kind], f"{kind} reply")
+    for p in reply.get("pairs", []):
+        _keys_only(p, PROFILE, "profile")
+    for e in reply.get("edges", []):
+        if not (isinstance(e, list) and len(e) == 2 and all(isinstance(x, str) and len(x) <= 4 for x in e)):
+            raise WireError("edges must be [donor_pair, patient_pair] ids")
+    for a in reply.get("answers", []):
+        _keys_only(a, ANSWER, "approval")
+        if a["decision"] not in DECISIONS or a["reason"] not in REASONS2 or a["readiness"] not in READINESS | {"not_this_week"}:
+            raise WireError(f"approval must use categories: {a}")
+    if kind == "hold" and (reply["decision"] not in DECISIONS or reply["reason"] not in REASONS2):
+        raise WireError(f"hold reply must use categories: {reply}")
+    return reply
