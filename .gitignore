@@ -1,0 +1,6 @@
+flower/.venv/
+.flwr-home/
+logs/
+runs/
+__pycache__/
+.pytest_cache/

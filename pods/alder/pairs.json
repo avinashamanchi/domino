@@ -1,0 +1,16 @@
+{
+  "hospital": "alder",
+  "name": "Alder Medical Center",
+  "city": "San Jose",
+  "synthetic": true,
+  "pairs": [
+    {"pair_id": "A1", "status": "active",
+     "patient": {"name": "Maria Alvarez", "initials": "MA", "age": 46, "blood": "A", "unacceptable_antigens": ["A1", "B8", "DR17"], "list_status": "active"},
+     "donor": {"name": "Elena Alvarez", "initials": "EA", "relation": "sister", "blood": "B", "hla": ["A2", "A24", "B7", "B44", "DR4", "DR15"]},
+     "why_not_direct": "blood type: Elena is B, Maria is A"},
+    {"pair_id": "A2", "status": "active",
+     "patient": {"name": "Hannah Brooks", "initials": "HB", "age": 58, "blood": "B", "unacceptable_antigens": ["A11"], "list_status": "active"},
+     "donor": {"name": "Mark Brooks", "initials": "MB", "relation": "husband", "blood": "A", "hla": ["A1", "A3", "B8", "B35", "DR3", "DR11"]},
+     "why_not_direct": "blood type"}
+  ]
+}

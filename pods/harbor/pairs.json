@@ -1,0 +1,24 @@
+{
+  "hospital": "harbor",
+  "name": "Harbor Point Hospital",
+  "city": "Oakland",
+  "synthetic": true,
+  "pairs": [
+    {"pair_id": "H1", "status": "active",
+     "patient": {"name": "James Okafor", "initials": "JO", "age": 52, "blood": "B", "unacceptable_antigens": ["A3", "B27"], "list_status": "active"},
+     "donor": {"name": "Priya Okafor", "initials": "PO", "relation": "wife", "blood": "A", "hla": ["A2", "A11", "B35", "B51", "DR1", "DR7"]},
+     "why_not_direct": "blood type: Priya is A, James is B"},
+    {"pair_id": "H2", "status": "active",
+     "patient": {"name": "Kenji Sato", "initials": "KS", "age": 61, "blood": "O", "unacceptable_antigens": [], "list_status": "active"},
+     "donor": {"name": "Aiko Sato", "initials": "AS", "relation": "wife", "blood": "B", "hla": ["A1", "A26", "B8", "B60", "DR3", "DR9"]},
+     "why_not_direct": "blood type"},
+    {"pair_id": "H3", "status": "active",
+     "patient": {"name": "Fatima Haddad", "initials": "FH", "age": 39, "blood": "B", "unacceptable_antigens": ["A24", "B44", "DR15"], "list_status": "active"},
+     "donor": {"name": "Samir Haddad", "initials": "SH", "relation": "brother", "blood": "A", "hla": ["A1", "A2", "B8", "B13", "DR7", "DR17"]},
+     "why_not_direct": "blood type"},
+    {"pair_id": "H4", "status": "active",
+     "patient": {"name": "Rosa Delgado", "initials": "RD", "age": 63, "blood": "O", "unacceptable_antigens": ["B7"], "list_status": "active"},
+     "donor": {"name": "Luis Delgado", "initials": "LD", "relation": "son", "blood": "A", "hla": ["A3", "A30", "B18", "B39", "DR8", "DR13"]},
+     "why_not_direct": "blood type"}
+  ]
+}

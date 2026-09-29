@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domino · Alder coordinator</title>
+<style>
+/*@FONTS@*/
+/*@SHARED@*/
+html, body { height: 100%; }
+body { background: var(--navy); overflow: hidden; color: #fff; }
+#stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; overflow: hidden;
+  background: radial-gradient(ellipse at 30% 40%, transparent 55%, rgba(8, 20, 36, .55) 100%), linear-gradient(135deg, #0E2740 0%, #13345C 55%, #1B4F8A 100%); }
+.topbar { position: relative; z-index: 6; }
+.topnav span { font-size: 15px; opacity: .75; }
+.topnav span.on { opacity: 1; }
+.topnav span i { font-style: normal; color: var(--tint); margin-right: 6px; font-weight: 400; }
+.hero { position: absolute; left: 0; right: 0; top: 70px; height: 900px; }
+.beat { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .5s ease; }
+.beat.on { opacity: 1; pointer-events: auto; }
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.in { opacity: 1; transform: none; }
+.caption { position: absolute; right: 72px; bottom: 26px; max-width: 1100px; text-align: right; color: var(--gold); font-weight: 500; font-size: 34px; line-height: 1.22; z-index: 5; transition: opacity .3s; }
+.caption.narrow { max-width: 700px; }
+.caption.left { left: 60px; right: auto; max-width: 900px; text-align: left; }
+.eyebrow { font-size: 20px; }
+h1.display { font-size: 64px; margin: 8px 0 0; }
+
+/* footer: wire strip + bar */
+.wirebar { position: absolute; left: 0; right: 0; top: 970px; height: 48px; background: rgba(8, 20, 36, .6); border-top: 1px solid rgba(196, 228, 247, .12); display: flex; align-items: center; gap: 12px; padding: 0 28px; overflow: hidden; }
+.wirebar .lbl { font-weight: 700; font-size: 12px; letter-spacing: .12em; color: var(--tint); flex: none; }
+.pkt { flex: none; background: #fff; color: var(--navy); font-family: var(--font-mono); font-size: 14px; padding: 4px 11px; border-radius: 13px; white-space: nowrap; animation: pktIn .5s ease; }
+.pkt b { color: var(--blue); font-weight: 400; }
+.pkt.in b { color: #2d7f81; }
+@keyframes pktIn { from { opacity: 0; transform: translateX(-16px); } }
+.foot { position: absolute; left: 0; right: 0; bottom: 0; height: 62px; background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; }
+.foot .fine { font-size: 14px; color: var(--tint); }
+.foot .keys { font-size: 13px; color: var(--offline); }
+.badge { font-weight: 700; font-size: 13px; letter-spacing: .06em; padding: 7px 12px; border-radius: 3px; border: 1px solid var(--gold); color: var(--gold); }
+.badge.live { border-color: var(--teal); color: var(--teal); }
+
+/* Beat 0 · situation */
+.b0 { position: absolute; left: 72px; top: 50px; right: 72px; }
+.families { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+.fam { background: #fff; color: var(--body); border-radius: 3px; box-shadow: var(--shadow); overflow: hidden; }
+.fam header { background: var(--navy-2); color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid var(--teal); }
+.fam header b { font-weight: 500; font-size: 22px; }
+.fam header span { color: var(--tint); font-size: 16px; font-style: italic; }
+.fam .people { display: grid; grid-template-columns: 1fr 70px 1fr; align-items: center; padding: 26px 24px 10px; }
+.person { display: flex; gap: 16px; align-items: center; }
+.av { width: 72px; height: 72px; border-radius: 50%; background: var(--heading); color: #fff; font-weight: 700; font-size: 24px; display: flex; align-items: center; justify-content: center; flex: none; }
+.person .n { font-weight: 500; font-size: 24px; color: var(--heading); }
+.person .r { font-size: 17px; color: #5b6b82; margin: 3px 0 6px; }
+.fam .x { text-align: center; }
+.fam .why { margin: 8px 24px 22px; padding: 12px 16px; background: var(--pale); border-left: 4px solid var(--gold); font-size: 18px; color: var(--heading); }
+.stat { margin-top: 44px; display: flex; align-items: baseline; gap: 26px; }
+.stat .num { font-family: var(--font-cond); font-size: 140px; line-height: .9; color: var(--gold); font-variant-numeric: tabular-nums; }
+.stat .txt { font-size: 32px; font-weight: 500; max-width: 700px; line-height: 1.25; }
+.stat .src { font-size: 14px; color: var(--offline); margin-top: 8px; font-weight: 400; }
+
+/* Beat 1 · question */
+.b1 { position: absolute; left: 0; right: 0; top: 60px; text-align: center; }
+.b1 h1 { font-size: 78px; max-width: 1500px; margin: 16px auto 0; }
+.b1 p { font-size: 26px; color: var(--tint); margin: 22px auto 0; max-width: 1100px; line-height: 1.4; }
+.b1 svg { margin-top: 26px; }
+
+/* Map (shared by beats 2, 4, 6) */
+#map { position: absolute; left: 0; top: 0; width: 1920px; height: 900px; opacity: 0; transition: opacity .5s; }
+#map.on { opacity: 1; }
+#map .land { fill: var(--county); stroke: var(--county-stroke); stroke-width: 1.5; fill-rule: evenodd; }
+#map .river { fill: none; stroke: #1F4A7A; stroke-width: 3; }
+#map .hwy { fill: none; stroke: rgba(196, 228, 247, .14); stroke-width: 2; stroke-dasharray: 2 5; }
+#map .city { fill: var(--offline); font-size: 17px; font-style: italic; font-family: var(--font); }
+#map .lbl-box { fill: rgba(14, 39, 64, .9); stroke: rgba(196, 228, 247, .25); }
+#map .lbl-name { fill: #fff; font-size: 21px; font-weight: 500; font-family: var(--font); }
+#map .lbl-sub { fill: var(--tint); font-size: 15px; font-family: var(--font); }
+#map .lbl-state { font-size: 14px; font-weight: 700; letter-spacing: .06em; font-family: var(--font); }
+#map .arc { fill: none; stroke-width: 6; stroke-linecap: round; }
+#map .arc.proposed { stroke: var(--gold); stroke-dasharray: 14 12; animation: flow 1.6s linear infinite; }
+#map .arc.reviewed { stroke: var(--teal); }
+@keyframes flow { to { stroke-dashoffset: -52; } }
+#map .out { fill: none; stroke: rgba(242, 182, 50, .7); stroke-width: 2.5; stroke-dasharray: 5 7; }
+#map .outlbl { fill: var(--gold); font-size: 15px; font-family: var(--font); }
+
+.rpanel { position: absolute; left: 1140px; top: 40px; width: 720px; }
+.rpanel p.lede { font-size: 20px; color: var(--tint); line-height: 1.45; margin: 16px 0 0; }
+.netlist { list-style: none; padding: 0; margin: 26px 0 0; }
+.netlist li { display: grid; grid-template-columns: 26px 1fr auto; gap: 12px; align-items: center; padding: 14px 0; border-top: 1px solid rgba(196, 228, 247, .14); font-size: 20px; }
+.netlist li small { color: var(--tint); font-size: 15px; }
+.findbtn { margin-top: 30px; font-size: 26px; padding: 20px 34px; }
+.findnote { margin-top: 14px; color: var(--tint); font-size: 16px; }
+
+/* Beat 3 · flowchart */
+.b3head { position: absolute; left: 60px; top: 26px; right: 60px; }
+.b3head h1 { font-size: 44px; }
+.formcard { position: absolute; left: 60px; top: 150px; width: 500px; background: #fff; color: var(--body); border-radius: 3px; box-shadow: var(--shadow); overflow: hidden; }
+.formcard header { background: var(--navy-2); color: #fff; padding: 12px 18px; border-bottom: 4px solid var(--teal); }
+.formcard header b { font-weight: 500; font-size: 19px; display: block; }
+.formcard header span { font-family: var(--font-mono); font-size: 14px; color: var(--tint); }
+.frow { display: grid; grid-template-columns: 116px 1fr; gap: 10px; padding: 9px 18px; border-bottom: 1px solid #f0f2f5; font-size: 15px; align-items: center; }
+.frow .k { color: #6b778c; font-size: 13px; }
+.frow .v { color: var(--heading); }
+.mono { font-family: var(--font-mono); }
+.qs { padding: 10px 18px 6px; font-size: 14px; color: var(--heading); }
+.qs ol { margin: 6px 0 0; padding-left: 20px; line-height: 1.5; }
+.formcard .not { padding: 8px 18px 12px; font-size: 13px; color: #6b778c; }
+.formcard .not s { color: #9aa5b8; }
+.formcard .pending { padding: 60px 18px; text-align: center; color: #6b778c; font-size: 17px; }
+
+#flowsvg { position: absolute; left: 0; top: 0; width: 1920px; height: 900px; pointer-events: none; }
+.hub { position: absolute; left: 600px; top: 400px; width: 160px; text-align: center; }
+.hub .lb { font-size: 15px; color: var(--tint); margin-top: 8px; line-height: 1.3; }
+.hub .lb b { color: #fff; font-weight: 500; display: block; font-size: 17px; }
+
+.lane { position: absolute; left: 800px; width: 1060px; height: 318px; border: 1px solid rgba(196, 228, 247, .16); border-radius: 4px; background: rgba(8, 20, 36, .32); padding: 14px 18px; }
+.lane .lh { display: flex; justify-content: space-between; align-items: baseline; }
+.lane .lh b { font-size: 22px; font-weight: 500; }
+.lane .lh b small { font-size: 15px; color: var(--tint); font-weight: 400; margin-left: 10px; }
+.lane .lh em { font-size: 14px; color: var(--offline); font-style: italic; }
+.boxes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 26px; margin-top: 14px; position: relative; }
+.box { position: relative; background: rgba(14, 39, 64, .85); border: 1px solid rgba(196, 228, 247, .18); border-top: 4px solid rgba(196, 228, 247, .18); border-radius: 3px; padding: 9px 12px; height: 98px; opacity: .45; transition: opacity .3s, border-color .3s; }
+.box:not(:last-child)::after { content: "→"; position: absolute; right: -22px; top: 32px; color: var(--offline); font-size: 18px; }
+.box .bn { font-size: 12px; color: var(--tint); letter-spacing: .06em; }
+.box .bt { font-size: 17px; font-weight: 500; margin: 4px 0 4px; }
+.box .bs { font-size: 13px; color: var(--tint); line-height: 1.3; }
+.box.active { opacity: 1; border-top-color: var(--gold); animation: glow 1.2s ease-in-out infinite; }
+.box.done { opacity: 1; border-top-color: var(--teal); }
+.box.done .bn::after { content: " ✓"; color: var(--teal); }
+@keyframes glow { 50% { box-shadow: 0 0 0 3px rgba(242, 182, 50, .18); } }
+.box svg.pod { position: absolute; right: 10px; top: 10px; }
+.result { display: grid; grid-template-columns: 560px 1fr; gap: 20px; margin-top: 12px; }
+.reply { background: #fff; color: var(--body); border-radius: 3px; overflow: hidden; min-height: 140px; }
+.reply header { background: var(--pale); padding: 7px 12px; font-size: 13px; color: #5b6b82; display: flex; justify-content: space-between; border-bottom: 1px solid var(--divider); }
+.reply .rr { display: grid; grid-template-columns: 170px 1fr; padding: 2px 12px; font-family: var(--font-mono); font-size: 14px; opacity: 0; transition: opacity .3s; }
+.reply .rr.in { opacity: 1; }
+.reply .rr span:first-child { color: #6b778c; }
+.reply .rr span:last-child { color: var(--heading); font-weight: 700; }
+.reply .wait { padding: 50px 12px; text-align: center; color: #8a97b5; font-size: 15px; }
+.verdict { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+.chipbig { align-self: flex-start; font-weight: 700; font-size: 26px; letter-spacing: .04em; padding: 10px 16px; border-radius: 3px; border: 2px solid var(--offline); color: var(--offline); }
+.chipbig.yes { border-color: var(--teal); color: var(--teal); }
+.chipbig.no { border-color: var(--gold); color: var(--gold); }
+.verdict .sub { font-size: 16px; color: var(--tint); line-height: 1.4; }
+.verdict .regions { display: flex; gap: 8px; flex-wrap: wrap; }
+.verdict .regions span { font-size: 13px; border: 1px dashed rgba(242, 182, 50, .7); color: var(--gold); padding: 3px 8px; border-radius: 3px; }
+
+/* Beat 4 · review */
+.card { background: #fff; color: var(--body); border-radius: 3px; box-shadow: var(--shadow); overflow: hidden; }
+.card > header { background: var(--navy-2); color: #fff; padding: 11px 18px; border-bottom: 4px solid var(--teal); font-size: 18px; font-weight: 500; display: flex; justify-content: space-between; align-items: baseline; }
+.card > header span { font-size: 13px; color: var(--tint); font-weight: 400; font-family: var(--font-mono); }
+table.resp { width: 100%; border-collapse: collapse; font-size: 15px; }
+table.resp th { text-align: left; font-weight: 500; color: #6b778c; font-size: 13px; padding: 8px 14px; border-bottom: 1px solid var(--divider); }
+table.resp td { padding: 8px 14px; border-bottom: 1px solid #f0f2f5; font-family: var(--font-mono); color: var(--heading); }
+table.resp td.k { font-family: var(--font); color: #6b778c; }
+td.t { color: #2d7f81 !important; font-weight: 700; }
+td.f { color: #a86b00 !important; font-weight: 700; }
+.checks { padding: 10px 18px; }
+.checks .cl { display: grid; grid-template-columns: 24px 1fr; gap: 10px; padding: 6px 0; font-size: 16px; color: var(--heading); }
+.ok { color: #2d7f81; font-weight: 700; }
+.bad { color: #b3261e; font-weight: 700; }
+.proposal { margin: 4px 18px 16px; padding: 12px 14px; background: var(--pale); border-left: 4px solid var(--gold); font-size: 16px; line-height: 1.55; color: var(--heading); }
+.proposal b { font-weight: 700; }
+.aside { margin-top: 14px; font-size: 16px; color: var(--tint); font-style: italic; }
+
+/* Beat 5 · doctor review */
+.drop { position: absolute; left: 60px; top: 150px; width: 900px; height: 610px; border: 2px dashed rgba(196, 228, 247, .45); border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(8, 20, 36, .25); cursor: pointer; text-align: center; transition: border-color .2s, background .2s; }
+.drop.over { border-color: var(--gold); background: rgba(242, 182, 50, .08); }
+.drop .t { font-size: 28px; font-weight: 500; margin-top: 12px; }
+.drop .s { font-size: 17px; color: var(--tint); margin-top: 8px; }
+.drop canvas { max-width: 880px; max-height: 590px; display: none; }
+.drop.has canvas { display: block; }
+.drop.has .hint { display: none; }
+.evidence { position: absolute; left: 1000px; top: 150px; width: 860px; }
+.xf { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; padding: 8px 18px 10px; }
+.xf div { padding: 6px 0; border-bottom: 1px solid #f0f2f5; font-size: 15px; }
+.xf .k { color: #6b778c; font-size: 12px; display: block; }
+.xf .v { font-family: var(--font-mono); color: var(--heading); }
+.confirm { padding: 12px 18px 18px; border-top: 1px solid var(--divider); }
+.confirm label { display: flex; gap: 10px; align-items: center; font-size: 17px; color: var(--heading); cursor: pointer; }
+.confirm input { width: 22px; height: 22px; }
+.confirm .btn { margin-top: 12px; font-size: 20px; padding: 14px 24px; }
+.stamp { display: none; margin-top: 12px; border: 3px solid var(--teal); border-radius: 4px; padding: 10px 14px; align-items: center; gap: 14px; }
+.stamp.on { display: flex; }
+.stamp b { font-size: 26px; letter-spacing: .08em; color: #2d7f81; }
+.stamp span { font-size: 14px; color: #6b778c; }
+
+/* Beat 6 */
+.done-panel .big { font-family: var(--font-cond); font-size: 110px; color: var(--teal); line-height: 1; }
+
+/* Overlays */
+.overlay { position: absolute; inset: 0; background: rgba(8, 20, 36, .82); display: none; align-items: center; justify-content: center; z-index: 20; }
+.overlay.on { display: flex; }
+.panel { background: #fff; color: var(--body); border-radius: 4px; padding: 24px 30px; width: 1300px; max-height: 860px; overflow: auto; }
+.panel h2 { margin: 0 0 10px; color: var(--heading); font-weight: 500; }
+.log { font-family: var(--font-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; color: #333; }
+.help kbd { font-family: var(--font-mono); background: var(--pale); border: 1px solid var(--divider); padding: 1px 8px; border-radius: 3px; margin-right: 10px; }
+.help div { font-size: 18px; line-height: 2; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <header class="topbar">
+    <div class="brand"><span class="wordmark">DOMINO</span><span class="sub">kidney exchange across hospitals</span></div>
+    <nav class="topnav" id="nav">
+      <span data-b="0,1">The situation</span>
+      <span data-b="2">The network</span>
+      <span data-b="3"><i>1</i>Ask</span>
+      <span data-b="4"><i>2</i>Review</span>
+      <span data-b="5,6"><i>3</i>Doctor review</span>
+    </nav>
+  </header>
+  <div class="stripe"></div>
+
+  <div class="hero">
+    <svg id="map" viewBox="0 0 1920 900" aria-label="Map of the San Francisco Bay Area and Sacramento"></svg>
+
+    <!-- 0 · The situation -->
+    <section class="beat" id="b0">
+      <div class="b0">
+        <div class="eyebrow">The situation</div>
+        <h1 class="display">A willing donor. The wrong blood type.</h1>
+        <div class="families">
+          <div class="fam reveal" id="fam1">
+            <header><b>Alder Medical Center</b><span>San Jose</span></header>
+            <div class="people">
+              <div class="person"><div class="av">MA</div><div><div class="n">Maria, 46</div><div class="r">needs a kidney</div><span class="chip A">A</span></div></div>
+              <div class="x"><svg width="56" height="40" viewBox="0 0 56 40"><path d="M50 20H8m0 0l10-9M8 20l10 9" stroke="#8A97B5" stroke-width="3" fill="none"/><path d="M22 8l12 24M34 8L22 32" stroke="#EC8017" stroke-width="4"/></svg></div>
+              <div class="person"><div class="av">EA</div><div><div class="n">Elena, her sister</div><div class="r">wants to give one</div><span class="chip B">B</span></div></div>
+            </div>
+            <div class="why">Elena's kidney can't go to Maria: blood type B can't go to A.</div>
+          </div>
+          <div class="fam reveal" id="fam2">
+            <header><b>Harbor Point Hospital</b><span>Oakland</span></header>
+            <div class="people">
+              <div class="person"><div class="av">JO</div><div><div class="n">James, 52</div><div class="r">needs a kidney</div><span class="chip B">B</span></div></div>
+              <div class="x"><svg width="56" height="40" viewBox="0 0 56 40"><path d="M50 20H8m0 0l10-9M8 20l10 9" stroke="#8A97B5" stroke-width="3" fill="none"/><path d="M22 8l12 24M34 8L22 32" stroke="#EC8017" stroke-width="4"/></svg></div>
+              <div class="person"><div class="av">PO</div><div><div class="n">Priya, his wife</div><div class="r">wants to give one</div><span class="chip A">A</span></div></div>
+            </div>
+            <div class="why">Priya's kidney can't go to James: blood type A can't go to B.</div>
+          </div>
+        </div>
+        <div class="stat reveal" id="stat">
+          <div class="num">95,492</div>
+          <div><div class="txt">people in the U.S. are waiting for a kidney.</div>
+            <div class="src">Source: organdonor.gov (HRSA), waiting list as of July 30, 2026.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1 · The question -->
+    <section class="beat" id="b1">
+      <div class="b1">
+        <div class="eyebrow">The question</div>
+        <h1 class="display">What if the person who could help your patient is at another hospital?</h1>
+        <svg width="1000" height="300" viewBox="0 0 1000 300" aria-hidden="true">
+          <text x="140" y="24" fill="#C4E4F7" font-size="18" text-anchor="middle" font-family="Ubuntu, Helvetica">Alder · San Jose</text>
+          <text x="860" y="24" fill="#C4E4F7" font-size="18" text-anchor="middle" font-family="Ubuntu, Helvetica">Harbor Point · Oakland</text>
+          <g font-family="Ubuntu, Helvetica" font-weight="700" font-size="22" text-anchor="middle">
+            <circle cx="140" cy="90" r="40" fill="#0A3C6E"/><text x="140" y="98" fill="#fff">MA</text>
+            <circle cx="140" cy="230" r="40" fill="#0A3C6E"/><text x="140" y="238" fill="#fff">EA</text>
+            <circle cx="860" cy="90" r="40" fill="#0A3C6E"/><text x="860" y="98" fill="#fff">JO</text>
+            <circle cx="860" cy="230" r="40" fill="#0A3C6E"/><text x="860" y="238" fill="#fff">PO</text>
+          </g>
+          <g font-family="Ubuntu, Helvetica" font-size="16" fill="#C4E4F7">
+            <text x="80" y="96" text-anchor="end">Maria · A</text><text x="80" y="236" text-anchor="end">Elena · B</text>
+            <text x="920" y="96">James · B</text><text x="920" y="236">Priya · A</text>
+          </g>
+          <path d="M190 225 C 420 225, 580 95, 808 95" stroke="#F2B632" stroke-width="3" stroke-dasharray="10 9" fill="none"/>
+          <path d="M810 225 C 580 225, 420 95, 192 95" stroke="#F2B632" stroke-width="3" stroke-dasharray="10 9" fill="none"/>
+          <circle cx="500" cy="160" r="30" fill="#0E2740" stroke="#F2B632" stroke-width="3"/>
+          <text x="500" y="172" fill="#F2B632" font-size="34" font-weight="700" text-anchor="middle" font-family="Ubuntu, Helvetica">?</text>
+        </svg>
+        <p>But hospitals can't look at each other's patients. Their records are private, and they should stay that way.</p>
+      </div>
+    </section>
+
+    <!-- 2 · The network -->
+    <section class="beat" id="b2">
+      <div class="rpanel">
+        <div class="eyebrow">The network</div>
+        <h1 class="display">Three hospitals. Three private pods.</h1>
+        <p class="lede">Each hospital keeps its patients in its own data pod, on its own machine. A Flower network connects their agents. Records never move; questions and short answers do.</p>
+        <ul class="netlist" id="netlist"></ul>
+        <button class="btn findbtn" id="findBtn">Find an exchange</button>
+        <div class="findnote" id="findNote"></div>
+      </div>
+    </section>
+
+    <!-- 3 · Step 1 · Ask -->
+    <section class="beat" id="b3">
+      <svg id="flowsvg" viewBox="0 0 1920 900"></svg>
+      <div class="b3head">
+        <div class="eyebrow">Step 1 · Ask</div>
+        <h1 class="display">Alder sends one form. Each hospital fills it from its own pod.</h1>
+      </div>
+      <div class="formcard" id="formcard"><header><b>Screening form</b><span>waiting for the Flower run…</span></header><div class="pending">The coordinator reads Alder's own pod and builds the form.</div></div>
+      <div class="hub">
+        <svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+          <line x1="30" y1="60" x2="60" y2="30" stroke="#1F4A7A" stroke-width="4"/><line x1="60" y1="30" x2="90" y2="60" stroke="#1F4A7A" stroke-width="4"/>
+          <line x1="30" y1="60" x2="60" y2="90" stroke="#1F4A7A" stroke-width="4"/><line x1="60" y1="90" x2="90" y2="60" stroke="#1F4A7A" stroke-width="4"/>
+          <circle cx="60" cy="30" r="9" fill="#0E2740" stroke="#C4E4F7" stroke-width="3"/><circle cx="60" cy="90" r="9" fill="#0E2740" stroke="#C4E4F7" stroke-width="3"/>
+          <circle cx="30" cy="60" r="12" fill="#0E2740" stroke="#4FA3A5" stroke-width="5"/><circle cx="90" cy="60" r="12" fill="#0E2740" stroke="#EC8017" stroke-width="5"/>
+        </svg>
+        <div class="lb"><b>Flower SuperLink</b><span id="runLbl">at Alder</span></div>
+      </div>
+      <div class="lane" id="lane-harbor" style="top:140px"></div>
+      <div class="lane" id="lane-riverbend" style="top:478px"></div>
+    </section>
+
+    <!-- 4 · Step 2 · Review -->
+    <section class="beat" id="b4">
+      <div class="rpanel">
+        <div class="eyebrow">Step 2 · Review</div>
+        <h1 class="display" style="font-size:52px">The answers come back as a form.</h1>
+        <div class="card" style="margin-top:22px">
+          <header>Replies at Alder<span id="respReq"></span></header>
+          <table class="resp" id="respTable"></table>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <header>Alder's review · code</header>
+          <div class="checks" id="reviewChecks"></div>
+          <div class="proposal" id="proposal"></div>
+        </div>
+        <div class="aside" id="aside"></div>
+      </div>
+    </section>
+
+    <!-- 5 · Step 3 · Doctor review -->
+    <section class="beat" id="b5">
+      <div class="b3head">
+        <div class="eyebrow">Step 3 · Evidence and doctor review</div>
+        <h1 class="display">A surgeon signs. A person confirms.</h1>
+      </div>
+      <div class="drop" id="drop">
+        <div class="hint">
+          <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><rect x="14" y="8" width="44" height="56" rx="3" fill="none" stroke="#C4E4F7" stroke-width="2.5"/><path d="M22 22h28M22 30h28M22 38h16" stroke="#C4E4F7" stroke-width="2"/><path d="M22 52c5-7 8-8 10-4s4 4 7-1 5-5 7 0" fill="none" stroke="#F2B632" stroke-width="3" stroke-linecap="round"/></svg>
+          <div class="t">Drop the signed approval form</div>
+          <div class="s">or click to choose an image · or paste it</div>
+        </div>
+        <canvas id="formCanvas"></canvas>
+        <input type="file" id="file" accept="image/*" hidden>
+      </div>
+      <div class="evidence">
+        <div class="card">
+          <header>Extracted from the form<span id="xfSrc">nothing yet</span></header>
+          <div class="xf" id="xf"><div style="grid-column:1/3; color:#6b778c; border:0">Fields are read from the form's QR code, on this machine.</div></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <header>Checks · computer vision and code</header>
+          <div class="checks" id="evChecks"><div class="cl"><span>·</span><span style="color:#6b778c">Waiting for a form.</span></div></div>
+          <div class="confirm">
+            <label><input type="checkbox" id="ack" disabled> I am the reviewing surgeon and I have checked this evidence.</label>
+            <button class="btn locked" id="confirmBtn" disabled>Confirm approval</button>
+            <div class="stamp" id="stamp"><b>REVIEWED</b><span id="stampTxt"></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Reviewed -->
+    <section class="beat" id="b6">
+      <div class="rpanel done-panel">
+        <div class="eyebrow">Reviewed</div>
+        <h1 class="display">Proposed → Reviewed.</h1>
+        <div class="card" style="margin-top:24px">
+          <header>Exchange<span id="doneReq"></span></header>
+          <div class="checks" id="doneLines"></div>
+        </div>
+        <p class="lede" style="font-size:22px">No shared database. No chart left its hospital. A person approved every step.</p>
+      </div>
+    </section>
+
+    <div class="caption" id="caption"></div>
+  </div>
+
+  <div class="wirebar"><span class="lbl">FLOWER</span><div id="wire" style="display:flex; gap:10px; overflow:hidden"></div></div>
+  <div class="foot">
+    <span class="badge" id="badge">…</span>
+    <span class="fine">All patients, donors and hospitals are fictional. Synthetic data.</span>
+    <span class="keys">→ next · ← back · L Flower log · H help</span>
+  </div>
+
+  <div class="overlay" id="logOverlay"><div class="panel"><h2>Flower run log</h2><div class="log" id="log"></div></div></div>
+  <div class="overlay" id="helpOverlay"><div class="panel help" style="width:760px">
+    <h2>Keys</h2>
+    <div><kbd>→ Space</kbd>next</div><div><kbd>←</kbd>back</div>
+    <div><kbd>L</kbd>Flower run log: run id, message ids, every event</div>
+    <div><kbd>R</kbd>reset the story (does not touch Flower)</div><div><kbd>F</kbd>fullscreen</div>
+  </div></div>
+</div>
+
+<script>/*@JSQR@*/</script>
+<script>/*@SOURCE@*/</script>
+<script>
+const RECORDING = /*@RECORDING@*/;
+const HOSP = {
+  alder: { name: 'Alder Medical Center', short: 'Alder', city: 'San Jose', lat: 37.335, lon: -121.89 },
+  harbor: { name: 'Harbor Point Hospital', short: 'Harbor Point', city: 'Oakland', lat: 37.805, lon: -122.27 },
+  riverbend: { name: 'Riverbend General', short: 'Riverbend', city: 'Sacramento', lat: 38.58, lon: -121.49 },
+};
+const LANES = ['harbor', 'riverbend'];
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const chip = b => `<span class="chip ${b}">${b}</span>`;
+
+function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); $('stage').style.transform = `translate(-50%,-50%) scale(${s})`; }
+addEventListener('resize', fit); fit();
+
+// ---------------- State ----------------
+const S = { beat: 0, step: 0, runId: null, nodes: {}, form: null, formBytes: 0, asks: {}, replies: {}, review: null,
+  evidence: null, reviewed: null, started: false, log: [] };
+
+// ---------------- Captions ----------------
+function caption() {
+  const b = S.beat;
+  let c = '';
+  if (b === 0) c = ["Maria's sister wants to give her a kidney. Their blood types don't match.",
+    'Across the bay, James and Priya have the same problem.',
+    'Neither hospital knows the other family exists.'][S.step];
+  else if (b === 1) c = 'The answer may already exist. It is just in someone else\'s records.';
+  else if (b === 2) c = S.started ? 'Starting a Flower run…' : 'One click. One form. Three private pods.';
+  else if (b === 3) {
+    const n = Object.keys(S.replies).length;
+    if (!S.form) c = 'Alder reads only its own pod to write the form.';
+    else if (n === 0) c = 'Each hospital\'s agent opens its own pod. Nothing else.';
+    else if (n < 2) c = 'Answers come back as five fields. Nothing more.';
+    else c = `${answerLine()}`;
+  } else if (b === 4) c = S.review?.proposal ? `Alder only sees ${S.review.proposal.candidate_token}. You know it's James and Priya.` : 'No usable candidate yet.';
+  else if (b === 5) c = S.reviewed ? 'Confirmed by a person.' : (S.evidence?.pass ? 'The evidence checks out. The surgeon still has to confirm.' : 'The form is read here. The image never leaves Alder.');
+  else c = 'No shared database. A person at every step.';
+  const el = $('caption');
+  el.classList.toggle('narrow', [2, 4, 6].includes(b));
+  el.classList.toggle('left', b === 5);
+  if (el.textContent !== c) { el.style.opacity = 0; setTimeout(() => { el.textContent = c; el.style.opacity = 1; }, 200); }
+}
+function answerLine() {
+  const h = S.replies.harbor, r = S.replies.riverbend;
+  return `Harbor Point: ${h?.candidate_found ? 'candidate found' : 'no candidate'}. Riverbend: ${r?.candidate_found ? 'candidate found' : 'no candidate, so it widens the search'}.`;
+}
+
+// ---------------- Badge ----------------
+function badge() {
+  const b = $('badge');
+  if (Source.live) { b.className = 'badge live'; b.textContent = `LIVE · Flower${S.runId ? ' run ' + S.runId : ''} · ${Object.keys(S.nodes).length || '–'} SuperNodes`; }
+  else { b.className = 'badge'; b.textContent = `REPLAY · recorded Flower run ${RECORDING?.run_id ?? '—'}`; }
+}
+
+// ---------------- Navigation ----------------
+function show(beat, step = 0) {
+  S.beat = Math.max(0, Math.min(6, beat)); S.step = step;
+  document.querySelectorAll('.beat').forEach(el => el.classList.toggle('on', el.id === 'b' + S.beat));
+  document.querySelectorAll('#nav span').forEach(el => el.classList.toggle('on', el.dataset.b.split(',').includes(String(S.beat))));
+  $('map').classList.toggle('on', [2, 4, 6].includes(S.beat));
+  if (S.beat === 0) ['fam1', 'fam2', 'stat'].forEach((id, i) => $(id).classList.toggle('in', i <= S.step));
+  if ([2, 4, 6].includes(S.beat)) drawMap();
+  if (S.beat === 4) renderReview();
+  if (S.beat === 6) renderDone();
+  caption();
+}
+function next() {
+  if (S.beat === 0 && S.step < 2) return show(0, S.step + 1);
+  if (S.beat === 2 && !S.started) return find();
+  if (S.beat === 5 && !S.reviewed) return;
+  show(S.beat + 1);
+}
+function back() { if (S.beat === 0 && S.step > 0) return show(0, S.step - 1); show(S.beat - 1, S.beat - 1 === 0 ? 2 : 0); }
+
+// ---------------- Network list (beat 2) ----------------
+const POD = (c = '#4FA3A5') => `<svg class="pod" width="22" height="26" viewBox="0 0 22 26"><ellipse cx="11" cy="5" rx="9" ry="3.5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 5v15c0 2 4 3.5 9 3.5s9-1.5 9-3.5V5" fill="none" stroke="${c}" stroke-width="2"/><path d="M2 12.5c0 2 4 3.5 9 3.5s9-1.5 9-3.5" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
+function renderNet() {
+  const rows = [
+    ['alder', 'coordinator · Flower SuperLink + ServerApp'],
+    ['harbor', 'hospital agent · Flower SuperNode + ClientApp'],
+    ['riverbend', 'hospital agent · Flower SuperNode + ClientApp'],
+  ];
+  $('netlist').innerHTML = rows.map(([id, role]) => {
+    const node = Object.entries(S.nodes).find(([, h]) => h === id);
+    return `<li>${POD()}<span>${HOSP[id].name} · ${HOSP[id].city}<br><small>${role}</small></span><small>${node ? 'node ' + String(node[0]).slice(0, 8) : 'own data pod'}</small></li>`;
+  }).join('');
+}
+
+// ---------------- Map ----------------
+const LAT_MAX = 38.66, LAT_MIN = 37.22, K = 900 / (LAT_MAX - LAT_MIN), LON_MIN = -123.2, COS = 0.79;
+const P = (lat, lon) => [(lon - LON_MIN) * COS * K, (LAT_MAX - lat) * K];
+const path = (pts, close) => pts.map((p, i) => (i ? 'L' : 'M') + P(p[0], p[1]).map(n => n.toFixed(1)).join(' ')).join('') + (close ? 'Z' : '');
+const COAST = [[39.5, -123.78], [39.0, -123.72], [38.75, -123.5], [38.6, -123.34], [38.45, -123.12], [38.31, -123.06], [38.24, -122.97], [38.1, -122.96], [38.0, -123.02], [37.99, -122.83], [37.94, -122.74], [37.9, -122.68], [37.83, -122.53], [37.826, -122.48], [37.79, -122.505], [37.73, -122.51], [37.63, -122.495], [37.5, -122.5], [37.4, -122.42], [37.25, -122.41], [37.11, -122.33], [37.0, -122.18], [36.96, -122.03], [36.97, -121.95], [36.95, -121.88], [36.85, -121.8], [36.6, -121.9], [36.5, -121.95], [36.5, -119.5], [39.5, -119.5]];
+const BAY = [[37.826, -122.475], [37.855, -122.475], [37.89, -122.5], [37.93, -122.49], [37.96, -122.49], [38.02, -122.5], [38.06, -122.48], [38.1, -122.4], [38.12, -122.3], [38.09, -122.24], [38.06, -122.22], [38.045, -122.12], [38.07, -122.05], [38.08, -121.95], [38.05, -121.88], [38.03, -121.88], [38.02, -121.95], [38.02, -122.1], [38.03, -122.2], [38.0, -122.3], [37.96, -122.39], [37.92, -122.385], [37.9, -122.32], [37.86, -122.305], [37.82, -122.3], [37.79, -122.285], [37.77, -122.26], [37.75, -122.23], [37.72, -122.21], [37.69, -122.17], [37.63, -122.15], [37.57, -122.11], [37.52, -122.05], [37.47, -122.0], [37.44, -121.96], [37.45, -122.02], [37.46, -122.1], [37.49, -122.17], [37.52, -122.21], [37.56, -122.26], [37.59, -122.3], [37.62, -122.36], [37.66, -122.38], [37.71, -122.38], [37.74, -122.37], [37.78, -122.385], [37.805, -122.405], [37.808, -122.43], [37.81, -122.465]];
+const RIVER = [[38.04, -121.88], [38.06, -121.75], [38.1, -121.62], [38.16, -121.66], [38.24, -121.58], [38.33, -121.56], [38.45, -121.51], [38.58, -121.51], [38.72, -121.6]];
+const HWYS = [
+  [[37.83, -122.29], [37.93, -122.32], [38.02, -122.26], [38.1, -122.21], [38.25, -122.04], [38.36, -121.97], [38.55, -121.74], [38.58, -121.5]],
+  [[37.805, -122.27], [37.725, -122.175], [37.6, -122.05], [37.48, -121.93], [37.335, -121.89]],
+  [[37.77, -122.41], [37.6, -122.39], [37.45, -122.16], [37.37, -121.95], [37.335, -121.89]],
+];
+function marker(id, state) {
+  const h = HOSP[id]; const [x, y] = P(h.lat, h.lon);
+  const ring = { yes: '#4FA3A5', no: '#F2B632', home: '#4FA3A5' }[state] || '#C4E4F7';
+  const stateTxt = { yes: 'CANDIDATE FOUND', no: 'NO CANDIDATE', home: 'COORDINATOR' }[state] || '';
+  const w = 260, ly = y < 150 ? y + 24 : y - 106, lx = id === 'riverbend' ? x - 24 - w : x + 24;
+  return `<g>
+    <circle cx="${x}" cy="${y}" r="28" fill="${ring}" opacity=".16"/>
+    <circle cx="${x}" cy="${y}" r="11" fill="#0E2740" stroke="${ring}" stroke-width="5"/>
+    <rect class="lbl-box" x="${lx}" y="${ly}" width="${w}" height="${stateTxt ? 98 : 78}" rx="3"/>
+    <text class="lbl-name" x="${lx + 12}" y="${ly + 28}">${h.name}</text>
+    <g transform="translate(${lx + 12} ${ly + 40}) scale(.7)">${POD('#C4E4F7').replace('class="pod" ', '')}</g>
+    <text class="lbl-sub" x="${lx + 34}" y="${ly + 56}">${h.city} · own data pod</text>
+    ${stateTxt ? `<text class="lbl-state" x="${lx + 12}" y="${ly + 84}" fill="${ring}">${stateTxt}</text>` : ''}
+  </g>`;
+}
+function arc(a, b, bend, cls) {
+  const [x1, y1] = P(HOSP[a].lat, HOSP[a].lon), [x2, y2] = P(HOSP[b].lat, HOSP[b].lon);
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
+  const cx = mx - dy / len * bend, cy = my + dx / len * bend;
+  return { d: `M${x1} ${y1}Q${cx} ${cy} ${x2} ${y2}`, cx, cy, cls };
+}
+function drawMap() {
+  const rh = S.replies.harbor, rr = S.replies.riverbend;
+  const exchange = S.beat >= 4 && S.review?.proposal;
+  const reviewed = S.beat >= 6 && S.reviewed;
+  const arcs = exchange ? [arc('alder', 'harbor', 70, reviewed ? 'reviewed' : 'proposed'), arc('harbor', 'alder', 70, reviewed ? 'reviewed' : 'proposed')] : [];
+  const [sx, sy] = P(HOSP.riverbend.lat, HOSP.riverbend.lon);
+  const outreach = S.beat >= 4 && rr?.readiness === 'searching_other_regions' ? `
+    <path class="out" d="M${sx} ${sy}L1040 120"/><text class="outlbl" x="1034" y="146" text-anchor="end">→ Sierra Nevada · Reno</text>
+    <path class="out" d="M${sx} ${sy}L1010 290"/><text class="outlbl" x="1004" y="316" text-anchor="end">→ Central Valley · Fresno</text>
+    <path class="out" d="M${sx} ${sy}L720 8"/><text class="outlbl" x="712" y="26" text-anchor="end">Pacific Northwest · Portland ←</text>
+    <text class="outlbl" x="1004" y="338" text-anchor="end" style="fill:#8A97B5; font-size:13px">partner regions · illustrative, outside this network</text>` : '';
+  const [fx, fy] = P(37.775, -122.42), [tx, ty] = P(37.4275, -122.17);
+  const tag = exchange ? (() => {
+    const a = arcs[0]; const label = reviewed ? 'REVIEWED' : 'PROPOSED';
+    return `<g transform="translate(${a.cx + 70} ${a.cy - 10})"><rect x="-6" y="-26" width="${reviewed ? 138 : 136}" height="38" rx="3" fill="${reviewed ? '#4FA3A5' : '#F2B632'}"/><text x="8" y="0" fill="#0E2740" font-weight="700" font-size="20" letter-spacing="2" font-family="Ubuntu, Helvetica">${label}</text></g>
+      <text x="${a.cx + 64}" y="${a.cy + 34}" fill="#C4E4F7" font-size="15" font-family="Ubuntu, Helvetica">Elena → candidate ${esc(S.review.proposal.candidate_token)}</text>
+      <text x="${a.cx + 64}" y="${a.cy + 54}" fill="#C4E4F7" font-size="15" font-family="Ubuntu, Helvetica">candidate's donor → Maria</text>`;
+  })() : '';
+  $('map').innerHTML = `
+    <defs><linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="#0E2740" stop-opacity="0"/><stop offset="1" stop-color="#0E2740" stop-opacity=".95"/></linearGradient></defs>
+    <rect width="1920" height="900" fill="#081424" opacity=".45"/>
+    <path class="land" d="${path(COAST, true)}${path(BAY, true)}"/>
+    <path class="river" d="${path(RIVER)}"/>
+    ${HWYS.map(h => `<path class="hwy" d="${path(h)}"/>`).join('')}
+    <text class="city" x="${fx - 120}" y="${fy + 6}">San Francisco</text>
+    <circle cx="${tx}" cy="${ty}" r="5" fill="#F2B632"/><text class="city" x="${tx - 12}" y="${ty + 26}" text-anchor="end" style="fill:#F2B632">Stanford · you are here</text>
+    ${arcs.map(a => `<path class="arc ${a.cls}" d="${a.d}"/>`).join('')}
+    ${outreach}
+    ${marker('alder', 'home')}
+    ${marker('harbor', S.beat >= 4 && rh ? (rh.candidate_found ? 'yes' : 'no') : '')}
+    ${marker('riverbend', S.beat >= 4 && rr ? (rr.candidate_found ? 'yes' : 'no') : '')}
+    ${tag}
+    <rect x="1000" y="0" width="120" height="900" fill="url(#fade)"/><rect x="1120" y="0" width="800" height="900" fill="#0E2740" opacity=".95"/>`;
+}
+
+// ---------------- Wire strip + log ----------------
+function wire(dir, text) {
+  const el = document.createElement('span');
+  el.className = 'pkt ' + dir;
+  el.innerHTML = text;
+  $('wire').prepend(el);
+  while ($('wire').children.length > 5) $('wire').lastChild.remove();
+}
+function log(e) {
+  S.log.push(e);
+  const line = e.type === 'flwr.log' ? `flwr │ ${e.line}` : `${e.who || ''} · ${e.type} ${JSON.stringify(Object.fromEntries(Object.entries(e).filter(([k]) => !['type', 'who', 't', 'seq'].includes(k))))}`;
+  const div = $('log');
+  div.textContent += line.slice(0, 600) + '\n';
+}
+
+// ---------------- Step 1: form, hub, lanes ----------------
+const LANE_STEPS = [
+  { t: 'Form arrives', s: 'Flower message from Alder' },
+  { t: 'Opens its own pod', s: 'pairs · availability notes · rulebook', pod: true },
+  { t: 'Retrieves', s: 'relevant pairs and rules (BM25)' },
+  { t: 'Screens in code', s: 'blood type + crossmatch, both ways' },
+  { t: 'Decides', s: 'readiness, or what to do next' },
+];
+function renderLane(h) {
+  const node = Object.entries(S.nodes).find(([, x]) => x === h);
+  $('lane-' + h).innerHTML = `
+    <div class="lh"><b>${HOSP[h].name}<small>${HOSP[h].city} · SuperNode ${node ? String(node[0]).slice(0, 10) : '…'}</small></b><em>Runs on ${HOSP[h].short}'s machine. Alder sees only the reply.</em></div>
+    <div class="boxes">${LANE_STEPS.map((s, i) => `<div class="box" id="bx-${h}-${i}">${s.pod ? POD() : ''}<div class="bn">STEP ${i + 1}</div><div class="bt">${s.t}</div><div class="bs" id="bs-${h}-${i}">${s.s}</div></div>`).join('')}</div>
+    <div class="result">
+      <div class="reply" id="rp-${h}"><header><span>Reply · restricted to 5 fields</span><span id="rpb-${h}"></span></header><div class="wait">waiting for ${HOSP[h].short}'s reply…</div></div>
+      <div class="verdict" id="vd-${h}"><span class="chipbig">WORKING</span><div class="sub">Alder cannot see inside ${HOSP[h].short}'s pod.</div></div>
+    </div>`;
+}
+const laneTimers = {};
+function setBox(h, i, cls) { const el = $(`bx-${h}-${i}`); if (el) { el.classList.remove('active', 'done'); if (cls) el.classList.add(cls); } }
+function startLane(h, bytes) {
+  (laneTimers[h] || []).forEach(clearTimeout);
+  laneTimers[h] = [];
+  $(`bs-${h}-0`).textContent = `Flower message · ${bytes} B`;
+  const step = REDUCED ? 50 : 1350;
+  LANE_STEPS.forEach((_, i) => {
+    laneTimers[h].push(setTimeout(() => { if (S.replies[h]) return; if (i) setBox(h, i - 1, 'done'); setBox(h, i, 'active'); }, i * step + 700));
+  });
+}
+async function finishLane(h, r, bytes) {
+  (laneTimers[h] || []).forEach(clearTimeout);
+  for (let i = 0; i < 5; i++) { setBox(h, i, 'done'); }
+  $(`bs-${h}-4`).textContent = r.candidate_found ? `readiness: ${r.readiness}` : (r.readiness === 'searching_other_regions' ? 'no local match → partner regions' : 'no local match');
+  $(`rpb-${h}`).textContent = `${bytes} B`;
+  const rows = [['request_id', r.request_id], ['candidate_token', r.candidate_token || '—'], ['candidate_found', String(r.candidate_found)], ['readiness', r.readiness], ['reason', r.reason]];
+  $('rp-' + h).innerHTML = `<header><span>Reply · restricted to 5 fields</span><span>${bytes} B</span></header>` + rows.map(([k, v]) => `<div class="rr"><span>${k}</span><span>${esc(v)}</span></div>`).join('');
+  const rr = $('rp-' + h).querySelectorAll('.rr');
+  for (const el of rr) { await sleep(REDUCED ? 0 : 260); el.classList.add('in'); }
+  $('vd-' + h).innerHTML = r.candidate_found
+    ? `<span class="chipbig yes">CANDIDATE FOUND</span><div class="sub">A pair at ${HOSP[h].short} fits both ways and is ready. Alder gets a token, not a name.</div>`
+    : `<span class="chipbig no">NO CANDIDATE FOUND</span><div class="sub">${r.reason === 'one_way_only' ? 'Only one direction works.' : 'No pair fits.'}${r.readiness === 'searching_other_regions' ? ` ${HOSP[h].short} is widening the search to partner regions:` : ''}</div>
+       ${r.readiness === 'searching_other_regions' ? '<div class="regions"><span>Reno</span><span>Fresno</span><span>Portland</span><span style="border-style:solid;color:#8A97B5;border-color:#8A97B5">illustrative</span></div>' : ''}`;
+}
+function renderForm() {
+  const f = S.form;
+  if (!f) return;
+  $('formcard').innerHTML = `<header><b>Screening form · from Alder</b><span>${esc(f.request_id)} · ${S.formBytes} B · built from Alder's own ${esc(S.alderRead?.file || 'pod')}</span></header>
+    <div class="frow"><span class="k">Our donor</span><span class="v"><span class="mono">${esc(f.donor.token)}</span> · ${chip(f.donor.blood)}<br><span class="mono" style="font-size:13px">HLA ${f.donor.hla.join(' ')}</span></span></div>
+    <div class="frow"><span class="k">Our patient</span><span class="v"><span class="mono">${esc(f.patient.token)}</span> · ${chip(f.patient.blood)}<br><span class="mono" style="font-size:13px">avoid ${f.patient.unacceptable_antigens.join(' ')}</span></span></div>
+    <div class="frow"><span class="k">Window</span><span class="v">${f.window.from} → ${f.window.to}</span></div>
+    <div class="qs">Please answer from your own records:<ol>${f.questions.map(q => `<li>${esc(q)}</li>`).join('')}</ol></div>
+    <div class="not">Not on the form: <s>names</s> · <s>charts</s> · <s>notes</s> · <s>calendars</s></div>`;
+}
+function drawFlowLines(active = {}) {
+  const hubX = 680, hubY = 460;
+  const lane = h => h === 'harbor' ? 190 : 528;
+  const line = (d, c, dash) => `<path d="${d}" stroke="${c}" stroke-width="3" fill="none" ${dash ? 'stroke-dasharray="8 8"' : ''}/>`;
+  $('flowsvg').innerHTML = [
+    line(`M560 460 L${hubX - 60} ${hubY}`, S.form ? '#4FA3A5' : '#1F4A7A', !S.form),
+    ...LANES.map(h => line(`M${hubX + 60} ${hubY} C 760 ${hubY}, 760 ${lane(h)}, 800 ${lane(h)}`,
+      S.replies[h] ? (S.replies[h].candidate_found ? '#4FA3A5' : '#F2B632') : active[h] ? '#C4E4F7' : '#1F4A7A', !S.replies[h])),
+    `<g id="pkts"></g>`,
+  ].join('');
+}
+function flyPacket(h, dir, label) {
+  const g = $('pkts');
+  if (!g) return;
+  const lane = h === 'harbor' ? 190 : 528;
+  const pts = dir === 'out' ? [[560, 460], [740, 460], [800, lane]] : [[800, lane], [740, 460], [560, 460]];
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.innerHTML = `<rect x="-58" y="-15" width="116" height="30" rx="15" fill="#fff"/><text x="0" y="5" text-anchor="middle" fill="#0E2740" font-size="14" font-family="Ubuntu Mono, monospace">${esc(label)}</text>`;
+  g.appendChild(el);
+  const dur = REDUCED ? 10 : 1100, t0 = performance.now();
+  (function frame(now) {
+    const t = Math.min(1, (now - t0) / dur), seg = t < .5 ? 0 : 1, lt = seg ? (t - .5) * 2 : t * 2;
+    const [a, b] = [pts[seg], pts[seg + 1]];
+    el.setAttribute('transform', `translate(${a[0] + (b[0] - a[0]) * lt} ${a[1] + (b[1] - a[1]) * lt})`);
+    if (t < 1) requestAnimationFrame(frame); else setTimeout(() => el.remove(), 250);
+  })(t0);
+}
+
+// ---------------- Step 2: review ----------------
+function renderReview() {
+  const f = S.form, cols = LANES.filter(h => S.replies[h]);
+  $('respReq').textContent = f ? f.request_id : '';
+  const fields = ['request_id', 'candidate_token', 'candidate_found', 'readiness', 'reason'];
+  $('respTable').innerHTML = `<tr><th>Field</th>${cols.map(h => `<th>${HOSP[h].short}</th>`).join('')}</tr>` +
+    fields.map(k => `<tr><td class="k">${k}</td>${cols.map(h => {
+      const v = S.replies[h][k]; const cls = k === 'candidate_found' ? (v ? 't' : 'f') : '';
+      return `<td class="${cls}">${esc(v === '' ? '—' : String(v))}</td>`;
+    }).join('')}</tr>`).join('');
+  const rv = S.review;
+  $('reviewChecks').innerHTML = rv ? rv.checks.map(c => `<div class="cl"><span class="${c.usable ? 'ok' : 'bad'}">${c.usable ? '✓' : '–'}</span><span>${HOSP[c.hospital].short}: ${c.candidate_found ? 'candidate found' : 'no candidate'} · ${c.readiness.replaceAll('_', ' ')} · ${c.reason.replaceAll('_', ' ')} → <b>${c.usable ? 'propose exchange' : (c.readiness === 'searching_other_regions' ? 'keep on file; it is searching other regions' : 'no action')}</b></span></div>`).join('')
+    : '<div class="cl"><span>·</span><span>Waiting for replies.</span></div>';
+  const p = rv?.proposal;
+  $('proposal').innerHTML = p ? `<b>Proposed exchange · ${esc(p.request_id)}</b><br>
+    Alder's donor (Elena) → ${HOSP[p.partner].short} candidate <span class="mono">${esc(p.candidate_token)}</span><br>
+    ${HOSP[p.partner].short} candidate's donor → Alder's patient (Maria)<br>
+    <span style="color:#a86b00">Needs a signed surgeon approval (AMC-KTP-04 ${esc(p.requires)}).</span>` : 'No exchange to propose.';
+  $('aside').textContent = p ? 'Code proposes. It does not decide. A surgeon does.' : '';
+}
+
+// ---------------- Step 3: evidence ----------------
+const FIELD_LABELS = { form: 'Form ID', request_id: 'Request ID', candidate_token: 'Candidate token', recipient_token: 'Recipient token', partner: 'Partner program', surgeon: 'Surgeon', date: 'Date' };
+function loadImage(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; }); }
+function inkRatio(data, w, h, poly, inset) {
+  const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
+  let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const ix = (x1 - x0) * inset, iy = (y1 - y0) * inset;
+  x0 = Math.max(0, Math.round(x0 + ix)); x1 = Math.min(w - 1, Math.round(x1 - ix)); y0 = Math.max(0, Math.round(y0 + iy)); y1 = Math.min(h - 1, Math.round(y1 - iy));
+  let ink = 0, n = 0;
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+    const i = (y * w + x) * 4, g = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+    if (g < 110) ink++; n++;
+  }
+  return n ? ink / n : 0;
+}
+async function handleForm(src) {
+  show(5);
+  let img;
+  try { img = await loadImage(src); } catch { return; }
+  const sc = Math.min(1, 1800 / img.naturalWidth);
+  const w = Math.round(img.naturalWidth * sc), h = Math.round(img.naturalHeight * sc);
+  const cv = $('formCanvas'); cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+  const data = ctx.getImageData(0, 0, w, h).data;
+  $('drop').classList.add('has');
+  S.reviewed = null; $('stamp').classList.remove('on');
+  const checks = [];
+  const qr = typeof jsQR === 'function' ? jsQR(data, w, h) : null;
+  let fields = null;
+  try { fields = qr ? JSON.parse(qr.data) : null; } catch { fields = null; }
+  checks.push({ ok: !!fields, t: fields ? 'Form QR code read' : 'No readable form QR code found' });
+  if (fields) {
+    const L = fields.layout, loc = qr.location;
+    const [qx, qy, qs] = L.qr;
+    const map = (fx, fy) => {
+      const u = (fx - qx) / qs, v = (fy - qy) / qs;
+      return [loc.topLeftCorner.x + u * (loc.topRightCorner.x - loc.topLeftCorner.x) + v * (loc.bottomLeftCorner.x - loc.topLeftCorner.x),
+        loc.topLeftCorner.y + u * (loc.topRightCorner.y - loc.topLeftCorner.y) + v * (loc.bottomLeftCorner.y - loc.topLeftCorner.y)];
+    };
+    const poly = b => [map(b[0], b[1]), map(b[2], b[1]), map(b[2], b[3]), map(b[0], b[3])];
+    const sig = inkRatio(data, w, h, poly(L.sig), 0.06), apr = inkRatio(data, w, h, poly(L.approve), 0.2), dec = inkRatio(data, w, h, poly(L.decline), 0.2);
+    const draw = (b, color, label) => {
+      const p = poly(b); ctx.strokeStyle = color; ctx.lineWidth = Math.max(4, w / 300); ctx.beginPath();
+      p.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); ctx.stroke();
+      ctx.fillStyle = color; ctx.font = `${Math.round(w / 60)}px Ubuntu, Helvetica`; ctx.fillText(label, p[0][0], p[0][1] - 8);
+    };
+    const qp = [loc.topLeftCorner, loc.topRightCorner, loc.bottomRightCorner, loc.bottomLeftCorner];
+    ctx.strokeStyle = '#4FA3A5'; ctx.lineWidth = Math.max(4, w / 300); ctx.beginPath(); qp.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y))); ctx.closePath(); ctx.stroke();
+    draw(L.sig, '#EC8017', `signature · ink ${(sig * 100).toFixed(1)}%`);
+    draw(L.approve, '#EC8017', `approve · ${(apr * 100).toFixed(0)}%`);
+    draw(L.decline, '#8A97B5', `decline · ${(dec * 100).toFixed(0)}%`);
+    const reqId = S.form?.request_id, token = S.review?.proposal?.candidate_token;
+    checks.push({ ok: !!reqId && fields.request_id === reqId, t: `Request ID matches this run${reqId ? '' : ' (no run yet)'}`, v: fields.request_id });
+    checks.push({ ok: !!token && fields.candidate_token === token, t: `Candidate token matches ${HOSP.harbor.short}'s reply`, v: `${fields.candidate_token}${token && fields.candidate_token !== token ? ' ≠ ' + token : ''}` });
+    checks.push({ ok: apr > 0.04, t: '"Approve" box is marked', v: `${(apr * 100).toFixed(0)}% ink` });
+    checks.push({ ok: dec < 0.02, t: '"Do not approve" box is empty', v: `${(dec * 100).toFixed(0)}% ink` });
+    checks.push({ ok: sig > 0.008, t: 'Signature present in the signature box', v: `${(sig * 100).toFixed(1)}% ink` });
+    $('xf').innerHTML = Object.entries(FIELD_LABELS).map(([k, l]) => `<div><span class="k">${l}</span><span class="v">${esc(fields[k] ?? '—')}</span></div>`).join('');
+    $('xfSrc').textContent = 'from the form QR · on this machine';
+  } else {
+    $('xf').innerHTML = '<div style="grid-column:1/3;border:0;color:#b3261e">Could not read the form. Try a sharper image.</div>';
+  }
+  const pass = checks.every(c => c.ok);
+  S.evidence = { pass, fields, checks };
+  $('evChecks').innerHTML = checks.map(c => `<div class="cl"><span class="${c.ok ? 'ok' : 'bad'}">${c.ok ? '✓' : '✗'}</span><span>${esc(c.t)}${c.v ? ` <span class="mono" style="color:#6b778c;font-size:13px">· ${esc(c.v)}</span>` : ''}</span></div>`).join('') +
+    `<div class="cl"><span></span><span style="color:${pass ? '#2d7f81' : '#b3261e'};font-weight:500">${pass ? 'Evidence complete. Waiting for the surgeon to confirm.' : 'Evidence incomplete. Approval stays locked.'}</span></div>`;
+  $('ack').disabled = !pass; $('ack').checked = false;
+  lockConfirm();
+  caption();
+}
+function lockConfirm() {
+  const ok = S.evidence?.pass && $('ack').checked && !S.reviewed;
+  $('confirmBtn').disabled = !ok; $('confirmBtn').classList.toggle('locked', !ok);
+}
+function confirmApproval() {
+  if (!S.evidence?.pass || !$('ack').checked || S.reviewed) return;
+  const t = new Date().toTimeString().slice(0, 5);
+  S.reviewed = { at: t, surgeon: S.evidence.fields.surgeon, request_id: S.evidence.fields.request_id, token: S.evidence.fields.candidate_token };
+  $('stampTxt').textContent = `${t} · ${S.reviewed.surgeon} · status: Proposed → Reviewed`;
+  $('stamp').classList.add('on');
+  lockConfirm();
+  Source.post('/ui', { type: 'review.confirmed', request_id: S.reviewed.request_id, candidate_token: S.reviewed.token, t: Date.now() / 1000 });
+  caption();
+  setTimeout(() => show(6), REDUCED ? 0 : 1600);
+}
+function renderDone() {
+  const r = S.reviewed, p = S.review?.proposal;
+  $('doneReq').textContent = r?.request_id || '';
+  $('doneLines').innerHTML = r && p ? `
+    <div class="cl"><span class="ok">✓</span><span>Alder's donor (Elena) → ${HOSP[p.partner].short} candidate <span class="mono">${esc(p.candidate_token)}</span></span></div>
+    <div class="cl"><span class="ok">✓</span><span>${HOSP[p.partner].short} candidate's donor → Alder's patient (Maria)</span></div>
+    <div class="cl"><span class="ok">✓</span><span>Reviewed by ${esc(r.surgeon)} at ${r.at} · signed form checked on Alder's machine</span></div>
+    <div class="cl"><span style="color:#a86b00">→</span><span>Next: ${HOSP[p.partner].short}'s surgeon signs on their side (HPH-LD-12 §2.1).</span></div>` : '<div class="cl"><span>·</span><span>Not reviewed yet.</span></div>';
+}
+
+// ---------------- Events ----------------
+function onEvent(e) {
+  if (!e) return;
+  log(e);
+  switch (e.type) {
+    case 'launch': $('findNote').textContent = 'Flower run starting…'; break;
+    case 'run.start': S.runId = e.run_id; $('runLbl').textContent = `run ${e.run_id}`; badge(); break;
+    case 'hospitals': S.nodes = e.nodes; LANES.forEach(renderLane); renderNet(); badge(); break;
+    case 'pod.read': if (e.who === 'coordinator') S.alderRead = e; break;
+    case 'form': S.form = e.request; S.formBytes = e.bytes; renderForm(); drawFlowLines(); caption(); break;
+    case 'ask.sent':
+      S.asks[e.to] = e; drawFlowLines(Object.fromEntries(Object.keys(S.asks).map(h => [h, 1])));
+      flyPacket(e.to, 'out', `form · ${e.bytes} B`); startLane(e.to, e.bytes);
+      wire('out', `<b>→ ${HOSP[e.to].short}</b> · query.screen · msg ${String(e.message_id).slice(0, 8)} · ${e.bytes} B`); caption(); break;
+    case 'reply.received':
+      S.replies[e.from] = e.response;
+      flyPacket(e.from, 'in', `5 fields · ${e.bytes} B`);
+      wire('in', `<b>← ${HOSP[e.from].short}</b> · reply · candidate_found=${e.response.candidate_found} · ${e.bytes} B`);
+      setTimeout(() => { finishLane(e.from, e.response, e.bytes); drawFlowLines(); caption(); }, REDUCED ? 0 : 1000);
+      break;
+    case 'review': S.review = { checks: e.checks, proposal: e.proposal }; if (S.beat === 4) renderReview(); break;
+    case 'run.end': $('findNote').textContent = 'Flower run finished. Press → to review the answers.'; break;
+    case 'flwr.exit': if (e.code) $('findNote').textContent = `flwr run exited with code ${e.code}. Press L for the log.`; break;
+  }
+}
+Source.on((e, meta) => { if (meta.catchUp) return; onEvent(e); });
+
+async function find() {
+  if (S.started) return;
+  S.started = true;
+  S.form = null; S.asks = {}; S.replies = {}; S.review = null;
+  LANES.forEach(renderLane); drawFlowLines(); renderForm();
+  $('findBtn').disabled = true; $('findBtn').textContent = 'Searching…';
+  caption();
+  if (Source.live) {
+    const r = await Source.post('/start');
+    if (!r.ok) { $('findNote').textContent = r.error || 'Could not start the Flower run.'; S.started = false; $('findBtn').disabled = false; $('findBtn').textContent = 'Find an exchange'; return; }
+  }
+  setTimeout(() => show(3), 600);
+  if (!Source.live && RECORDING) Source.replay(RECORDING.events);
+}
+
+// ---------------- Inputs ----------------
+$('findBtn').onclick = find;
+$('confirmBtn').onclick = confirmApproval;
+$('ack').onchange = lockConfirm;
+const drop = $('drop');
+drop.onclick = () => $('file').click();
+$('file').onchange = e => { const f = e.target.files[0]; if (f) handleForm(URL.createObjectURL(f)); e.target.value = ''; };
+['dragenter', 'dragover'].forEach(ev => addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+addEventListener('drop', e => { const f = [...(e.dataTransfer?.files || [])].find(x => x.type.startsWith('image/')); if (f) handleForm(URL.createObjectURL(f)); });
+addEventListener('paste', e => { const it = [...(e.clipboardData?.items || [])].find(x => x.type.startsWith('image/')); if (it) handleForm(URL.createObjectURL(it.getAsFile())); });
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') return;
+  const k = e.key;
+  if (k === 'Escape') { $('logOverlay').classList.remove('on'); $('helpOverlay').classList.remove('on'); return; }
+  if ($('logOverlay').classList.contains('on') && k !== 'l' && k !== 'L') return;
+  if (k === 'ArrowRight' || k === ' ' || k === 'PageDown') { e.preventDefault(); next(); }
+  else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); back(); }
+  else if (k === 'l' || k === 'L') $('logOverlay').classList.toggle('on');
+  else if (k === 'h' || k === 'H') $('helpOverlay').classList.toggle('on');
+  else if (k === 'f' || k === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+  else if (k === 'r' || k === 'R') location.reload();
+});
+
+renderNet(); LANES.forEach(renderLane); drawFlowLines(); badge(); show(0, 0);
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "hospital": "riverbend",
+  "name": "Riverbend General",
+  "city": "Sacramento",
+  "synthetic": true,
+  "pairs": [
+    {"pair_id": "R1", "status": "active",
+     "patient": {"name": "Grace Lin", "initials": "GL", "age": 44, "blood": "A", "unacceptable_antigens": ["A3", "B62"], "list_status": "active"},
+     "donor": {"name": "Sam Lin", "initials": "SL", "relation": "brother", "blood": "O", "hla": ["A3", "A11", "B7", "B62", "DR4", "DR13"]},
+     "why_not_direct": "antibodies: Grace reacts to Sam's A3 and B62"},
+    {"pair_id": "R2", "status": "active",
+     "patient": {"name": "David Park", "initials": "DP", "age": 57, "blood": "A", "unacceptable_antigens": [], "list_status": "active"},
+     "donor": {"name": "Ruth Park", "initials": "RP", "relation": "mother", "blood": "B", "hla": ["A1", "A2", "B8", "B57", "DR3", "DR7"]},
+     "why_not_direct": "blood type"},
+    {"pair_id": "R3", "status": "active",
+     "patient": {"name": "Aisha Bello", "initials": "AB", "age": 35, "blood": "A", "unacceptable_antigens": ["DR4"], "list_status": "active"},
+     "donor": {"name": "Malik Bello", "initials": "MB", "relation": "husband", "blood": "B", "hla": ["A23", "A30", "B53", "B58", "DR11", "DR13"]},
+     "why_not_direct": "blood type"},
+    {"pair_id": "R4", "status": "active",
+     "patient": {"name": "Tom Reyes", "initials": "TR", "age": 49, "blood": "O", "unacceptable_antigens": [], "list_status": "active"},
+     "donor": {"name": "Nora Reyes", "initials": "NR", "relation": "sister", "blood": "B", "hla": ["A2", "A68", "B44", "B51", "DR1", "DR15"]},
+     "why_not_direct": "blood type"}
+  ]
+}

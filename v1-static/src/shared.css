@@ -1,0 +1,86 @@
+/* Domino shared tokens + components (design language borrowed from unos.org, not its brand) */
+:root {
+  --navy: #0E2740;
+  --navy-2: #13345C;
+  --navy-3: #1B4F8A;
+  --heading: #0A3C6E;
+  --blue: #0C7AC9;
+  --blue-press: #015B98;
+  --band-1: #2B6CB0;
+  --band-2: #1F5A99;
+  --pale: #EEF2F6;
+  --white: #FFFFFF;
+  --divider: #E6E6E6;
+  --tint: #C4E4F7;
+  --teal: #4FA3A5;
+  --orange: #EC8017;
+  --gold: #F2B632;
+  --offline: #8A97B5;
+  --body: #333333;
+  --county: #13345C;
+  --county-stroke: #1F4A7A;
+  --shadow: 0 2px 8px rgba(14, 39, 64, .12);
+  --font: "Ubuntu", Helvetica, Arial, sans-serif;
+  --font-cond: "Ubuntu Condensed", "Ubuntu", Helvetica, Arial, sans-serif;
+  --font-mono: "Ubuntu Mono", ui-monospace, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+button { font-family: var(--font); }
+
+/* 1 · Top bar + teal stripe */
+.topbar {
+  height: 64px; background: var(--navy); color: #fff;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 32px;
+}
+.brand { display: flex; align-items: baseline; gap: 14px; }
+.wordmark { font-weight: 700; font-size: 26px; letter-spacing: .06em; }
+.brand .sub { font-style: italic; font-size: 14px; color: var(--tint); }
+.topnav { display: flex; gap: 28px; align-items: center; }
+.topnav span { font-weight: 500; font-size: 14px; color: #fff; letter-spacing: .02em; }
+.topnav span.on { color: var(--gold); }
+.stripe { height: 6px; background: var(--teal); }
+
+/* Eyebrow + display type */
+.eyebrow { font-style: italic; font-weight: 400; color: var(--tint); }
+.display { font-weight: 700; text-transform: uppercase; line-height: 1.05; margin: 0; }
+
+/* 6 · Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--blue); color: #fff; border: 0; border-radius: 3px;
+  font-weight: 500; font-size: 16px; padding: 12px 18px; cursor: pointer;
+}
+.btn:hover { background: var(--blue-press); }
+.btn:active { background: var(--blue-press); }
+.btn.secondary { background: #fff; color: var(--heading); border: 1px solid var(--divider); }
+.btn.secondary:hover { background: var(--pale); }
+.btn.outline { background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, .7); }
+.btn.outline:hover { background: rgba(255, 255, 255, .08); }
+.btn.locked, .btn:disabled { background: var(--offline); color: #fff; cursor: not-allowed; }
+.btn svg { width: 16px; height: 16px; }
+
+/* Blood-bag chips */
+.chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 34px; height: 26px; padding: 0 8px; border-radius: 3px;
+  font-weight: 700; font-size: 14px; color: #1a1a1a;
+}
+.chip.O { background: #2F6FED; color: #fff; }
+.chip.A { background: #F2C94C; }
+.chip.B { background: #F28DB2; }
+.chip.AB { background: #F3F4F6; }
+
+/* Link pill (connection state) */
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500;
+  padding: 5px 10px; border-radius: 3px; border: 1px solid rgba(255, 255, 255, .25); color: #fff;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--offline); display: inline-block; }
+.dot.on { background: var(--teal); box-shadow: 0 0 0 3px rgba(79, 163, 165, .25); }
+.dot.warn { background: var(--gold); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}

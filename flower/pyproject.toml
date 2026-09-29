@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "domino"
+version = "0.2.0"
+description = "Domino: kidney-exchange screening across hospitals with Flower. Each hospital's agent answers from its own data pod; only a restricted reply crosses the wire."
+license = "MIT"
+dependencies = ["flwr>=1.22,<2.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["domino_app"]
+
+[tool.flwr.app]
+publisher = "domino"
+fab-include = ["domino_app/**/*.py"]
+
+[tool.flwr.app.components]
+serverapp = "domino_app.server_app:app"
+clientapp = "domino_app.client_app:app"
+
+[tool.flwr.app.config]
+request-id = "REQ-2026-0929-A1"
+alder-pod = ""
+bridge-url = "http://127.0.0.1:8765"
+pace = 1.0

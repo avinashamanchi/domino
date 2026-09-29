@@ -1,0 +1,54 @@
+{
+  "harbor": {
+    "id": "harbor",
+    "file": "B-harbor-point.html",
+    "name": "Harbor Point Hospital",
+    "short": "Harbor Point",
+    "city": "Oakland",
+    "pickup": "09:30",
+    "drive_h": { "San Jose": 1.0, "Sacramento": 1.5 },
+    "records": [
+      { "id": "HP-K-2291", "organ": "kidney", "side": "left", "blood": "O", "recovered": "06:40", "cold_h": 2.5, "status": "available",
+        "donor": "DN-8841 · 34 y", "notes": "Hypothermic machine perfusion, flows good. Biopsy normal. Cleared for allocation to an outside center." },
+      { "id": "HP-K-2292", "organ": "kidney", "side": "right", "blood": "O", "recovered": "06:40", "cold_h": 2.5, "status": "allocated",
+        "donor": "DN-8841 · 34 y", "notes": "Allocated to a Harbor Point recipient, surgery 11:00." },
+      { "id": "HP-K-2240", "organ": "kidney", "side": "left", "blood": "A", "recovered": "05:10", "cold_h": 4.0, "status": "available",
+        "donor": "DN-8836 · 51 y", "notes": "Static cold storage. Biopsy normal." },
+      { "id": "HP-L-1180", "organ": "liver", "side": "", "blood": "A", "recovered": "07:05", "cold_h": 2.1, "status": "available",
+        "donor": "DN-8839 · 42 y", "notes": "Normothermic perfusion running." },
+      { "id": "HP-H-0417", "organ": "heart", "side": "", "blood": "B", "recovered": "08:20", "cold_h": 0.8, "status": "allocated",
+        "donor": "DN-8842 · 29 y", "notes": "In OR 3 for implant." },
+      { "id": "HP-P-0093", "organ": "pancreas", "side": "", "blood": "O", "recovered": "06:40", "cold_h": 2.5, "status": "hold",
+        "donor": "DN-8841 · 34 y", "notes": "On hold, histology pending." }
+    ]
+  },
+  "riverbend": {
+    "id": "riverbend",
+    "file": "C-riverbend.html",
+    "name": "Riverbend General",
+    "short": "Riverbend",
+    "city": "Sacramento",
+    "pickup": "09:30",
+    "drive_h": { "San Jose": 2.0, "Oakland": 1.5 },
+    "records": [
+      { "id": "RB-K-3310", "organ": "kidney", "side": "left", "blood": "A", "recovered": "04:50", "cold_h": 4.3, "status": "available",
+        "donor": "DN-5520 · 47 y", "notes": "Machine perfusion. Biopsy normal." },
+      { "id": "RB-K-3311", "organ": "kidney", "side": "right", "blood": "A", "recovered": "04:50", "cold_h": 4.3, "status": "available",
+        "donor": "DN-5520 · 47 y", "notes": "Machine perfusion. Biopsy normal." },
+      { "id": "RB-K-3354", "organ": "kidney", "side": "left", "blood": "B", "recovered": "07:30", "cold_h": 1.7, "status": "hold",
+        "donor": "DN-5531 · 63 y", "notes": "On hold, biopsy pending." },
+      { "id": "RB-L-2102", "organ": "liver", "side": "", "blood": "O", "recovered": "06:15", "cold_h": 2.9, "status": "available",
+        "donor": "DN-5527 · 38 y", "notes": "Static cold storage." },
+      { "id": "RB-LU-0231", "organ": "lung", "side": "bilateral", "blood": "O", "recovered": "08:00", "cold_h": 1.2, "status": "available",
+        "donor": "DN-5527 · 38 y", "notes": "Ex vivo lung perfusion." },
+      { "id": "RB-H-0788", "organ": "heart", "side": "", "blood": "AB", "recovered": "07:45", "cold_h": 1.4, "status": "allocated",
+        "donor": "DN-5529 · 55 y", "notes": "Allocated to a Riverbend recipient." }
+    ]
+  },
+  "demoAsk": {
+    "type": "ask",
+    "from": "alder",
+    "question": "Do you have a kidney for a blood type O recipient at Alder Medical Center in San Jose, arriving within 10 hours?",
+    "fields": { "organ": "kidney", "recipient_blood": "O", "destination": "San Jose", "max_transport_h": 10 }
+  }
+}

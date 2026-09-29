@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domino · Alder coordinator</title>
+<style>
+/*@FONTS@*/
+/*@SHARED@*/
+html, body { height: 100%; }
+body { background: var(--navy); overflow: hidden; color: #fff; }
+#stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; overflow: hidden;
+  background: radial-gradient(ellipse at 30% 40%, transparent 55%, rgba(8, 20, 36, .55) 100%), linear-gradient(135deg, #0E2740 0%, #13345C 55%, #1B4F8A 100%); }
+.topbar { position: relative; z-index: 5; }
+.topnav span { font-size: 15px; }
+.topnav span i { font-style: normal; color: var(--tint); margin-right: 6px; font-weight: 400; }
+.topnav span.on i { color: var(--gold); }
+
+.hero { position: absolute; left: 0; right: 0; top: 70px; height: 880px; }
+.slide { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .45s ease; }
+.slide.on { opacity: 1; pointer-events: auto; }
+.caption.narrow { max-width: 598px; }
+.caption { position: absolute; right: 72px; bottom: 26px; max-width: 1180px; text-align: right; color: var(--gold); font-weight: 500; font-size: 36px; line-height: 1.2; z-index: 4; transition: opacity .3s; }
+
+/* Wire + footer */
+.wirebar { position: absolute; left: 0; right: 0; top: 950px; height: 60px; background: rgba(8, 20, 36, .55); border-top: 1px solid rgba(196, 228, 247, .12); display: flex; align-items: center; gap: 14px; padding: 0 32px; overflow: hidden; }
+.wirebar .lbl { font-weight: 700; font-size: 13px; letter-spacing: .12em; color: var(--tint); flex: none; }
+.pkt { flex: none; background: #fff; color: var(--navy); font-family: var(--font-mono); font-size: 15px; padding: 5px 12px; border-radius: 14px; white-space: nowrap; animation: pktIn .5s ease; }
+.pkt b { color: var(--blue); font-weight: 400; }
+.pkt.in b { color: #2d7f81; }
+@keyframes pktIn { from { opacity: 0; transform: translateX(-20px); } }
+.foot { position: absolute; left: 0; right: 0; bottom: 0; height: 70px; background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; border-top: 1px solid rgba(255, 255, 255, .06); }
+.foot .fine { font-size: 14px; color: var(--tint); }
+.foot .keys { font-size: 13px; color: var(--offline); }
+.badge { font-weight: 700; font-size: 13px; letter-spacing: .08em; padding: 7px 12px; border-radius: 3px; border: 1px solid var(--gold); color: var(--gold); }
+.badge.live { border-color: var(--teal); color: var(--teal); }
+
+/* ---------- Slide 1 · Standby + question ---------- */
+.s1-left { position: absolute; left: 72px; top: 44px; width: 1060px; }
+.s1-left .eyebrow { font-size: 22px; }
+.s1-left h1 { font-size: 92px; margin: 10px 0 18px; }
+.s1-left h1 em { font-style: normal; color: var(--gold); }
+.s1-left .sub { font-size: 24px; color: var(--tint); line-height: 1.4; max-width: 980px; margin: 0 0 30px; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); }
+.tile { background: var(--band-1); padding: 20px 20px 18px; min-height: 196px; display: flex; flex-direction: column; gap: 6px; position: relative; }
+.tile:nth-child(even) { background: var(--band-2); }
+.tile::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: transparent; transition: background .3s; }
+.tile svg { width: 34px; height: 34px; }
+.tile .num { font-family: var(--font-cond); font-size: 60px; line-height: 1; font-variant-numeric: tabular-nums; }
+.tile .txt { font-size: 17px; line-height: 1.3; color: #fff; }
+.sources { font-size: 13px; color: var(--offline); margin-top: 14px; line-height: 1.5; max-width: 1040px; }
+
+.s1-right { position: absolute; left: 1210px; top: 44px; width: 638px; }
+.standby { background: rgba(8, 20, 36, .35); border: 1px solid rgba(196, 228, 247, .15); border-radius: 3px; padding: 28px; transition: opacity .4s; }
+.standby .big { font-weight: 700; font-size: 44px; letter-spacing: .04em; }
+.standby .big .dot { width: 14px; height: 14px; margin-right: 12px; vertical-align: middle; animation: breathe 2.4s ease-in-out infinite; }
+@keyframes breathe { 50% { opacity: .35; } }
+.presence { list-style: none; margin: 18px 0 0; padding: 0; }
+.presence li { display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid rgba(196, 228, 247, .12); font-size: 19px; }
+.presence li span:last-child { color: var(--tint); font-size: 15px; }
+
+.qcard { opacity: 0; transform: translateY(12px); transition: opacity .5s, transform .5s; pointer-events: none; }
+.qcard.on { opacity: 1; transform: none; pointer-events: auto; }
+.callout-navy { background: var(--navy); padding: 26px 28px; border-radius: 3px 3px 0 0; }
+.callout-navy .eyebrow { font-size: 16px; }
+.callout-navy .q { font-size: 32px; font-weight: 500; line-height: 1.22; margin: 8px 0 18px; }
+.callout-pale { background: var(--pale); color: var(--body); padding: 18px 28px; border-radius: 0 0 3px 3px; }
+.qfields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; font-size: 17px; }
+.qfields .k { color: #6b778c; font-size: 13px; display: block; margin-bottom: 2px; }
+.qfields b { color: var(--heading); font-weight: 500; font-size: 19px; }
+.notsent { margin-top: 12px; font-size: 14px; color: #6b778c; }
+.notsent s { color: #9aa5b8; }
+
+.replies { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
+.rcard { background: rgba(8, 20, 36, .4); border: 1px solid rgba(196, 228, 247, .15); border-left: 6px solid var(--offline); border-radius: 3px; padding: 14px 18px; transition: border-color .4s; }
+.rcard.yes { border-left-color: var(--teal); }
+.rcard.no { border-left-color: var(--gold); }
+.rhead { display: flex; justify-content: space-between; align-items: baseline; }
+.rhead .h { font-size: 20px; font-weight: 500; }
+.rhead .c { font-size: 14px; color: var(--tint); }
+.track { position: relative; height: 34px; margin: 10px 0 6px; }
+.track::before { content: ""; position: absolute; left: 10px; right: 10px; top: 16px; border-top: 2px dashed rgba(196, 228, 247, .3); }
+.track .end { position: absolute; top: 9px; width: 16px; height: 16px; border-radius: 50%; background: var(--navy); border: 3px solid var(--teal); }
+.track .end.l { left: 2px; }
+.track .end.r { right: 2px; border-color: var(--orange); }
+.track .cap { position: absolute; top: 3px; left: 24px; background: #fff; color: var(--navy); font-family: var(--font-mono); font-size: 14px; padding: 4px 10px; border-radius: 14px; opacity: 0; white-space: nowrap; }
+.rstate { font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; min-height: 28px; }
+.rstate small { font-size: 15px; font-weight: 400; text-transform: none; color: var(--tint); margin-left: 8px; letter-spacing: 0; }
+.rcard.yes .rstate { color: var(--teal); }
+.rcard.no .rstate { color: var(--gold); }
+.simtag { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--gold); border: 1px solid var(--gold); padding: 1px 5px; border-radius: 2px; margin-left: 8px; vertical-align: middle; }
+
+/* ---------- Slide 2 · Route ---------- */
+#map { position: absolute; left: 0; top: 0; width: 1920px; height: 880px; }
+#map .land { fill: var(--county); stroke: var(--county-stroke); stroke-width: 1.5; fill-rule: evenodd; }
+#map .river { fill: none; stroke: #1F4A7A; stroke-width: 3; }
+#map .hwy { fill: none; stroke: rgba(196, 228, 247, .16); stroke-width: 2; stroke-dasharray: 2 5; }
+#map .link { fill: none; stroke: rgba(196, 228, 247, .35); stroke-width: 2; stroke-dasharray: 6 8; }
+#map .route-base { fill: none; stroke: rgba(236, 128, 23, .35); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+#map .route-lit { fill: none; stroke: var(--teal); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+#map .city { fill: var(--offline); font-size: 17px; font-family: var(--font); font-style: italic; }
+#map .lbl-name { fill: #fff; font-size: 21px; font-weight: 500; font-family: var(--font); }
+#map .lbl-sub { fill: var(--tint); font-size: 15px; font-family: var(--font); }
+#map .lbl-box { fill: rgba(14, 39, 64, .88); stroke: rgba(196, 228, 247, .25); }
+#map .state-yes { fill: var(--teal); font-weight: 700; font-size: 15px; letter-spacing: .06em; }
+#map .state-no { fill: var(--gold); font-weight: 700; font-size: 15px; letter-spacing: .06em; }
+.s2-right { position: absolute; left: 1250px; top: 44px; width: 598px; }
+.s2-right .eyebrow { font-size: 20px; }
+.s2-right h1 { font-size: 64px; margin: 8px 0 22px; }
+.split { display: grid; grid-template-columns: 250px 1fr; border-radius: 3px; overflow: hidden; }
+.split .nv { background: var(--navy-2); padding: 20px 22px; display: flex; flex-direction: column; justify-content: center; }
+.split .nv .n { font-family: var(--font-cond); font-size: 120px; line-height: .9; font-variant-numeric: tabular-nums; }
+.split .nv .u { color: var(--tint); font-size: 16px; margin-top: 6px; }
+.split .pl { background: var(--pale); color: var(--body); padding: 18px 20px; font-size: 16px; line-height: 1.45; }
+.split .pl .leg { color: var(--heading); font-weight: 500; font-size: 19px; }
+.split .pl .dim { color: #7a869a; }
+.split .pl hr { border: 0; border-top: 1px solid var(--divider); margin: 10px 0; }
+.rstatus { margin: 20px 0 16px; display: flex; align-items: center; gap: 14px; font-size: 22px; font-weight: 500; }
+.rstatus .clock { margin-left: auto; font-family: var(--font-cond); font-size: 54px; font-variant-numeric: tabular-nums; color: #fff; }
+.rstatus.hold { color: var(--gold); }
+.rstatus.go { color: var(--teal); }
+.tiles.four .tile { min-height: 150px; padding: 16px 14px; }
+.tiles.four .tile .t1 { font-weight: 700; font-size: 17px; }
+.tiles.four .tile .t2 { font-size: 15px; color: var(--tint); }
+.tiles.four .tile { opacity: .55; transition: opacity .4s; }
+.tiles.four .tile.active, .tiles.four .tile.done { opacity: 1; }
+.tiles.four .tile.active::before { background: var(--gold); }
+.tiles.four .tile.done::before { background: var(--teal); }
+.knows { margin-top: 18px; font-size: 15px; color: var(--tint); line-height: 1.5; }
+.knows b { color: #fff; font-weight: 500; }
+
+/* ---------- Slide 3 · Approval ---------- */
+.s3-left { position: absolute; left: 72px; top: 40px; width: 1000px; }
+.s3-left .eyebrow { font-size: 20px; }
+.s3-left h1 { font-size: 60px; margin: 8px 0 22px; }
+.drop { position: relative; height: 470px; border: 2px dashed rgba(196, 228, 247, .45); border-radius: 4px; display: flex; align-items: center; justify-content: center; text-align: center; background: rgba(8, 20, 36, .25); transition: border-color .2s, background .2s; cursor: pointer; }
+.drop.over { border-color: var(--gold); background: rgba(242, 182, 50, .08); }
+.drop .hint .t { font-size: 30px; font-weight: 500; margin-top: 14px; }
+.drop .hint .s { font-size: 18px; color: var(--tint); margin-top: 8px; }
+.drop .hint svg { width: 72px; height: 72px; }
+.views { position: absolute; inset: 16px; display: none; grid-template-columns: 1fr 1fr; gap: 16px; }
+.views.on { display: grid; }
+.view { background: var(--navy); border-radius: 3px; display: flex; flex-direction: column; overflow: hidden; }
+.view .vl { font-size: 14px; color: var(--tint); padding: 10px 12px; border-bottom: 1px solid rgba(196, 228, 247, .12); display: flex; justify-content: space-between; }
+.view .vc { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; }
+.view canvas { max-width: 100%; max-height: 100%; }
+.refrow { margin-top: 12px; display: flex; align-items: center; gap: 14px; font-size: 15px; color: var(--tint); min-height: 44px; }
+.refrow img { height: 44px; background: var(--navy); border-radius: 3px; padding: 4px; }
+.refrow a { color: var(--gold); cursor: pointer; text-decoration: underline; }
+.enroll-banner { position: absolute; top: 12px; left: 12px; right: 12px; background: var(--gold); color: var(--navy); font-weight: 700; padding: 8px 12px; border-radius: 3px; font-size: 15px; display: none; z-index: 2; }
+.enroll-banner.on { display: block; }
+
+.s3-right { position: absolute; left: 1120px; top: 40px; width: 728px; }
+.wcard { background: #fff; color: var(--body); border-radius: 3px; box-shadow: var(--shadow); overflow: hidden; }
+.wcard > header { background: var(--navy); color: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--teal); }
+.wcard > header h2 { margin: 0; font-size: 20px; font-weight: 500; }
+.wcard > header .m { font-size: 13px; color: var(--tint); }
+.cvsteps { list-style: none; margin: 0; padding: 6px 20px 10px; }
+.cvsteps li { display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid #f1f3f6; font-size: 16px; opacity: .4; transition: opacity .3s; }
+.cvsteps li.on { opacity: 1; }
+.cvsteps li:last-child { border-bottom: 0; }
+.cvsteps .ic { width: 22px; height: 22px; border-radius: 50%; background: var(--pale); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--heading); }
+.cvsteps li.ok .ic { background: var(--teal); color: #fff; }
+.cvsteps li.bad .ic { background: #c0392b; color: #fff; }
+.cvsteps .v { font-family: var(--font-mono); font-size: 14px; color: var(--heading); text-align: right; }
+.verdict { margin: 0 20px 16px; padding: 12px 14px; background: var(--pale); border-left: 4px solid var(--offline); font-size: 17px; font-weight: 500; color: var(--heading); }
+.verdict.ok { border-left-color: var(--teal); }
+.verdict.bad { border-left-color: #c0392b; }
+.acard { margin-top: 18px; }
+.acard .abody { padding: 16px 20px 20px; }
+.acard .line { font-size: 17px; margin-bottom: 6px; display: flex; gap: 10px; align-items: center; }
+.acard .btns { display: flex; gap: 12px; margin-top: 14px; }
+.acard .btn { font-size: 18px; padding: 14px 22px; }
+.stamp { margin-top: 14px; display: none; align-items: center; gap: 16px; border: 3px solid var(--teal); border-radius: 4px; padding: 12px 16px; color: var(--heading); animation: pktIn .5s ease; }
+.stamp.on { display: flex; }
+.stamp .st { font-weight: 700; font-size: 26px; letter-spacing: .08em; color: #2d7f81; }
+.stamp .sm { font-size: 14px; color: #6b778c; }
+
+/* Overlays */
+.overlay { position: absolute; inset: 0; background: rgba(8, 20, 36, .78); display: none; align-items: center; justify-content: center; z-index: 20; }
+.overlay.on { display: flex; }
+.pad { background: #fff; color: var(--body); border-radius: 4px; overflow: hidden; width: 1040px; }
+.pad header { background: var(--navy); color: #fff; padding: 14px 20px; font-size: 20px; font-weight: 500; border-bottom: 4px solid var(--teal); }
+.pad canvas { display: block; margin: 20px; border: 1px solid var(--divider); background: #fff; cursor: crosshair; touch-action: none; }
+.pad .row { display: flex; gap: 12px; justify-content: flex-end; padding: 0 20px 20px; }
+.help { background: #fff; color: var(--body); border-radius: 4px; padding: 26px 32px; width: 720px; font-size: 18px; line-height: 1.9; }
+.help h2 { margin: 0 0 8px; color: var(--heading); font-weight: 500; }
+.help kbd { font-family: var(--font-mono); background: var(--pale); border: 1px solid var(--divider); padding: 1px 8px; border-radius: 3px; margin-right: 10px; }
+.help .relay { margin-top: 14px; display: flex; gap: 10px; }
+.help input { font: inherit; font-size: 16px; padding: 8px 10px; border: 1px solid #cfd6df; border-radius: 3px; flex: 1; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <header class="topbar">
+    <div class="brand"><span class="wordmark">DOMINO</span><span class="sub">kidney exchange across hospitals</span></div>
+    <nav class="topnav" id="nav">
+      <span data-n="0"><i>01</i>The question</span>
+      <span data-n="1"><i>02</i>The route</span>
+      <span data-n="2"><i>03</i>The approval</span>
+    </nav>
+  </header>
+  <div class="stripe"></div>
+
+  <div class="hero">
+    <!-- ================= Slide 1 ================= -->
+    <section class="slide" id="slide0">
+      <div class="s1-left">
+        <div class="eyebrow">Standby · Alder Medical Center, San Jose</div>
+        <h1 class="display" id="headline"></h1>
+        <p class="sub">The organ often exists. The hard part is finding it in time, across hospitals that cannot share their records.</p>
+        <div class="tiles" id="statTiles"></div>
+        <div class="sources" id="sources"></div>
+      </div>
+      <div class="s1-right">
+        <div class="standby" id="standby">
+          <div class="eyebrow" style="font-size:16px">Network status</div>
+          <div class="big"><span class="dot on"></span>STANDBY</div>
+          <svg viewBox="0 0 580 170" width="580" height="170" style="margin-top:14px" aria-hidden="true">
+            <line x1="90" y1="85" x2="290" y2="45" stroke="#1F4A7A" stroke-width="3"/>
+            <line x1="90" y1="85" x2="290" y2="125" stroke="#1F4A7A" stroke-width="3"/>
+            <line x1="290" y1="45" x2="440" y2="40" stroke="#1F4A7A" stroke-width="3"/>
+            <line x1="290" y1="125" x2="440" y2="130" stroke="#1F4A7A" stroke-width="3"/>
+            <circle cx="290" cy="45" r="9" fill="#0E2740" stroke="#C4E4F7" stroke-width="2"/>
+            <circle cx="290" cy="125" r="9" fill="#0E2740" stroke="#C4E4F7" stroke-width="2"/>
+            <circle cx="90" cy="85" r="18" fill="#0E2740" stroke="#4FA3A5" stroke-width="5"/>
+            <circle cx="440" cy="40" r="15" fill="#0E2740" stroke="#EC8017" stroke-width="5" id="nodeHarbor"/>
+            <circle cx="440" cy="130" r="15" fill="#0E2740" stroke="#EC8017" stroke-width="5" id="nodeRiver"/>
+            <text x="90" y="135" fill="#C4E4F7" font-size="15" text-anchor="middle" font-family="Ubuntu, Helvetica, Arial">Alder</text>
+            <text x="466" y="45" fill="#C4E4F7" font-size="15" font-family="Ubuntu, Helvetica, Arial">Harbor</text>
+            <text x="466" y="135" fill="#C4E4F7" font-size="15" font-family="Ubuntu, Helvetica, Arial">Riverbend</text>
+          </svg>
+          <ul class="presence" id="presence"></ul>
+          <div style="margin-top:16px; color: var(--tint); font-size: 16px">Press <b style="color:#fff">→</b> to pose the question.</div>
+        </div>
+
+        <div class="qcard" id="qcard" style="position:absolute; top:0; left:0; right:0">
+          <div class="callout-navy">
+            <div class="eyebrow">The question · from Alder Medical Center</div>
+            <div class="q">Does any hospital have a kidney for our patient tonight?</div>
+            <button class="btn" id="askBtn">Ask the network<span style="opacity:.7; font-size:13px">(A)</span></button>
+          </div>
+          <div class="callout-pale">
+            <div class="qfields">
+              <div><span class="k">Organ</span><b>Kidney</b></div>
+              <div><span class="k">Recipient blood type</span><span class="chip O">O</span></div>
+              <div><span class="k">Deliver to</span><b>San Jose</b></div>
+              <div><span class="k">Arrive within</span><b>10 hours</b></div>
+            </div>
+            <div class="notsent">Not sent: <s>patient name</s> · <s>chart</s> · <s>HLA</s> · <s>antibodies</s></div>
+          </div>
+          <div class="replies" id="replies"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Slide 2 ================= -->
+    <section class="slide" id="slide1">
+      <svg id="map" viewBox="0 0 1920 880" aria-label="Map of the San Francisco Bay Area and Sacramento"></svg>
+      <div class="s2-right">
+        <div class="eyebrow" id="routeEyebrow">The route</div>
+        <h1 class="display" id="routeTitle">Oakland → San Jose</h1>
+        <div class="split">
+          <div class="nv"><div class="n" id="driveH">1.0<span style="font-size:60px"> h</span></div><div class="u" id="driveU">drive · ≈ 40 mi · I-880 S</div></div>
+          <div class="pl" id="routeLegs"></div>
+        </div>
+        <div class="rstatus hold" id="rstatus"><span id="rstatusText">Awaiting surgeon approval</span><span class="clock" id="simClock">09:24</span></div>
+        <div class="tiles four" id="legTiles"></div>
+        <div class="knows">Alder knows: <b>yes · kidney · 1.0 h away</b>. Alder never saw: the donor, the record, the notes.</div>
+      </div>
+    </section>
+
+    <!-- ================= Slide 3 ================= -->
+    <section class="slide" id="slide2">
+      <div class="s3-left">
+        <div class="eyebrow">Approval · Alder Medical Center</div>
+        <h1 class="display">No kidney moves without a surgeon's signature.</h1>
+        <div class="drop" id="drop">
+          <div class="enroll-banner" id="enrollBanner">Enroll mode: the next signature becomes the surgeon's signature on file.</div>
+          <div class="hint" id="dropHint">
+            <svg viewBox="0 0 72 72" aria-hidden="true"><rect x="10" y="14" width="52" height="44" rx="3" fill="none" stroke="#C4E4F7" stroke-width="2.5"/><path d="M18 44c6-10 10-12 12-6s4 6 8-2 6-8 8 0 4 4 8 0" fill="none" stroke="#F2B632" stroke-width="3" stroke-linecap="round"/></svg>
+            <div class="t">Drop a photo of the signed approval</div>
+            <div class="s">or click to choose a file · paste an image · press P to sign on screen</div>
+          </div>
+          <div class="views" id="views">
+            <div class="view"><div class="vl"><span>Photo</span><span id="vl1"></span></div><div class="vc"><canvas id="cvOrig"></canvas></div></div>
+            <div class="view"><div class="vl"><span>What the model sees</span><span id="vl2"></span></div><div class="vc"><canvas id="cvMask"></canvas></div></div>
+          </div>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+        <div class="refrow" id="refrow"></div>
+      </div>
+      <div class="s3-right">
+        <div class="wcard">
+          <header><h2>Computer-vision signature check</h2><span class="m">runs on this machine · image never sent</span></header>
+          <ol class="cvsteps" id="cvsteps"></ol>
+          <div class="verdict" id="verdict">Waiting for a signature.</div>
+        </div>
+        <div class="wcard acard">
+          <header><h2>Surgeon approval</h2>
+            <svg width="30" height="30" viewBox="0 0 30 30" aria-label="audit mark"><path d="M3 10V3h7" fill="none" stroke="#EC8017" stroke-width="3"/><path d="M20 3h7v7M27 20v7h-7M10 27H3v-7" fill="none" stroke="#fff" stroke-width="3"/><path d="M15 9v12M9 15h12" stroke="#4FA3A5" stroke-width="3"/></svg>
+          </header>
+          <div class="abody">
+            <div class="line">Kidney from <b id="apFrom">Harbor Point · Oakland</b></div>
+            <div class="line">Donor blood <span class="chip O">O</span> → recipient <span class="chip O">O</span> · arrives in <b id="apEta">1.0 h</b></div>
+            <div class="line" style="color:#6b778c; font-size:15px">The computer checks the signature. The surgeon decides.</div>
+            <div class="btns">
+              <button class="btn locked" id="approveBtn" disabled>
+                <svg viewBox="0 0 16 16" id="lockIc"><rect x="3" y="7" width="10" height="8" rx="1" fill="#fff"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="#fff" stroke-width="1.6"/></svg>
+                <span id="approveTxt">Approve &amp; dispatch</span></button>
+              <button class="btn secondary" id="declineBtn">Not this time</button>
+            </div>
+            <div class="stamp" id="stamp">
+              <svg width="44" height="44" viewBox="0 0 30 30"><path d="M3 10V3h7" fill="none" stroke="#EC8017" stroke-width="3"/><path d="M20 3h7v7M27 20v7h-7M10 27H3v-7" fill="none" stroke="#0E2740" stroke-width="3"/><path d="M15 9v12M9 15h12" stroke="#4FA3A5" stroke-width="3"/></svg>
+              <div><div class="st">APPROVED</div><div class="sm" id="stampSm"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="caption" id="caption"></div>
+  </div>
+
+  <div class="wirebar"><span class="lbl">WIRE</span><div id="wire" style="display:flex; gap:10px; overflow:hidden"></div></div>
+  <div class="foot">
+    <span class="badge" id="badge">REHEARSAL · LOCAL ONLY</span>
+    <span class="fine">All patients, donors and hospitals are fictional. Synthetic data.</span>
+    <span class="keys">→ next · ← back · A ask · P sign · R reset · H help</span>
+  </div>
+
+  <div class="overlay" id="padOverlay">
+    <div class="pad">
+      <header>Sign on screen</header>
+      <canvas id="padCanvas" width="1000" height="320"></canvas>
+      <div class="row">
+        <button class="btn secondary" id="padClear">Clear</button>
+        <button class="btn secondary" id="padCancel">Cancel</button>
+        <button class="btn" id="padUse">Use this signature</button>
+      </div>
+    </div>
+  </div>
+  <div class="overlay" id="helpOverlay">
+    <div class="help">
+      <h2>Keys</h2>
+      <div><kbd>→ Space</kbd>next step / slide</div>
+      <div><kbd>←</kbd>previous slide</div>
+      <div><kbd>A</kbd>ask the network · <kbd>S</kbd>simulate a missing hospital</div>
+      <div><kbd>P</kbd>sign on screen · <kbd>E</kbd>enroll the surgeon's signature on file</div>
+      <div><kbd>R</kbd>reset everything (also resets the hospital pages) · <kbd>F</kbd>fullscreen</div>
+      <form class="relay" id="relayForm"><input id="relayIn" placeholder="relay address, e.g. 192.168.1.20:8765"><button class="btn" type="submit">Connect</button></form>
+      <div style="font-size:14px; color:#6b778c; margin-top:8px" id="relayNow"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/*@BUS@*/
+</script>
+<script>
+// ======================================================================
+// Content you may edit before presenting
+// ======================================================================
+const HEADLINE = '<em>28,000</em> organs a year never reach a patient.';
+const STATS = [
+  { num: '~90,000', txt: 'people in the U.S. are waiting for a kidney' },
+  { num: '17', txt: 'people die each day waiting for a transplant' },
+  { num: '1 in 4', txt: 'recovered kidneys is never transplanted' },
+  { num: '0', txt: 'patient records shared between hospitals in this demo' },
+];
+const SOURCES = '28,000: estimated U.S. organs left unrecovered each year (Bridgespan Group analysis, cited by the U.S. Senate Finance Committee). ~90,000 kidney waitlist: OPTN. 17 a day: HRSA. 1 in 4 kidneys not used: OPTN/SRTR annual data.';
+const SURGEON = 'Dr. M. Castillo, transplant surgeon';
+const HOSPITALS = {
+  harbor: { name: 'Harbor Point Hospital', short: 'Harbor Point', city: 'Oakland', lat: 37.805, lon: -122.27 },
+  riverbend: { name: 'Riverbend General', short: 'Riverbend', city: 'Sacramento', lat: 38.58, lon: -121.49 },
+};
+const ALDER = { name: 'Alder Medical Center', city: 'San Jose', lat: 37.335, lon: -121.89 };
+const ASK = {
+  question: 'Do you have a kidney for a blood type O recipient at Alder Medical Center in San Jose, arriving within 10 hours?',
+  fields: { organ: 'kidney', recipient_blood: 'O', destination: 'San Jose', max_transport_h: 10 },
+};
+// Rehearsal answers, used only when a hospital page is not connected (badge says so).
+const SIMULATED = { harbor: { answer: 'yes', eta_h: 1.0, reason: 'none' }, riverbend: { answer: 'no', eta_h: null, reason: 'no_compatible_organ' } };
+
+// ======================================================================
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* ignore */ } },
+  del(k) { try { localStorage.removeItem(k); } catch { /* ignore */ } },
+};
+
+// ---------- Stage scaling (1920×1080, never scrolls) ----------
+function fit() {
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+  $('stage').style.transform = `translate(-50%, -50%) scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+// ---------- Wire allowlist for what Alder sends ----------
+const ALLOW = {
+  ask: ['type', 'mid', 'ts', 'id', 'from', 'to', 'question', 'fields'],
+  approve: ['type', 'mid', 'ts', 'ask_id', 'from', 'to', 'decision', 'verified', 'signer_role'],
+  reset: ['type', 'mid', 'ts', 'from'],
+  presence: ['type', 'mid', 'ts', 'from'],
+};
+function sendWire(m, show = true) {
+  const allow = ALLOW[m.type];
+  if (!allow) throw new Error('not allowlisted: ' + m.type);
+  Object.keys(m).forEach(k => { if (!allow.includes(k)) throw new Error('field not allowlisted: ' + k); });
+  const sent = Bus.send(m);
+  if (show) wirePacket('out', sent);
+  return sent;
+}
+function wirePacket(dir, m) {
+  const fields = m.type === 'ask' ? Object.keys(m.fields)
+    : Object.keys(m).filter(k => !['type', 'mid', 'ts', 'from', 'to', 'ask_id', 'id', 'simulated'].includes(k) && m[k] != null).map(k => `${k}=${m[k]}`);
+  const who = dir === 'out' ? `→ ${Array.isArray(m.to) ? m.to.join(',') : (m.to || 'all')}` : `← ${m.from}`;
+  const el = document.createElement('span');
+  el.className = 'pkt ' + dir;
+  el.innerHTML = `<b>${who}</b> · ${m.type}${fields.length ? ' · ' + fields.join(' ') : ''} · ${Bus.bytes(m)} B${m.simulated ? ' · simulated' : ''}`;
+  const w = $('wire');
+  w.prepend(el);
+  while (w.children.length > 5) w.lastChild.remove();
+}
+
+// ---------- State ----------
+const S = {
+  slide: 0, step: 0, ask: null, replies: {}, stages: {}, simulated: {},
+  seen: { harbor: 0, riverbend: 0 }, cv: null, approved: false, dispatched: false, delivered: false,
+  enroll: false, reference: store.get('domino.sigref'),
+};
+
+// ---------- Slide 1 content ----------
+const PIN = `<svg viewBox="0 0 34 34" aria-hidden="true"><path d="M17 3c-6 0-10.8 4.7-10.8 10.5C6.2 21.7 17 32 17 32s10.8-10.3 10.8-18.5C27.8 7.7 23 3 17 3z" fill="none" stroke="#fff" stroke-width="1.6"/><path d="M17 18.6l-3.9-3.7a2.5 2.5 0 0 1 3.6-3.6l.3.3.3-.3a2.5 2.5 0 0 1 3.6 3.6z" fill="#4FA3A5"/></svg>`;
+$('headline').innerHTML = HEADLINE;
+$('statTiles').innerHTML = STATS.map(s => `<div class="tile">${PIN}<div class="num">${s.num}</div><div class="txt">${s.txt}</div></div>`).join('');
+$('sources').textContent = SOURCES;
+
+function renderPresence() {
+  const now = Date.now();
+  $('presence').innerHTML = Object.entries(HOSPITALS).map(([id, h]) => {
+    const on = now - S.seen[id] < 10000;
+    return `<li><span><span class="dot ${on ? 'on' : ''}"></span>&nbsp; ${h.name} · ${h.city}</span><span>${on ? 'agent online' : (Bus.linked ? 'not connected' : 'rehearsal')}</span></li>`;
+  }).join('');
+  $('nodeHarbor').setAttribute('stroke', now - S.seen.harbor < 10000 ? '#4FA3A5' : '#EC8017');
+  $('nodeRiver').setAttribute('stroke', now - S.seen.riverbend < 10000 ? '#4FA3A5' : '#EC8017');
+}
+
+function renderReplies() {
+  $('replies').innerHTML = Object.entries(HOSPITALS).map(([id, h]) => `
+    <div class="rcard" id="rc-${id}">
+      <div class="rhead"><span class="h">${h.name}</span><span class="c">${h.city}</span></div>
+      <div class="track"><span class="end l"></span><span class="cap" id="cap-${id}"></span><span class="end r"></span></div>
+      <div class="rstate" id="rs-${id}"><small>waiting for the question</small></div>
+    </div>`).join('');
+}
+function flyCapsule(id, text, dir) {
+  const cap = $('cap-' + id);
+  if (!cap) return;
+  cap.textContent = text;
+  cap.style.transition = 'none';
+  cap.style.opacity = '1';
+  const w = cap.parentElement.clientWidth;
+  const from = dir === 'out' ? 24 : w - cap.offsetWidth - 24;
+  const to = dir === 'out' ? w - cap.offsetWidth - 24 : 24;
+  cap.style.left = from + 'px';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    cap.style.transition = `left ${REDUCED ? 1 : 700}ms ease, opacity .3s ease ${REDUCED ? 0 : 900}ms`;
+    cap.style.left = to + 'px';
+    cap.style.opacity = '0';
+  }));
+}
+function setReplyState(id) {
+  const card = $('rc-' + id), st = $('rs-' + id);
+  if (!card) return;
+  const r = S.replies[id];
+  const sim = S.simulated[id] ? '<span class="simtag">SIMULATED</span>' : '';
+  if (r) {
+    card.className = 'rcard ' + (r.answer === 'yes' ? 'yes' : 'no');
+    st.innerHTML = r.answer === 'yes'
+      ? `Yes · kidney available<small>${Number(r.eta_h).toFixed(1)} h from San Jose</small>${sim}`
+      : `No<small>no compatible kidney</small>${sim}`;
+    return;
+  }
+  const stage = S.stages[id];
+  st.innerHTML = stage === 'retrieving' ? '<small>reading its own records…</small>'
+    : stage === 'checking' ? '<small>checking in code…</small>'
+    : S.ask ? '<small>question sent · waiting</small>' : '<small>waiting for the question</small>';
+}
+
+// ---------- Captions ----------
+function caption() {
+  let c = '';
+  if (S.slide === 0) {
+    if (S.step === 0) c = 'Organs exist. Finding one in time, across hospitals, is the hard part.';
+    else if (!S.ask) c = 'One question to every hospital. No name, no chart.';
+    else if (Object.keys(S.replies).length < 2) c = "Each hospital's agent reads only its own records.";
+    else c = `${answerLine()} Not one record left either hospital.`;
+  } else if (S.slide === 1) {
+    if (!yesHospital()) c = 'No hospital has a match yet. The question stays open.';
+    else if (S.delivered) c = 'One question. One yes. One signature. A kidney arrives in San Jose.';
+    else if (S.dispatched) c = 'Approved at Alder. Confirmed at Harbor Point. On the road.';
+    else c = 'The route is ready. Nothing moves until a surgeon signs.';
+  } else {
+    if (S.approved) c = 'Approved by a person. Verified by a model. The image never left Alder.';
+    else if (S.cv && S.cv.pass) c = 'Signature verified on this machine. The surgeon still decides.';
+    else c = 'A surgeon signs. A model checks the signature. A person decides.';
+  }
+  const el = $('caption');
+  if (el.textContent !== c) { el.style.opacity = 0; setTimeout(() => { el.textContent = c; el.style.opacity = 1; }, 200); }
+}
+function answerLine() {
+  return Object.entries(S.replies).map(([id, r]) => `${HOSPITALS[id].short}: ${r.answer}.`).join(' ');
+}
+const yesHospital = () => Object.keys(S.replies).find(id => S.replies[id].answer === 'yes');
+
+// ---------- Badge ----------
+function badge() {
+  const b = $('badge');
+  const anySim = Object.keys(S.simulated).length > 0;
+  const online = Object.keys(HOSPITALS).filter(id => Date.now() - S.seen[id] < 10000);
+  if (Bus.linked && !anySim) {
+    b.className = 'badge live';
+    b.textContent = `LIVE · relay ${Bus.base.replace(/^https?:\/\//, '')} · ${online.length}/2 hospital agents online`;
+  } else if (anySim) {
+    b.className = 'badge';
+    b.textContent = `REHEARSAL · ${Object.keys(S.simulated).map(id => HOSPITALS[id].short).join(' + ')} simulated`;
+  } else {
+    b.className = 'badge';
+    b.textContent = Bus.base ? 'REHEARSAL · relay unreachable' : 'REHEARSAL · local only';
+  }
+}
+
+// ---------- Navigation ----------
+function show(slide) {
+  S.slide = Math.max(0, Math.min(2, slide));
+  document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('on', i === S.slide));
+  document.querySelectorAll('#nav span').forEach((el, i) => el.classList.toggle('on', i === S.slide));
+  if (S.slide === 1) enterRoute();
+  if (S.slide === 2) renderApproval();
+  $('caption').classList.toggle('narrow', S.slide === 1);
+  caption();
+}
+function renderStep() {
+  $('standby').style.opacity = S.step === 0 ? 1 : 0;
+  $('qcard').classList.toggle('on', S.step >= 1);
+  caption();
+}
+function next() {
+  if (S.slide === 0) {
+    if (S.step === 0) { S.step = 1; renderStep(); return; }
+    if (!S.ask) { askNetwork(); return; }
+    show(1); return;
+  }
+  if (S.slide === 1) {
+    if (S.delivered || !S.approved) { show(2); return; }
+    return;
+  }
+}
+function back() {
+  if (S.slide === 0 && S.step === 1 && !S.ask) { S.step = 0; renderStep(); return; }
+  show(S.slide - 1);
+}
+
+// ---------- Ask the network ----------
+function askNetwork() {
+  if (S.ask) return;
+  S.step = 1; renderStep();
+  S.ask = sendWire({ type: 'ask', id: 'q-' + Bus.rid(), from: 'alder', to: Object.keys(HOSPITALS), question: ASK.question, fields: ASK.fields });
+  $('askBtn').disabled = true;
+  $('askBtn').innerHTML = 'Question sent';
+  Object.keys(HOSPITALS).forEach(id => { flyCapsule(id, `ask · 4 fields · ${Bus.bytes(S.ask)} B`, 'out'); setReplyState(id); });
+  caption();
+  // Hospitals whose agent is not connected get a clearly labelled rehearsal answer.
+  Object.keys(HOSPITALS).forEach((id, i) => {
+    if (Date.now() - S.seen[id] >= 10000) setTimeout(() => simulate(id), 1800 + i * 1400);
+  });
+}
+function simulate(id) {
+  if (!S.ask || S.replies[id]) return;
+  S.stages[id] = 'retrieving'; setReplyState(id);
+  setTimeout(() => {
+    if (S.replies[id]) return;
+    S.simulated[id] = true;
+    onReply({ type: 'reply', ask_id: S.ask.id, from: id, to: 'alder', organ: 'kidney', ...SIMULATED[id], mid: Bus.rid(), ts: Date.now(), simulated: true });
+  }, 1100);
+}
+function onReply(m) {
+  if (!S.ask || m.ask_id !== S.ask.id || S.replies[m.from]) return;
+  S.replies[m.from] = m;
+  wirePacket('in', m);
+  flyCapsule(m.from, `${m.answer}${m.eta_h ? ' · ' + Number(m.eta_h).toFixed(1) + ' h' : ''} · ${Bus.bytes(m)} B`, 'in');
+  setTimeout(() => setReplyState(m.from), REDUCED ? 0 : 700);
+  badge(); caption();
+  if (S.slide === 1) enterRoute();
+}
+
+// ---------- Map ----------
+const LAT_MAX = 38.66, LAT_MIN = 37.22, K = 880 / (LAT_MAX - LAT_MIN), LON_MIN = -123.2, COS = 0.79;
+const P = (lat, lon) => [(lon - LON_MIN) * COS * K, (LAT_MAX - lat) * K];
+const path = (pts, close) => pts.map((p, i) => (i ? 'L' : 'M') + P(p[0], p[1]).map(n => n.toFixed(1)).join(' ')).join('') + (close ? 'Z' : '');
+const COAST = [[39.5, -123.78], [39.0, -123.72], [38.75, -123.5], [38.6, -123.34], [38.45, -123.12], [38.31, -123.06], [38.24, -122.97], [38.1, -122.96], [38.0, -123.02], [37.99, -122.83], [37.94, -122.74], [37.9, -122.68], [37.83, -122.53], [37.826, -122.48], [37.79, -122.505], [37.73, -122.51], [37.63, -122.495], [37.5, -122.5], [37.4, -122.42], [37.25, -122.41], [37.11, -122.33], [37.0, -122.18], [36.96, -122.03], [36.97, -121.95], [36.95, -121.88], [36.85, -121.8], [36.6, -121.9], [36.5, -121.95], [36.5, -119.5], [39.5, -119.5]];
+const BAY = [[37.826, -122.475], [37.855, -122.475], [37.89, -122.5], [37.93, -122.49], [37.96, -122.49], [38.02, -122.5], [38.06, -122.48], [38.1, -122.4], [38.12, -122.3], [38.09, -122.24], [38.06, -122.22], [38.045, -122.12], [38.07, -122.05], [38.08, -121.95], [38.05, -121.88], [38.03, -121.88], [38.02, -121.95], [38.02, -122.1], [38.03, -122.2], [38.0, -122.3], [37.96, -122.39], [37.92, -122.385], [37.9, -122.32], [37.86, -122.305], [37.82, -122.3], [37.79, -122.285], [37.77, -122.26], [37.75, -122.23], [37.72, -122.21], [37.69, -122.17], [37.63, -122.15], [37.57, -122.11], [37.52, -122.05], [37.47, -122.0], [37.44, -121.96], [37.45, -122.02], [37.46, -122.1], [37.49, -122.17], [37.52, -122.21], [37.56, -122.26], [37.59, -122.3], [37.62, -122.36], [37.66, -122.38], [37.71, -122.38], [37.74, -122.37], [37.78, -122.385], [37.805, -122.405], [37.808, -122.43], [37.81, -122.465]];
+const RIVER = [[38.04, -121.88], [38.06, -121.75], [38.1, -121.62], [38.16, -121.66], [38.24, -121.58], [38.33, -121.56], [38.45, -121.51], [38.58, -121.51], [38.72, -121.6]];
+const HWYS = [
+  [[37.83, -122.29], [37.93, -122.32], [38.02, -122.26], [38.1, -122.21], [38.25, -122.04], [38.36, -121.97], [38.55, -121.74], [38.58, -121.5]],
+  [[37.77, -122.41], [37.6, -122.39], [37.45, -122.16], [37.37, -121.95], [37.335, -121.89]],
+  [[38.04, -122.13], [37.9, -122.06], [37.7, -121.93], [37.53, -121.92], [37.34, -121.85]],
+];
+const ROUTE_880 = [[37.805, -122.27], [37.775, -122.23], [37.725, -122.175], [37.67, -122.1], [37.6, -122.05], [37.545, -121.985], [37.48, -121.93], [37.43, -121.905], [37.37, -121.9], [37.335, -121.89]];
+
+function marker(id, lat, lon, name, sub, state) {
+  const [x, y] = P(lat, lon);
+  const ring = state === 'yes' ? '#4FA3A5' : state === 'no' ? '#F2B632' : state === 'home' ? '#4FA3A5' : '#8A97B5';
+  const stateTxt = state === 'yes' ? 'YES · KIDNEY' : state === 'no' ? 'NO MATCH' : state === 'home' ? 'RECIPIENT' : '';
+  const w = Math.max(name.length * 11 + 24, 170);
+  const ly = y < 140 ? y + 22 : y - 58;
+  return `<g id="mk-${id}">
+    <circle cx="${x}" cy="${y}" r="26" fill="${ring}" opacity=".18"/>
+    <circle cx="${x}" cy="${y}" r="11" fill="#0E2740" stroke="${ring}" stroke-width="5"/>
+    <rect class="lbl-box" x="${x + 22}" y="${ly}" width="${w}" height="${stateTxt ? 80 : 58}" rx="3"/>
+    <text class="lbl-name" x="${x + 34}" y="${ly + 26}">${name}</text>
+    <text class="lbl-sub" x="${x + 34}" y="${ly + 46}">${sub}</text>
+    ${stateTxt ? `<text class="${state === 'no' ? 'state-no' : 'state-yes'}" x="${x + 34}" y="${ly + 70}">${stateTxt}</text>` : ''}
+  </g>`;
+}
+const KIDNEY = 'M-2 -9c-6 0-9 5-9 10s3 8 8 8c3 0 4-2 4-4 0-2-1.5-3-1.5-4.5S1-2 1-4c0-3-1-5-3-5z';
+
+function drawMap() {
+  const yes = yesHospital();
+  const noIds = Object.keys(S.replies).filter(id => S.replies[id].answer === 'no');
+  const [ax, ay] = P(ALDER.lat, ALDER.lon);
+  const links = Object.entries(HOSPITALS).map(([, h]) => {
+    const [hx, hy] = P(h.lat, h.lon);
+    const mx = (ax + hx) / 2 + 90, my = (ay + hy) / 2;
+    return `<path class="link" d="M${ax} ${ay}Q${mx} ${my} ${hx} ${hy}"/>`;
+  }).join('');
+  const [sx, sy] = P(37.4275, -122.17);
+  const [fx, fy] = P(37.775, -122.42);
+  $('map').innerHTML = `
+    <defs><linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="#0E2740" stop-opacity="0"/><stop offset="1" stop-color="#0E2740" stop-opacity=".94"/></linearGradient></defs>
+    <rect width="1920" height="880" fill="#081424" opacity=".45"/>
+    <path class="land" d="${path(COAST, true)}${path(BAY, true)}"/>
+    <path class="river" d="${path(RIVER)}"/>
+    ${HWYS.map(h => `<path class="hwy" d="${path(h)}"/>`).join('')}
+    ${links}
+    <text class="city" x="${fx - 120}" y="${fy + 6}">San Francisco</text>
+    <g><circle cx="${sx}" cy="${sy}" r="6" fill="#F2B632"/><text class="city" x="${sx - 14}" y="${sy + 28}" text-anchor="end" style="fill:#F2B632">Stanford · you are here</text></g>
+    ${yes ? `<path class="route-base" id="routeBase" d="${path(ROUTE_880)}"/><path class="route-lit" id="routeLit" d="${path(ROUTE_880)}"/>` : ''}
+    ${marker('alder', ALDER.lat, ALDER.lon, ALDER.name, ALDER.city, 'home')}
+    ${Object.entries(HOSPITALS).map(([id, h]) => marker(id, h.lat, h.lon, h.name, h.city, S.replies[id]?.answer === 'yes' ? 'yes' : noIds.includes(id) ? 'no' : '')).join('')}
+    <rect x="1080" y="0" width="140" height="880" fill="url(#fade)"/><rect x="1220" y="0" width="700" height="880" fill="#0E2740" opacity=".94"/>
+    ${yes ? `<g id="courier"><circle r="20" fill="#EC8017"/><circle r="27" fill="none" stroke="#F2B632" stroke-width="3" id="courierRing" stroke-dasharray="6 6"/><path d="${KIDNEY}" fill="#fff" transform="translate(2 0)"/></g>` : ''}
+  `;
+  if (yes) {
+    const lit = $('routeLit'), base = $('routeBase');
+    const L = lit.getTotalLength();
+    lit.style.strokeDasharray = `${L}`;
+    lit.style.strokeDashoffset = `${L}`;
+    base.style.strokeDasharray = `${L}`;
+    base.style.strokeDashoffset = `${L}`;
+    base.getBoundingClientRect();
+    base.style.transition = `stroke-dashoffset ${REDUCED ? 1 : 600}ms ease`;
+    base.style.strokeDashoffset = '0';
+    placeCourier(S.delivered ? 1 : S.courierT || 0);
+  }
+}
+function placeCourier(t) {
+  const lit = $('routeLit'), c = $('courier');
+  if (!lit || !c) return;
+  const L = lit.getTotalLength();
+  const p = lit.getPointAtLength(L * t);
+  c.setAttribute('transform', `translate(${p.x} ${p.y})`);
+  lit.style.strokeDashoffset = `${L * (1 - t)}`;
+  $('courierRing').style.display = S.dispatched ? 'none' : '';
+}
+
+const LEG_TILES = [
+  { t1: 'Recovered', t2: 'Oakland' },
+  { t1: 'Approved', t2: 'Alder surgeon' },
+  { t1: 'In transit', t2: 'I-880 S' },
+  { t1: 'Delivered', t2: 'San Jose · 10:30' },
+];
+function renderTiles() {
+  const stage = S.delivered ? 4 : S.dispatched ? 2 : S.approved ? 2 : 1;
+  $('legTiles').innerHTML = LEG_TILES.map((x, i) => {
+    const cls = i < stage ? 'done' : i === stage ? 'active' : '';
+    return `<div class="tile ${cls}">${PIN}<div class="t1">${x.t1}</div><div class="t2">${x.t2}</div></div>`;
+  }).join('');
+}
+function enterRoute() {
+  const yes = yesHospital();
+  const h = yes ? HOSPITALS[yes] : null;
+  $('routeTitle').textContent = h ? `${h.city} → San Jose` : 'No match yet';
+  $('driveH').innerHTML = h ? `${Number(S.replies[yes].eta_h).toFixed(1)}<span style="font-size:60px"> h</span>` : '—';
+  $('driveU').textContent = h ? 'drive · ≈ 40 mi · I-880 S' : 'waiting for a yes';
+  const noLines = Object.entries(S.replies).filter(([, r]) => r.answer === 'no')
+    .map(([id]) => `<div class="dim">${HOSPITALS[id].name}, ${HOSPITALS[id].city} · no compatible kidney</div>`).join('');
+  $('routeLegs').innerHTML = h
+    ? `<div class="leg">${h.name}, ${h.city}<br>→ ${ALDER.name}, ${ALDER.city}</div>
+       <div style="margin-top:6px">Kidney · donor <span class="chip O">O</span> → recipient <span class="chip O">O</span></div><hr>${noLines}`
+    : `<div class="dim">Ask the network on slide 1 first.</div>${noLines}`;
+  renderTiles();
+  const rs = $('rstatus');
+  if (S.delivered) { rs.className = 'rstatus go'; $('rstatusText').textContent = 'Delivered · implant can begin'; }
+  else if (S.dispatched) { rs.className = 'rstatus go'; $('rstatusText').textContent = 'Dispatched 09:30 · arriving 10:30'; }
+  else if (S.approved) { rs.className = 'rstatus go'; $('rstatusText').textContent = 'Approved · waiting for Harbor Point hand-off'; }
+  else { rs.className = 'rstatus hold'; $('rstatusText').textContent = h ? 'Awaiting surgeon approval' : 'No route'; }
+  drawMap();
+  caption();
+}
+
+let courierRun = 0;
+async function runCourier() {
+  if (S.dispatched) return;
+  S.dispatched = true;
+  show(1);
+  const run = ++courierRun;
+  const dur = REDUCED ? 300 : 9000;
+  const t0 = performance.now();
+  await sleep(700);
+  enterRoute();
+  const start = performance.now();
+  (function frame(now) {
+    if (run !== courierRun) return;
+    const t = Math.min(1, (now - start) / dur);
+    const e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    S.courierT = e;
+    placeCourier(e);
+    const mins = Math.round(e * 60);
+    $('simClock').textContent = `${mins < 30 ? '09' : '10'}:${String((30 + mins) % 60).padStart(2, '0')}`;
+    if (t < 1) requestAnimationFrame(frame);
+    else { S.delivered = true; enterRoute(); }
+  })(start);
+  void t0;
+}
+
+// ---------- Computer vision: signature check (all on this machine) ----------
+function loadImage(src) {
+  return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+}
+function analyze(img) {
+  const sc = Math.min(1, 1000 / img.naturalWidth, 800 / img.naturalHeight);
+  const w = Math.max(1, Math.round(img.naturalWidth * sc)), h = Math.max(1, Math.round(img.naturalHeight * sc));
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+  const px = ctx.getImageData(0, 0, w, h).data;
+  const n = w * h, g = new Float32Array(n), hist = new Uint32Array(256);
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    const v = 0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2];
+    g[i] = v; hist[v | 0]++; sum += v;
+  }
+  // Otsu threshold
+  let sumB = 0, wB = 0, best = 0, otsu = 127;
+  for (let t = 0; t < 256; t++) {
+    wB += hist[t]; if (!wB) continue;
+    const wF = n - wB; if (!wF) break;
+    sumB += t * hist[t];
+    const mB = sumB / wB, mF = (sum - sumB) / wF, between = wB * wF * (mB - mF) ** 2;
+    if (between > best) { best = between; otsu = t; }
+  }
+  const darkInk = sum / n > otsu;
+  // Bradley adaptive threshold via integral image (robust to phone-photo lighting)
+  const W1 = w + 1, I = new Float64Array(W1 * (h + 1));
+  for (let y = 0; y < h; y++) {
+    let row = 0;
+    for (let x = 0; x < w; x++) { row += g[y * w + x]; I[(y + 1) * W1 + x + 1] = I[y * W1 + x + 1] + row; }
+  }
+  const half = Math.max(8, Math.round(Math.max(w, h) / 16)), T = 0.15;
+  const ink = new Uint8Array(n);
+  for (let y = 0; y < h; y++) {
+    const y0 = Math.max(0, y - half), y1 = Math.min(h - 1, y + half);
+    for (let x = 0; x < w; x++) {
+      const x0 = Math.max(0, x - half), x1 = Math.min(w - 1, x + half);
+      const area = (x1 - x0 + 1) * (y1 - y0 + 1);
+      const s = I[(y1 + 1) * W1 + x1 + 1] - I[y0 * W1 + x1 + 1] - I[(y1 + 1) * W1 + x0] + I[y0 * W1 + x0];
+      const v = g[y * w + x];
+      ink[y * w + x] = darkInk ? (v * area < s * (1 - T) && v <= otsu + 10) : (v * area > s * (1 + T) && v >= otsu - 10);
+    }
+  }
+  // Connected components (8-neighbour)
+  const lab = new Int32Array(n), comps = [], stack = new Int32Array(n);
+  const minArea = Math.max(6, n * 0.00002);
+  for (let i = 0; i < n; i++) {
+    if (!ink[i] || lab[i]) continue;
+    const id = comps.length + 1;
+    let sp = 0, area = 0, x0 = w, y0 = h, x1 = 0, y1 = 0;
+    stack[sp++] = i; lab[i] = id;
+    while (sp) {
+      const p = stack[--sp], x = p % w, y = (p / w) | 0;
+      area++; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+        const q = ny * w + nx;
+        if (ink[q] && !lab[q]) { lab[q] = id; stack[sp++] = q; }
+      }
+    }
+    const border = x0 === 0 || y0 === 0 || x1 === w - 1 || y1 === h - 1;
+    comps.push({ id, area, x0, y0, x1, y1, keep: area >= minArea && !(border && area > n * 0.02) });
+  }
+  const kept = comps.filter(c => c.keep);
+  const keepSet = new Uint8Array(comps.length + 1);
+  kept.forEach(c => { keepSet[c.id] = 1; });
+  let bx0 = w, by0 = h, bx1 = 0, by1 = 0, inkPx = 0, perim = 0;
+  const mask = new Uint8Array(n);
+  for (let i = 0; i < n; i++) if (lab[i] && keepSet[lab[i]]) mask[i] = 1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = y * w + x;
+    if (!mask[i]) continue;
+    inkPx++;
+    if (x < bx0) bx0 = x; if (x > bx1) bx1 = x; if (y < by0) by0 = y; if (y > by1) by1 = y;
+    if (!mask[i - 1] || !mask[i + 1] || !mask[i - w] || !mask[i + w]) perim++;
+  }
+  const bw = Math.max(1, bx1 - bx0 + 1), bh = Math.max(1, by1 - by0 + 1);
+  const f = {
+    w, h, otsu, inkPx, comps: kept.length, bbox: [bx0, by0, bw, bh],
+    coverage: inkPx / (bw * bh), aspect: bw / bh, widthFrac: bw / w,
+    stroke: perim ? (2 * inkPx) / perim : 0,
+  };
+  f.checks = [
+    { k: 'Ink found', v: `${inkPx} px`, ok: inkPx > 150 },
+    { k: 'Wider than tall', v: `aspect ${f.aspect.toFixed(1)}`, ok: f.aspect >= 1.4 && f.aspect <= 14 },
+    { k: 'Sparse pen strokes', v: `${(f.coverage * 100).toFixed(1)}% ink`, ok: f.coverage >= 0.015 && f.coverage <= 0.35 },
+    { k: 'Few connected strokes', v: `${f.comps} strokes`, ok: f.comps >= 1 && f.comps <= 60 },
+    { k: 'Thin, handwritten line', v: `${f.stroke.toFixed(1)} px wide`, ok: f.stroke > 0 && f.stroke <= Math.max(4, bh * 0.14) },
+  ];
+  f.isSig = f.checks.every(c => c.ok);
+  f.desc = describe(mask, w, f.bbox);
+  return { f, cv, mask };
+}
+// Shape descriptor: 40×12 ink-density grid + horizontal and vertical profiles of the cropped strokes
+function describe(mask, w, [x0, y0, bw, bh]) {
+  const GW = 40, GH = 12, grid = new Float32Array(GW * GH), hp = new Float32Array(GW), vp = new Float32Array(GH);
+  for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) {
+    if (!mask[(y0 + y) * w + x0 + x]) continue;
+    const gx = Math.min(GW - 1, (x / bw * GW) | 0), gy = Math.min(GH - 1, (y / bh * GH) | 0);
+    grid[gy * GW + gx]++; hp[gx]++; vp[gy]++;
+  }
+  const blur = new Float32Array(GW * GH);
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
+    let s = 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const nx = x + dx, ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < GW && ny < GH) s += grid[ny * GW + nx] * (dx || dy ? 0.5 : 1);
+    }
+    blur[y * GW + x] = s;
+  }
+  return { grid: [...blur], hp: [...hp], vp: [...vp], aspect: bw / bh };
+}
+function pearson(a, b) {
+  const n = a.length, ma = a.reduce((s, v) => s + v, 0) / n, mb = b.reduce((s, v) => s + v, 0) / n;
+  let num = 0, da = 0, db = 0;
+  for (let i = 0; i < n; i++) { num += (a[i] - ma) * (b[i] - mb); da += (a[i] - ma) ** 2; db += (b[i] - mb) ** 2; }
+  return da && db ? num / Math.sqrt(da * db) : 0;
+}
+function similarity(d, r) {
+  let s = 0.6 * pearson(d.grid, r.grid) + 0.25 * pearson(d.hp, r.hp) + 0.15 * pearson(d.vp, r.vp);
+  const ar = Math.max(d.aspect, r.aspect) / Math.min(d.aspect, r.aspect);
+  if (ar > 1.5) s *= 0.8;
+  return Math.max(0, s);
+}
+const MATCH_THRESHOLD = 0.5;
+
+function drawViews({ f, cv, mask }) {
+  const [x0, y0, bw, bh] = f.bbox;
+  const fitTo = (c, w, h) => { const s = Math.min(420 / w, 340 / h, 1.5); c.width = Math.round(w * s); c.height = Math.round(h * s); return s; };
+  const o = $('cvOrig'), m = $('cvMask');
+  const s1 = fitTo(o, f.w, f.h);
+  const oc = o.getContext('2d');
+  oc.drawImage(cv, 0, 0, o.width, o.height);
+  if (f.inkPx) { oc.strokeStyle = '#F2B632'; oc.lineWidth = 3; oc.strokeRect(x0 * s1, y0 * s1, bw * s1, bh * s1); }
+  const s2 = fitTo(m, f.w, f.h);
+  const tmp = document.createElement('canvas'); tmp.width = f.w; tmp.height = f.h;
+  const tc = tmp.getContext('2d'), id = tc.createImageData(f.w, f.h);
+  for (let i = 0; i < mask.length; i++) {
+    const on = mask[i];
+    id.data[i * 4] = on ? 79 : 14; id.data[i * 4 + 1] = on ? 163 : 39; id.data[i * 4 + 2] = on ? 165 : 64; id.data[i * 4 + 3] = 255;
+  }
+  tc.putImageData(id, 0, 0);
+  const mc = m.getContext('2d');
+  mc.imageSmoothingEnabled = false;
+  mc.drawImage(tmp, 0, 0, m.width, m.height);
+  if (f.inkPx) { mc.strokeStyle = '#F2B632'; mc.lineWidth = 3; mc.strokeRect(x0 * s2, y0 * s2, bw * s2, bh * s2); }
+  $('vl1').textContent = `${f.w}×${f.h}`;
+  $('vl2').textContent = `threshold: adaptive + Otsu ${f.otsu}`;
+  $('views').classList.add('on');
+  $('dropHint').style.display = 'none';
+  return tmp;
+}
+function thumbOf(tmp, f) {
+  const [x0, y0, bw, bh] = f.bbox, c = document.createElement('canvas');
+  c.height = 60; c.width = Math.max(1, Math.round(60 * bw / bh));
+  c.getContext('2d').drawImage(tmp, x0, y0, bw, bh, 0, 0, c.width, c.height);
+  return c.toDataURL('image/png');
+}
+
+function renderRef() {
+  const r = S.reference;
+  $('refrow').innerHTML = r
+    ? `Signature on file: <img src="${r.thumb}" alt="reference signature"> ${SURGEON} · enrolled ${r.when} · <a id="reEnroll">re-enroll (E)</a> · <a id="forget">forget</a>`
+    : `No signature on file: detection only. <a id="reEnroll">Enroll ${SURGEON.split(',')[0]}'s signature (E)</a>`;
+  $('reEnroll').onclick = e => { e.stopPropagation(); setEnroll(true); };
+  if ($('forget')) $('forget').onclick = e => { e.stopPropagation(); S.reference = null; store.del('domino.sigref'); renderRef(); };
+}
+function setEnroll(on) { S.enroll = on; $('enrollBanner').classList.toggle('on', on); if (on) show(2); }
+
+const CV_STEPS = ['Load image', 'Separate ink from paper', 'Find pen strokes', 'Measure the strokes', 'Compare with signature on file', 'Decision'];
+function renderCvSteps(state = {}) {
+  $('cvsteps').innerHTML = CV_STEPS.map((k, i) => {
+    const s = state[i];
+    return `<li class="${s ? 'on ' + (s.ok === false ? 'bad' : 'ok') : ''}"><span class="ic">${s ? (s.ok === false ? '✗' : '✓') : i + 1}</span><span>${k}</span><span class="v">${s ? s.v : ''}</span></li>`;
+  }).join('');
+}
+
+async function handleImage(src) {
+  let img;
+  try { img = await loadImage(src); } catch { $('verdict').textContent = 'Could not read that image.'; return; }
+  show(2);
+  S.cv = null; S.approved = false;
+  $('stamp').classList.remove('on');
+  lockApprove(true, 'Approve & dispatch');
+  const st = {};
+  renderCvSteps(st);
+  $('verdict').className = 'verdict'; $('verdict').textContent = 'Checking…';
+  const res = analyze(img);
+  const { f } = res;
+  const tmp = drawViews(res);
+  const pace = REDUCED ? 0 : 380;
+  st[0] = { v: `${img.naturalWidth}×${img.naturalHeight}` }; renderCvSteps(st); await sleep(pace);
+  st[1] = { v: `${f.inkPx} ink px`, ok: f.inkPx > 150 }; renderCvSteps(st); await sleep(pace);
+  st[2] = { v: `${f.comps} strokes`, ok: f.checks[3].ok }; renderCvSteps(st); await sleep(pace);
+  const failed = f.checks.filter(c => !c.ok);
+  st[3] = { v: failed.length ? failed.map(c => c.v).join(' · ') : `aspect ${f.aspect.toFixed(1)} · ${(f.coverage * 100).toFixed(1)}% ink`, ok: f.isSig };
+  renderCvSteps(st); await sleep(pace);
+
+  if (S.enroll && f.isSig) {
+    S.reference = { ...f.desc, thumb: thumbOf(tmp, f), when: new Date().toTimeString().slice(0, 5) };
+    store.set('domino.sigref', S.reference);
+    setEnroll(false); renderRef();
+    st[4] = { v: 'enrolled as reference' }; st[5] = { v: 'reference saved' };
+    renderCvSteps(st);
+    $('verdict').className = 'verdict ok';
+    $('verdict').textContent = `Saved as ${SURGEON.split(',')[0]}'s signature on file. Now drop the signed approval.`;
+    caption();
+    return;
+  }
+  let sim = null, match = true;
+  if (S.reference && f.isSig) { sim = similarity(f.desc, S.reference); match = sim >= MATCH_THRESHOLD; }
+  st[4] = S.reference ? (f.isSig ? { v: `similarity ${sim.toFixed(2)} (≥ ${MATCH_THRESHOLD.toFixed(2)})`, ok: match } : { v: 'skipped', ok: false }) : { v: 'no reference · skipped' };
+  renderCvSteps(st); await sleep(pace);
+  const pass = f.isSig && match;
+  st[5] = { v: pass ? 'signature verified' : 'not verified', ok: pass };
+  renderCvSteps(st);
+  S.cv = { pass, sim, f };
+  const v = $('verdict');
+  if (pass) {
+    v.className = 'verdict ok';
+    v.textContent = S.reference
+      ? `Handwritten signature, matches ${SURGEON.split(',')[0]} on file (${sim.toFixed(2)}). Approval unlocked.`
+      : 'Handwritten signature detected. No reference on file, so this is detection only. Approval unlocked.';
+    lockApprove(false, 'Approve & dispatch');
+  } else {
+    v.className = 'verdict bad';
+    v.textContent = !f.isSig ? `This does not look like a handwritten signature (${failed.map(c => c.k.toLowerCase()).join(', ')}). Approval stays locked.`
+      : `Signature does not match the surgeon on file (${sim.toFixed(2)}). Approval stays locked.`;
+  }
+  caption();
+}
+function lockApprove(locked, text) {
+  const b = $('approveBtn');
+  b.disabled = locked;
+  b.classList.toggle('locked', locked);
+  $('lockIc').style.display = locked ? '' : 'none';
+  $('approveTxt').textContent = text;
+}
+function renderApproval() {
+  const yes = yesHospital();
+  $('apFrom').textContent = yes ? `${HOSPITALS[yes].short} · ${HOSPITALS[yes].city}` : 'no hospital yet';
+  $('apEta').textContent = yes ? `${Number(S.replies[yes].eta_h).toFixed(1)} h` : '—';
+  if (!S.cv) renderCvSteps();
+  renderRef();
+}
+function approve() {
+  if (!S.cv || !S.cv.pass || S.approved) return;
+  const yes = yesHospital();
+  if (!yes) { $('verdict').textContent = 'No hospital said yes yet. Ask the network first.'; return; }
+  S.approved = true;
+  lockApprove(true, 'Approved');
+  $('lockIc').style.display = 'none';
+  const t = new Date().toTimeString().slice(0, 5);
+  $('stampSm').textContent = `${t} · ${SURGEON} · signature ${S.reference ? 'matched' : 'detected'} by computer vision`;
+  $('stamp').classList.add('on');
+  sendWire({ type: 'approve', ask_id: S.ask.id, from: 'alder', to: yes, decision: 'approved', verified: 'signature_cv', signer_role: 'transplant_surgeon' });
+  caption();
+  // If Harbor Point's page is connected it hands the kidney to the courier; otherwise rehearse the hand-off.
+  if (S.simulated[yes] || Date.now() - S.seen[yes] >= 10000) setTimeout(() => runCourier(), 1600);
+  else setTimeout(() => { if (!S.dispatched) show(1); }, 1600);
+}
+
+// ---------- Sign pad ----------
+const pad = $('padCanvas'), pctx = pad.getContext('2d');
+function clearPad() { pctx.fillStyle = '#fff'; pctx.fillRect(0, 0, pad.width, pad.height); pctx.strokeStyle = '#E6E6E6'; pctx.beginPath(); pctx.moveTo(40, 250); pctx.lineTo(960, 250); pctx.stroke(); }
+clearPad();
+let drawing = false;
+const padPos = e => { const r = pad.getBoundingClientRect(); return [(e.clientX - r.left) * pad.width / r.width, (e.clientY - r.top) * pad.height / r.height]; };
+pad.onpointerdown = e => { drawing = true; pad.setPointerCapture(e.pointerId); const [x, y] = padPos(e); pctx.beginPath(); pctx.moveTo(x, y); };
+pad.onpointermove = e => { if (!drawing) return; const [x, y] = padPos(e); pctx.lineTo(x, y); pctx.strokeStyle = '#0E2740'; pctx.lineWidth = 4; pctx.lineCap = 'round'; pctx.lineJoin = 'round'; pctx.stroke(); };
+pad.onpointerup = () => { drawing = false; };
+function openPad() { show(2); clearPad(); $('padOverlay').classList.add('on'); }
+$('padClear').onclick = clearPad;
+$('padCancel').onclick = () => $('padOverlay').classList.remove('on');
+$('padUse').onclick = () => {
+  // hide the guide line before analysis
+  const c = document.createElement('canvas'); c.width = pad.width; c.height = pad.height;
+  const cx = c.getContext('2d'); cx.drawImage(pad, 0, 0);
+  cx.fillStyle = '#fff'; cx.fillRect(38, 248, 924, 4);
+  $('padOverlay').classList.remove('on');
+  handleImage(c.toDataURL('image/png'));
+};
+
+// ---------- Drop / choose / paste ----------
+const drop = $('drop');
+drop.onclick = () => $('file').click();
+$('file').onchange = e => { const f = e.target.files[0]; if (f) handleImage(URL.createObjectURL(f)); e.target.value = ''; };
+['dragenter', 'dragover'].forEach(ev => addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => addEventListener(ev, e => { e.preventDefault(); if (ev === 'drop' || e.target === drop) drop.classList.remove('over'); }));
+addEventListener('drop', e => {
+  const f = [...(e.dataTransfer?.files || [])].find(x => x.type.startsWith('image/'));
+  if (f) handleImage(URL.createObjectURL(f));
+});
+addEventListener('paste', e => {
+  const it = [...(e.clipboardData?.items || [])].find(x => x.type.startsWith('image/'));
+  if (it) handleImage(URL.createObjectURL(it.getAsFile()));
+});
+$('approveBtn').onclick = approve;
+$('declineBtn').onclick = () => { $('verdict').className = 'verdict bad'; $('verdict').textContent = 'Declined by the surgeon. Nothing was sent.'; lockApprove(true, 'Approve & dispatch'); };
+$('askBtn').onclick = askNetwork;
+
+// ---------- Reset ----------
+function reset(broadcast = true) {
+  courierRun++;
+  Object.assign(S, { slide: 0, step: 0, ask: null, replies: {}, stages: {}, simulated: {}, cv: null, approved: false, dispatched: false, delivered: false, courierT: 0 });
+  setEnroll(false);
+  $('askBtn').disabled = false;
+  $('askBtn').innerHTML = 'Ask the network<span style="opacity:.7; font-size:13px">(A)</span>';
+  $('wire').innerHTML = '';
+  $('views').classList.remove('on');
+  $('dropHint').style.display = '';
+  $('stamp').classList.remove('on');
+  $('verdict').className = 'verdict'; $('verdict').textContent = 'Waiting for a signature.';
+  $('simClock').textContent = '09:24';
+  lockApprove(true, 'Approve & dispatch');
+  renderReplies(); renderCvSteps(); renderStep(); show(0); badge();
+  if (broadcast) sendWire({ type: 'reset', from: 'alder' }, false);
+}
+
+// ---------- Bus ----------
+Bus.on(m => {
+  if (m.type === 'presence' && HOSPITALS[m.from]) { S.seen[m.from] = Date.now(); renderPresence(); badge(); return; }
+  if (m.type === 'status' && S.ask && m.ask_id === S.ask.id) {
+    if (m.stage === 'courier_dispatched') { wirePacket('in', m); runCourier(); return; }
+    S.stages[m.from] = m.stage; setReplyState(m.from); return;
+  }
+  if (m.type === 'reply') onReply(m);
+});
+Bus.onLink(() => { badge(); renderPresence(); });
+setInterval(() => { sendWire({ type: 'presence', from: 'alder' }, false); renderPresence(); badge(); }, 4000);
+sendWire({ type: 'presence', from: 'alder' }, false);
+
+// ---------- Keys ----------
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const k = e.key;
+  if ($('padOverlay').classList.contains('on')) { if (k === 'Escape') $('padOverlay').classList.remove('on'); return; }
+  if ($('helpOverlay').classList.contains('on') && k !== 'h' && k !== 'H' && k !== 'Escape') return;
+  if (k === 'ArrowRight' || k === ' ' || k === 'PageDown') { e.preventDefault(); next(); }
+  else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); back(); }
+  else if (k === 'a' || k === 'A') { if (S.slide !== 0) show(0); askNetwork(); }
+  else if (k === 's' || k === 'S') { if (S.ask) Object.keys(HOSPITALS).forEach(simulate); }
+  else if (k === 'p' || k === 'P') openPad();
+  else if (k === 'e' || k === 'E') setEnroll(!S.enroll);
+  else if (k === 'r' || k === 'R') reset();
+  else if (k === 'f' || k === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+  else if (k === 'h' || k === 'H' || k === 'Escape') {
+    const o = $('helpOverlay');
+    o.classList.toggle('on', k === 'Escape' ? false : !o.classList.contains('on'));
+    $('relayNow').textContent = Bus.base ? `Relay: ${Bus.base} · ${Bus.linked ? 'connected' : 'unreachable'}` : 'No relay: pages talk only inside this browser.';
+  }
+});
+$('relayForm').onsubmit = e => { e.preventDefault(); const v = $('relayIn').value.trim(); if (v) location.search = '?relay=' + encodeURIComponent(v); };
+
+reset(false);
+</script>
+</body>
+</html>

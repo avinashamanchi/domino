@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>@TITLE@</title>
+<style>
+/*@FONTS@*/
+/*@SHARED@*/
+body { background: #fff; color: var(--body); min-height: 100vh; display: flex; flex-direction: column; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 32px; width: 100%; }
+.topbar .right { display: flex; align-items: center; gap: 14px; }
+.topbar .hosp { font-weight: 500; font-size: 14px; }
+
+/* 8 · Breadcrumb */
+.crumbs { height: 32px; background: var(--divider); color: var(--body); font-size: 13px; display: flex; align-items: center; }
+.crumbs .wrap { display: flex; gap: 8px; }
+.crumbs b { font-weight: 500; }
+
+.band { background: var(--pale); padding: 28px 0 24px; border-bottom: 1px solid var(--divider); }
+.band .eyebrow { color: #5b6b82; font-size: 15px; }
+.band h1 { margin: 4px 0 6px; font-weight: 500; font-size: 34px; color: var(--heading); }
+.band p { margin: 0; max-width: 820px; line-height: 1.5; }
+
+main.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; padding-top: 24px; padding-bottom: 40px; flex: 1; }
+.col-main { grid-column: span 7; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.col-side { grid-column: span 5; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+@media (max-width: 980px) { .col-main, .col-side { grid-column: span 12; } }
+
+/* 7 · Card */
+.card { background: #fff; border-radius: 3px; box-shadow: var(--shadow); border: 1px solid #edf0f4; overflow: hidden; }
+.card > header { padding: 14px 20px; border-bottom: 1px solid var(--divider); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.card > header h2 { margin: 0; font-size: 18px; font-weight: 500; color: var(--heading); }
+.card > header .meta { font-size: 12px; color: #6b778c; }
+.card .body { padding: 16px 20px; }
+.private-tag { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #fff; background: var(--navy); padding: 3px 7px; border-radius: 2px; }
+
+/* Answer banner */
+.answer { border-radius: 3px; padding: 26px 28px; background: var(--navy); color: #fff; position: relative; overflow: hidden; min-height: 150px; }
+.answer::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: var(--offline); }
+.answer .eyebrow { font-size: 14px; }
+.answer .big { font-weight: 700; text-transform: uppercase; font-size: 44px; line-height: 1.05; margin: 8px 0 10px; }
+.answer .small { color: var(--tint); font-size: 15px; }
+.answer.yes::before { background: var(--teal); }
+.answer.yes .big em { color: var(--teal); font-style: normal; }
+.answer.no::before { background: var(--gold); }
+.answer.no .big em { color: var(--gold); font-style: normal; }
+.answer.working::before { background: var(--blue); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+
+/* Request */
+.req-q { font-size: 20px; font-weight: 500; color: var(--heading); line-height: 1.35; margin: 0 0 12px; }
+.fields { display: flex; flex-wrap: wrap; gap: 8px; }
+.field { font-family: var(--font-mono); font-size: 14px; background: var(--pale); border: 1px solid var(--divider); padding: 4px 8px; border-radius: 3px; }
+.field b { color: var(--heading); }
+.muted { color: #6b778c; font-size: 13px; }
+.empty { color: #6b778c; font-style: italic; }
+
+/* Steps */
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps > li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--divider); opacity: .35; transition: opacity .4s; }
+.steps > li:last-child { border-bottom: 0; }
+.steps > li.on { opacity: 1; }
+.steps .n { width: 28px; height: 28px; border-radius: 50%; background: var(--pale); color: var(--heading); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+.steps li.done .n { background: var(--teal); color: #fff; }
+.steps h3 { margin: 3px 0 6px; font-size: 16px; font-weight: 500; color: var(--heading); }
+.steps .out { font-size: 14px; line-height: 1.5; }
+
+.hits { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.hit { display: grid; grid-template-columns: 110px 1fr 90px; gap: 10px; align-items: center; font-size: 13px; }
+.hit .id { font-family: var(--font-mono); color: var(--heading); font-weight: 400; }
+.hit .txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hit mark { background: var(--tint); color: var(--heading); padding: 0 2px; border-radius: 2px; }
+.bar { height: 6px; background: var(--pale); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--blue); }
+
+table.checks, table.inv { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.checks th, table.inv th { text-align: left; font-weight: 500; color: #6b778c; padding: 6px 6px; border-bottom: 1px solid var(--divider); }
+table.checks td, table.inv td { padding: 7px 6px; border-bottom: 1px solid #f1f3f6; vertical-align: middle; }
+table.checks td.ok { color: #2d7f81; font-weight: 700; }
+table.checks td.bad { color: #b3261e; font-weight: 700; }
+table.checks tr.pass td { background: #eef7f7; }
+.mono { font-family: var(--font-mono); }
+.status { font-size: 12px; font-weight: 500; padding: 2px 6px; border-radius: 2px; background: var(--pale); color: var(--heading); }
+.status.available { background: #e3f2f2; color: #2d7f81; }
+.status.allocated, .status.hold { background: #fdf3de; color: #8a5a00; }
+table.inv tr.hl td { background: #eef7f7; }
+
+.explain { background: var(--pale); border-left: 3px solid var(--teal); padding: 10px 12px; font-size: 15px; line-height: 1.5; }
+.by { font-size: 12px; color: #6b778c; margin-top: 6px; }
+pre.wire { margin: 6px 0 0; background: var(--navy); color: var(--tint); font-family: var(--font-mono); font-size: 13px; padding: 10px 12px; border-radius: 3px; white-space: pre-wrap; word-break: break-word; }
+.okline { color: #2d7f81; font-weight: 500; font-size: 13px; margin-top: 6px; }
+
+/* Ask-your-own */
+.own { display: flex; gap: 8px; }
+.own input { flex: 1; font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid #cfd6df; border-radius: 3px; min-width: 0; }
+.own input:focus { outline: 2px solid var(--blue); outline-offset: -1px; }
+
+.ledger { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: 13px; }
+.ledger li { padding: 6px 0; border-bottom: 1px solid #f1f3f6; display: flex; justify-content: space-between; gap: 10px; }
+.ledger li .dir { color: var(--blue); }
+.ledger li.in .dir { color: var(--offline); }
+
+.dispatch .body { display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: start; }
+.dispatch svg { width: 56px; height: 56px; }
+
+/* 9 · Footer */
+footer.foot { background: var(--navy); color: #fff; padding: 22px 0; }
+footer.foot .wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+footer.foot .row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+footer.foot .private { font-weight: 700; letter-spacing: .06em; font-size: 14px; }
+footer.foot .fine { font-size: 12px; color: var(--tint); }
+.relay-form { display: none; gap: 8px; align-items: center; }
+.relay-form.show { display: flex; }
+.relay-form input { font: inherit; font-size: 14px; padding: 8px 10px; border-radius: 3px; border: 0; width: 220px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="wordmark">DOMINO</span><span class="sub">kidney exchange across hospitals</span></div>
+  <div class="right">
+    <span class="hosp" id="hospName"></span>
+    <span class="pill"><span class="dot" id="linkDot"></span><span id="linkText">local only</span></span>
+  </div>
+</header>
+<div class="stripe"></div>
+<div class="crumbs"><div class="wrap" id="crumbs"></div></div>
+
+<section class="band">
+  <div class="wrap">
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="title"></h1>
+    <p>This screen is the hospital's own agent. It answers questions from the network using only this hospital's records, retrieved and checked on this machine. Only the answer's category crosses the wire: never a donor, a record or a note.</p>
+  </div>
+</section>
+
+<main class="wrap grid">
+  <div class="col-main">
+    <div class="answer idle" id="answer">
+      <div class="eyebrow">Standing by</div>
+      <div class="big">Waiting for a question</div>
+      <div class="small">The coordinator at Alder Medical Center will ask the network.</div>
+    </div>
+
+    <article class="card dispatch" id="dispatchCard" hidden>
+      <header><h2>Approved by the receiving surgeon</h2><span class="meta" id="dispatchMeta"></span></header>
+      <div class="body">
+        <svg viewBox="0 0 56 56" aria-hidden="true"><path d="M28 6c-8.3 0-15 6.5-15 14.6C13 32 28 50 28 50s15-18 15-29.4C43 12.5 36.3 6 28 6z" fill="none" stroke="#4FA3A5" stroke-width="2.5"/><path d="M28 29.5l-5.2-5a3.4 3.4 0 0 1 4.8-4.8l.4.4.4-.4a3.4 3.4 0 0 1 4.8 4.8z" fill="#4FA3A5"/></svg>
+        <div>
+          <div id="dispatchText"></div>
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
+            <button class="btn" id="handoffBtn">Hand kidney to courier</button>
+            <span class="muted" id="handoffNote"></span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <header><h2>Incoming request</h2><span class="meta" id="reqMeta">nothing received yet</span></header>
+      <div class="body" id="reqBody"><p class="empty">No request yet.</p></div>
+    </article>
+
+
+    <article class="card">
+      <header><h2>Local agent · retrieval over our own records</h2><span class="meta" id="modelMeta">checking for a local model…</span></header>
+      <div class="body">
+        <ol class="steps" id="steps">
+          <li data-s="1"><span class="n">1</span><div><h3>Read the question</h3><div class="out" id="s1"></div></div></li>
+          <li data-s="2"><span class="n">2</span><div><h3>Retrieve from this hospital's records</h3><div class="out" id="s2"></div></div></li>
+          <li data-s="3"><span class="n">3</span><div><h3>Check in code: organ, blood type, status, cold time</h3><div class="out" id="s3"></div></div></li>
+          <li data-s="4"><span class="n">4</span><div><h3>Explain, for our own team</h3><div class="out" id="s4"></div></div></li>
+          <li data-s="5"><span class="n">5</span><div><h3>Reply on the wire: category only</h3><div class="out" id="s5"></div></div></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+
+  <aside class="col-side">
+    <article class="card">
+      <header><h2>Private organ inventory</h2><span class="private-tag">PRIVATE</span></header>
+      <div class="body" style="padding-top:8px">
+        <table class="inv" id="inv"></table>
+        <p class="muted" style="margin:10px 0 0">Never leaves this hospital. Donor ids, ages and notes stay here.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <header><h2>Ask our own records</h2><span class="meta">stays on this machine</span></header>
+      <div class="body">
+        <form class="own" id="ownForm">
+          <input id="ownQ" placeholder="e.g. liver for a blood type B recipient" autocomplete="off">
+          <button class="btn secondary" type="submit">Ask</button>
+        </form>
+        <p class="muted" style="margin:8px 0 0">Runs the same agent. Nothing is sent to the network.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <header><h2>Everything this hospital has ever disclosed</h2><span class="meta" id="ledgerMeta">0 messages</span></header>
+      <div class="body" style="padding-top:6px">
+        <ul class="ledger" id="ledger"><li class="empty" style="font-family:var(--font)">Nothing yet.</li></ul>
+      </div>
+    </article>
+  </aside>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="private">PRIVATE — THIS SCREEN NEVER LEAVES THE HOSPITAL</div>
+    <div class="row">
+      <button class="btn outline" id="simBtn">Rehearse a request</button>
+      <button class="btn outline" id="relayBtn">Connect to relay</button>
+      <button class="btn outline" id="resetBtn">Reset</button>
+      <form class="relay-form" id="relayForm"><input id="relayIn" placeholder="192.168.1.20:8765"><button class="btn" type="submit">Connect</button></form>
+    </div>
+    <div class="fine">All patients, donors and hospitals are fictional. Synthetic data.</div>
+  </div>
+</footer>
+
+<script>
+/*@BUS@*/
+</script>
+<script>
+const H = /*@CONFIG@*/;
+
+// ---------- Rules (code decides) ----------
+const ABO = { O: ['O', 'A', 'B', 'AB'], A: ['A', 'AB'], B: ['B', 'AB'], AB: ['AB'] }; // donor -> recipients
+const MAX_COLD_H = { kidney: 24, liver: 12, pancreas: 12, heart: 4, lung: 6 };
+const ORGANS = ['kidney', 'liver', 'heart', 'lung', 'pancreas'];
+
+// ---------- Wire allowlist (enforced on every outbound message) ----------
+const ALLOW = {
+  reply: ['type', 'mid', 'ts', 'ask_id', 'from', 'to', 'answer', 'organ', 'eta_h', 'reason'],
+  status: ['type', 'mid', 'ts', 'ask_id', 'from', 'to', 'stage'],
+  presence: ['type', 'mid', 'ts', 'from'],
+};
+const FORBIDDEN = /(^|_)(names?|notes?|donors?|records?|citations?|hla|antigens?|cpra|calendar|availability|age)($|_)/i;
+function assertOutbound(m) {
+  const allow = ALLOW[m.type];
+  if (!allow) throw new Error('message kind not allowlisted: ' + m.type);
+  for (const [k, v] of Object.entries(m)) {
+    if (!allow.includes(k)) throw new Error('field not allowlisted: ' + k);
+    if (FORBIDDEN.test(k)) throw new Error('forbidden field: ' + k);
+    if (typeof v === 'string' && v.length > 80) throw new Error('free text over 80 characters in ' + k);
+  }
+}
+function sendWire(m, log = true) {
+  assertOutbound({ ...m, mid: 'x', ts: 0 });
+  const sent = Bus.send(m);
+  if (log) addLedger('out', sent);
+  return sent;
+}
+
+// ---------- BM25 retrieval (k1 1.4, b 0.75) ----------
+const STOP = new Set('a an the of for to and or in on at is are be with from by as this that it we our you your do does have has any there tonight please can could who which what recipient patient arriving arrive within hour need needed deliver medical center alder san jose'.split(' '));
+function norm(text) {
+  return String(text).toLowerCase()
+    .replace(/\b(?:blood\s*type|blood|type)\s*(ab|a|b|o)\b(?:\s*[+-])?/g, ' blood_$1 ')
+    .replace(/\b(ab|a|b|o)[+-]?\s+(?=recipient|patient|donor)/g, ' blood_$1 ');
+}
+function tokens(text) {
+  return (norm(text).match(/[a-z0-9_§.]+/g) || [])
+    .map(t => t.replace(/\.$/, ''))
+    .map(t => (t.length > 4 && t.endsWith('s') && !t.endsWith('ss') ? t.slice(0, -1) : t))
+    .filter(t => t && !STOP.has(t) && (t.length > 1 || t.startsWith('blood_')));
+}
+function recordText(r) {
+  return `${r.organ} ${r.side || ''} donor blood type ${r.blood}. status ${r.status}. recovered ${r.recovered} at ${H.name}, ${H.city}. ${r.notes}`;
+}
+const DOCS = H.records.map(r => ({ r, toks: tokens(recordText(r)) }));
+const AVGDL = DOCS.reduce((s, d) => s + d.toks.length, 0) / DOCS.length;
+function bm25(query, k = 4) {
+  const q = [...new Set(tokens(query))];
+  const N = DOCS.length;
+  const scored = DOCS.map(d => {
+    let s = 0;
+    const tf = {};
+    d.toks.forEach(t => { tf[t] = (tf[t] || 0) + 1; });
+    const hits = [];
+    q.forEach(t => {
+      if (!tf[t]) return;
+      const df = DOCS.filter(x => x.toks.includes(t)).length;
+      const idf = Math.log(1 + (N - df + 0.5) / (df + 0.5));
+      s += idf * (tf[t] * 2.4) / (tf[t] + 1.4 * (1 - 0.75 + 0.75 * d.toks.length / AVGDL));
+      hits.push(t);
+    });
+    return { r: d.r, score: s, hits };
+  }).filter(x => x.score > 0).sort((a, b) => b.score - a.score);
+  return { qtoks: q, top: scored.slice(0, k) };
+}
+
+// ---------- Parse a question into fields (for typed questions) ----------
+function parseQuestion(text) {
+  const t = String(text).toLowerCase();
+  const organ = ORGANS.find(o => t.includes(o)) || 'kidney';
+  const m = norm(t).match(/blood_(ab|a|b|o)\b/);
+  return { organ, recipient_blood: m ? m[1].toUpperCase() : 'O', destination: 'San Jose', max_transport_h: 10 };
+}
+
+function checkRecord(r, f) {
+  const drive = H.drive_h[f.destination] ?? 3;
+  const remaining = (MAX_COLD_H[r.organ] || 12) - r.cold_h;
+  return {
+    organ: r.organ === f.organ,
+    blood: ABO[r.blood].includes(f.recipient_blood),
+    status: r.status === 'available',
+    cold: drive <= f.max_transport_h && remaining >= drive + 0.5,
+    remaining, drive,
+  };
+}
+const passes = c => c.organ && c.blood && c.status && c.cold;
+
+function explainTemplate(f, hit, fails) {
+  if (hit) {
+    const c = checkRecord(hit, f);
+    return `Yes: ${hit.id} is a ${hit.organ} from a blood type ${hit.blood} donor, available now, with ${c.remaining.toFixed(1)} h of cold time left for a ${c.drive.toFixed(1)} h drive to ${f.destination}.`;
+  }
+  const parts = fails.map(({ r, c }) => {
+    if (!c.organ) return `${r.id} is a ${r.organ}`;
+    if (!c.blood) return `${r.id} is blood type ${r.blood}`;
+    if (!c.status) return `${r.id} is ${r.status}`;
+    return `${r.id} would not arrive in time`;
+  });
+  return `No: nothing we hold can go to a blood type ${f.recipient_blood} ${f.organ} recipient. ${parts.join('; ')}.`;
+}
+
+// ---------- Optional local model (Ollama on this Mac) ----------
+const LLM = { model: null };
+function fetchT(url, opts, ms) {
+  const c = new AbortController();
+  const t = setTimeout(() => c.abort(), ms);
+  return fetch(url, { ...opts, signal: c.signal }).finally(() => clearTimeout(t));
+}
+async function detectModel() {
+  try {
+    const j = await (await fetchT('http://127.0.0.1:11434/api/tags', {}, 1500)).json();
+    const names = (j.models || []).map(m => m.name);
+    LLM.model = names.find(n => /qwen|llama|gemma|phi|mistral/i.test(n)) || names[0] || null;
+  } catch { LLM.model = null; }
+  document.getElementById('modelMeta').textContent = LLM.model
+    ? `local model: ${LLM.model} · on this machine` : 'no local model found · template explanations';
+}
+async function explain(f, hit, fails, retrieved) {
+  const fallback = explainTemplate(f, hit, fails);
+  if (!LLM.model) return { text: fallback, by: 'template · no local model running' };
+  const decision = hit ? 'YES' : 'NO';
+  const facts = retrieved.map(({ r, c }) =>
+    `${r.id}: ${r.organ}, donor blood type ${r.blood}, status ${r.status}, cold time left ${c.remaining.toFixed(1)} h. Checks: organ ${c.organ ? 'ok' : 'fail'}, blood ${c.blood ? 'ok' : 'fail'}, status ${c.status ? 'ok' : 'fail'}, time ${c.cold ? 'ok' : 'fail'}.`).join('\n');
+  try {
+    const res = await fetchT('http://127.0.0.1:11434/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        model: LLM.model, stream: false, think: false, options: { temperature: 0 },
+        messages: [
+          { role: 'system', content: `You are the private transplant agent of ${H.name}. Write ONE plain sentence (at most 35 words) for the hospital's own transplant coordinator explaining the decision. Start with "${decision === 'YES' ? 'Yes' : 'No'}:". Use only the facts given. Never mention donor ages. The decision was made by code; do not change it.` },
+          { role: 'user', content: `Question: ${f.organ} for a blood type ${f.recipient_blood} recipient in ${f.destination}.\nDecision: ${decision}\nRetrieved records:\n${facts}` },
+        ],
+      }),
+    }, 15000);
+    const j = await res.json();
+    const text = (j.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+    const contradicts = decision === 'YES' ? /^\W*no\b/i.test(text) : /^\W*yes\b/i.test(text);
+    if (!text || contradicts) throw new Error('unusable');
+    return { text: text.slice(0, 360), by: `written by ${LLM.model} on this machine · decision made by code` };
+  } catch {
+    return { text: fallback, by: 'template · local model unavailable or timed out' };
+  }
+}
+
+// ---------- UI helpers ----------
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const clock = () => new Date().toTimeString().slice(0, 5);
+const chip = b => `<span class="chip ${b}">${b}</span>`;
+
+function renderInventory(highlight = []) {
+  $('inv').innerHTML = `<tr><th>Record</th><th>Organ</th><th>Blood</th><th>Recovered</th><th>Status</th></tr>` +
+    H.records.map(r => `<tr class="${highlight.includes(r.id) ? 'hl' : ''}">
+      <td class="mono">${r.id}</td><td>${r.organ}${r.side ? ' · ' + r.side : ''}</td><td>${chip(r.blood)}</td>
+      <td>${r.recovered}</td><td><span class="status ${r.status.split(' ')[0]}">${r.status}</span></td></tr>`).join('');
+}
+
+let ledgerCount = 0;
+function addLedger(dir, m) {
+  const fields = Object.keys(m).filter(k => !['type', 'mid', 'ts', 'from', 'to', 'ask_id'].includes(k));
+  const li = document.createElement('li');
+  li.className = dir;
+  li.innerHTML = `<span><span class="dir">→ sent</span> ${clock()} · ${m.type}${fields.length ? ' · ' + fields.join(', ') : ''}</span><span>${Bus.bytes(m)} B</span>`;
+  const ul = $('ledger');
+  if (!ledgerCount) ul.innerHTML = '';
+  ul.prepend(li);
+  if (dir === 'out') ledgerCount++;
+  $('ledgerMeta').textContent = `${ledgerCount} message${ledgerCount === 1 ? '' : 's'} sent`;
+}
+
+function setAnswer(state, eyebrow, big, small) {
+  const a = $('answer');
+  a.className = 'answer ' + state;
+  a.innerHTML = `<div class="eyebrow">${eyebrow}</div><div class="big">${big}</div><div class="small">${small}</div>`;
+}
+function stepsReset() {
+  document.querySelectorAll('#steps > li').forEach(li => { li.className = ''; });
+  for (let i = 1; i <= 5; i++) $('s' + i).innerHTML = '';
+}
+function stepOn(n, html) {
+  const li = document.querySelector(`#steps > li[data-s="${n}"]`);
+  li.classList.add('on');
+  $('s' + n).innerHTML = html;
+}
+function stepDone(n) { document.querySelector(`#steps > li[data-s="${n}"]`).classList.add('done'); }
+
+function highlightHits(text, hits) {
+  let out = esc(text);
+  hits.filter(h => !h.startsWith('blood_')).forEach(h => {
+    out = out.replace(new RegExp(`\\b(${h}s?)\\b`, 'gi'), '<mark>$1</mark>');
+  });
+  hits.filter(h => h.startsWith('blood_')).forEach(h => {
+    const b = h.slice(6).toUpperCase();
+    out = out.replace(new RegExp(`(blood type ${b})\\b`, 'g'), '<mark>$1</mark>');
+  });
+  return out;
+}
+
+// ---------- The agent ----------
+let busy = false;
+async function runAgent({ ask, question, fields, local }) {
+  if (busy) return;
+  busy = true;
+  stepsReset();
+  renderInventory();
+  $('dispatchCard').hidden = true;
+  const f = fields || parseQuestion(question);
+  const t0 = performance.now();
+  setAnswer('working', local ? 'Local question · nothing sent' : 'Working · on this machine', 'Reading our own records…', `${H.records.length} records · retrieval runs locally`);
+
+  stepOn(1, `<div class="fields">
+    <span class="field">organ=<b>${esc(f.organ)}</b></span>
+    <span class="field">recipient_blood=<b>${esc(f.recipient_blood)}</b></span>
+    <span class="field">destination=<b>${esc(f.destination)}</b></span>
+    <span class="field">max_transport_h=<b>${esc(f.max_transport_h)}</b></span></div>`);
+  stepDone(1);
+  if (ask) sendWire({ type: 'status', ask_id: ask.id, from: H.id, to: 'alder', stage: 'retrieving' });
+  await sleep(700);
+
+  const query = question || `${f.organ} blood type ${f.recipient_blood} available`;
+  const { qtoks, top } = bm25(query, 4);
+  const maxS = top[0]?.score || 1;
+  stepOn(2, `<div class="muted">query tokens: <span class="mono">${qtoks.map(esc).join(' ')}</span> · searched ${H.records.length} records · top ${top.length}</div>
+    <div class="hits">${top.map(h => `<div class="hit"><span class="id">${h.r.id}</span>
+      <span class="txt">${highlightHits(`${h.r.organ}${h.r.side ? ' (' + h.r.side + ')' : ''} · donor blood type ${h.r.blood} · ${h.r.status}`, h.hits)}</span>
+      <span class="bar" title="BM25 ${h.score.toFixed(2)}"><i style="width:${(100 * h.score / maxS).toFixed(0)}%"></i></span></div>`).join('')}</div>`);
+  renderInventory(top.map(h => h.r.id));
+  stepDone(2);
+  await sleep(900);
+
+  const retrieved = top.map(h => ({ r: h.r, c: checkRecord(h.r, f) }));
+  const hitRow = retrieved.find(x => passes(x.c));
+  const fullScan = H.records.some(r => passes(checkRecord(r, f)));
+  const cell = (ok, txt) => `<td class="${ok ? 'ok' : 'bad'}">${ok ? '✓' : '✗'} ${txt}</td>`;
+  stepOn(3, `<table class="checks"><tr><th>Record</th><th>Organ</th><th>Blood → ${esc(f.recipient_blood)}</th><th>Status</th><th>Cold time</th></tr>
+    ${retrieved.map(({ r, c }) => `<tr class="${passes(c) ? 'pass' : ''}"><td class="mono">${r.id}</td>
+      ${cell(c.organ, r.organ)}${cell(c.blood, r.blood)}${cell(c.status, r.status)}${cell(c.cold, c.remaining.toFixed(1) + ' h left')}</tr>`).join('')}</table>
+    <div class="okline">Decision: ${hitRow ? 'YES' : 'NO'} · cross-check over all ${H.records.length} records ${fullScan === !!hitRow ? 'agrees ✓' : 'DISAGREES ✗'}</div>`);
+  stepDone(3);
+  if (ask) sendWire({ type: 'status', ask_id: ask.id, from: H.id, to: 'alder', stage: 'checking' });
+  await sleep(700);
+
+  stepOn(4, `<div class="muted">writing…</div>`);
+  const ex = await explain(f, hitRow?.r, retrieved.filter(x => !passes(x.c)), retrieved);
+  stepOn(4, `<div class="explain">${esc(ex.text)}</div><div class="by">${esc(ex.by)} · stays on this console</div>`);
+  stepDone(4);
+  await sleep(500);
+
+  const drive = H.drive_h[f.destination] ?? null;
+  const reply = {
+    type: 'reply', ask_id: ask ? ask.id : 'local', from: H.id, to: 'alder',
+    answer: hitRow ? 'yes' : 'no', organ: f.organ, eta_h: hitRow ? drive : null,
+    reason: hitRow ? 'none' : 'no_compatible_organ',
+  };
+  let wireHtml;
+  try {
+    assertOutbound({ ...reply, mid: 'x', ts: 0 });
+    wireHtml = `<pre class="wire">${esc(JSON.stringify(reply, null, 1))}</pre>
+      <div class="okline">Allowlist check passed · ${Bus.bytes(reply)} bytes · ${local ? 'NOT sent (local question)' : 'sent to Alder'}</div>`;
+    if (ask) sendWire(reply);
+  } catch (e) {
+    wireHtml = `<div class="okline" style="color:#b3261e">Blocked by the wire allowlist: ${esc(e.message)}</div>`;
+  }
+  stepOn(5, wireHtml);
+  stepDone(5);
+  if (hitRow) lastHit = hitRow.r;
+
+  const secs = ((performance.now() - t0) / 1000).toFixed(1);
+  if (hitRow) {
+    setAnswer('yes', local ? 'Local answer · not sent' : `Answered in ${secs} s`,
+      `<em>Yes</em> — we have access to this ${esc(f.organ)}`,
+      `${local ? 'Would reply' : 'Replied'}: answer = yes · ${Number(drive).toFixed(1)} h from ${esc(f.destination)}. The record, the donor and the notes stayed here.`);
+  } else {
+    setAnswer('no', local ? 'Local answer · not sent' : `Answered in ${secs} s`,
+      `<em>No</em> — we don't have this ${esc(f.organ)}`,
+      `${local ? 'Would reply' : 'Replied'}: answer = no · reason = no compatible organ. Nothing else left this hospital.`);
+  }
+  busy = false;
+}
+let lastHit = null;
+
+function showRequest(ask, rehearsal) {
+  const f = ask.fields;
+  $('reqMeta').textContent = `${rehearsal ? 'rehearsal · not from the network' : 'from Alder Medical Center'} · ${clock()} · ${Bus.bytes(ask)} B`;
+  $('reqBody').innerHTML = `<p class="req-q">“${esc(ask.question)}”</p>
+    <div class="fields">${Object.entries(f).map(([k, v]) => `<span class="field">${esc(k)}=<b>${esc(v)}</b></span>`).join('')}</div>
+    <p class="muted" style="margin:10px 0 0">Received: no patient name, no chart, no HLA, no antibody list.</p>`;
+}
+
+function handleAsk(ask, rehearsal = false) {
+  showRequest(ask, rehearsal);
+  runAgent({ ask: rehearsal ? null : ask, question: ask.question, fields: ask.fields });
+}
+
+let handoffTimer = null;
+function handleApprove(m) {
+  const r = lastHit || H.records.find(x => x.status === 'available');
+  $('dispatchCard').hidden = false;
+  $('dispatchMeta').textContent = `${clock()} · ${Bus.bytes(m)} B`;
+  $('dispatchText').innerHTML = `Alder's transplant surgeon approved this kidney. Their signature was verified by computer vision <b>at Alder</b>; the image never left Alder.<br>
+    Prepare <span class="mono">${r ? r.id : ''}</span> for courier pickup at <b>${esc(H.pickup)}</b> → Alder Medical Center, San Jose.`;
+  const btn = $('handoffBtn');
+  btn.disabled = false;
+  btn.textContent = 'Hand kidney to courier';
+  let left = 20;
+  $('handoffNote').textContent = `sends automatically in ${left} s`;
+  clearInterval(handoffTimer);
+  handoffTimer = setInterval(() => {
+    left -= 1;
+    $('handoffNote').textContent = `sends automatically in ${left} s`;
+    if (left <= 0) handoff(m);
+  }, 1000);
+}
+function handoff(m) {
+  clearInterval(handoffTimer);
+  const btn = $('handoffBtn');
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = 'Courier dispatched';
+  $('handoffNote').textContent = '';
+  sendWire({ type: 'status', ask_id: m.ask_id, from: H.id, to: 'alder', stage: 'courier_dispatched' });
+  setAnswer('yes', 'Dispatched', '<em>Kidney</em> on its way', `Courier left ${esc(H.city)} at ${esc(H.pickup)} for San Jose.`);
+}
+let lastApprove = null;
+$('handoffBtn').onclick = () => lastApprove && handoff(lastApprove);
+
+function resetUI() {
+  busy = false;
+  clearInterval(handoffTimer);
+  stepsReset();
+  renderInventory();
+  $('dispatchCard').hidden = true;
+  $('reqMeta').textContent = 'nothing received yet';
+  $('reqBody').innerHTML = '<p class="empty">No request yet.</p>';
+  setAnswer('idle', 'Standing by', 'Waiting for a question', 'The coordinator at Alder Medical Center will ask the network.');
+}
+
+// ---------- Wiring ----------
+document.title = `${H.short} · Domino`;
+$('hospName').textContent = `${H.name} · ${H.city}`;
+$('crumbs').innerHTML = `<span>${esc(H.name)}</span> » <span>Transplant</span> » <b>Organ availability</b>`;
+$('eyebrow').textContent = `Private console · ${H.city}`;
+$('title').textContent = H.name;
+renderInventory();
+detectModel();
+
+let coordinatorSeen = 0;
+Bus.on(m => {
+  if (m.type === 'ask' && (!m.to || m.to.includes(H.id))) handleAsk(m);
+  else if (m.type === 'approve' && m.to === H.id) { lastApprove = m; handleApprove(m); }
+  else if (m.type === 'reset') resetUI();
+  else if (m.type === 'presence' && m.from === 'alder') coordinatorSeen = Date.now();
+});
+function updateLink() {
+  const coord = Date.now() - coordinatorSeen < 10000;
+  $('linkDot').className = 'dot ' + (Bus.linked ? (coord ? 'on' : 'warn') : '');
+  $('linkText').textContent = Bus.linked
+    ? `linked · relay ${Bus.base.replace(/^https?:\/\//, '')}${coord ? ' · coordinator online' : ' · waiting for coordinator'}`
+    : (Bus.base ? 'relay unreachable' : 'local only · open with ?relay=IP:8765');
+}
+Bus.onLink(updateLink);
+setInterval(() => { sendWire({ type: 'presence', from: H.id }, false); updateLink(); }, 4000);
+sendWire({ type: 'presence', from: H.id }, false);
+
+$('ownForm').onsubmit = e => {
+  e.preventDefault();
+  const q = $('ownQ').value.trim();
+  if (!q) return;
+  $('reqMeta').textContent = 'typed here · not sent';
+  $('reqBody').innerHTML = `<p class="req-q">“${esc(q)}”</p><p class="muted" style="margin:0">A question typed on this console. The answer stays here.</p>`;
+  runAgent({ question: q, local: true });
+};
+$('simBtn').onclick = () => handleAsk({ id: 'rehearsal', ...H.demoAsk }, true);
+$('resetBtn').onclick = resetUI;
+$('relayBtn').onclick = () => $('relayForm').classList.toggle('show');
+$('relayForm').onsubmit = e => {
+  e.preventDefault();
+  const v = $('relayIn').value.trim();
+  if (v) location.search = '?relay=' + encodeURIComponent(v);
+};
+</script>
+</body>
+</html>
